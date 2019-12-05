@@ -11,50 +11,51 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.devian.detected.R;
-import com.devian.detected.utils.Network.NetworkService;
-import com.devian.detected.utils.domain.User;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ProfileFragment extends Fragment {
     
-    private TextView tvLogin;
-    private TextView tvEmail;
+    private static final String TAG = "ProfileFragment";
+    
+    private FirebaseAuth mAuth;
+    
+    @BindView(R.id.profile_tvName) TextView tvName;
+    @BindView(R.id.profile_tvEmail) TextView tvEmail;
     
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
-        
-        tvLogin = v.findViewById(R.id.profile_tvLogin);
-        tvEmail = v.findViewById(R.id.profile_tvEmail);
-        
+        ButterKnife.bind(this, v);
+        mAuth = FirebaseAuth.getInstance();
         init();
         
         return v;
     }
     
     private void init() {
-        NetworkService.getInstance()
-                .getJSONApi()
-                .getProfile()
-                .enqueue(new Callback<User>() {
-                    @Override
-                    public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                        User user = response.body();
-                        tvLogin.setText(user.getLogin());
-                        tvEmail.setText(user.getEmail());
-                        
-                    }
-                
-                    @Override
-                    public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
-                        tvLogin.setText(t.getMessage());
-                        tvEmail.setText("");
-                    }
-                });
+        tvName.setText(mAuth.getCurrentUser().getDisplayName());
+        tvEmail.setText(mAuth.getCurrentUser().getEmail());
     }
+    
+//    @OnClick(R.id.profile_btnLogout) void logout() {
+//        // Firebase sign out
+//        mAuth.signOut();
+//
+//        // Google sign out
+//        mGoogleSignInClient.signOut().addOnCompleteListener(getActivity(),
+//                new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        updateUI(null);
+//                    }
+//                });
+//    }
 }

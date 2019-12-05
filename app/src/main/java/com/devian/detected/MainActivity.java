@@ -1,18 +1,15 @@
 package com.devian.detected;
 
-import androidx.annotation.NonNull;
+import android.os.Bundle;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.devian.detected.login.LoginFragment;
-import com.devian.detected.utils.LocalSharedPreferences;
+import com.devian.detected.login.AuthFragment;
+import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.Network.NetworkService;
 import com.devian.detected.utils.domain.ServerResponse;
-import com.devian.detected.utils.domain.User;
-import com.devian.detected.utils.security.CipherUtility;
+import com.google.android.material.snackbar.Snackbar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,37 +27,40 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mInstance = this;
         
-        CipherUtility.getInstance();
-        LocalSharedPreferences.getInstance(this);
+        NetworkService.getInstance();
+        LocalStorage.getInstance(this);
         
-        init();
-        
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.activity_main, new LoginFragment())
-                .commit();
+        testConnection();
+    
+        // TODO: 05.12.2019 loading wheel
 
-//        getSupportFragmentManager().beginTransaction()
-//                .add(R.id.activity_main, new MainFragment())
-//                .commit();
     }
     
-    private void init() {
-        NetworkService.getInstance()
-                .getJSONApi()
-                .getPUKey()
-                .enqueue(new Callback<ServerResponse>() {
-                    @Override
-                    public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                        LocalSharedPreferences.getInstance(mInstance).updateServerKey(response.body().getInfo());
-                    }
+    private void testConnection() {
     
-                    @Override
-                    public void onFailure(Call<ServerResponse> call, Throwable t) {
-                        Log.e(TAG, "onFailure: " + t.getMessage());
-                        Toast.makeText(mInstance, "Нет соединения с сервером", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        final TextView textView = findViewById(R.id.main_text);
+        
+        NetworkService.getInstance().getJSONApi().testConnection().enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                if (response.body().getType() == 0) {
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.activity_main, new AuthFragment(), "auth")
+                            .commit();
+                } else {
+                    textView.setText("Нет соединения с сервером, попробуйте зайти позже");
+                }
+            }
+    
+            @Override
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                t.printStackTrace();
+                textView.setText("Нет соединения с сервером, попробуйте зайти позже");
+            }
+        });
     }
     
-    
+    @Override
+    public void onBackPressed() {
+    }
 }

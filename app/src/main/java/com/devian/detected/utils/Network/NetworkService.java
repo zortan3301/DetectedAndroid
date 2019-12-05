@@ -10,7 +10,6 @@ public class NetworkService {
     private static NetworkService mInstance;
     private static final String BASE_URL = "http://10.0.2.2:8080";
     private Retrofit mRetrofit;
-    private static Gson mGson = new Gson();
     
     private NetworkService() {
         mRetrofit = new Retrofit.Builder()
@@ -24,10 +23,6 @@ public class NetworkService {
             mInstance = new NetworkService();
         }
         return mInstance;
-    }
-    
-    public Gson getGson() {
-        return mGson;
     }
     
     public JSONPlaceHolderApi getJSONApi() {
