@@ -1,6 +1,8 @@
 package com.devian.detected;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,8 +11,10 @@ import com.devian.detected.login.AuthFragment;
 import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.Network.NetworkService;
 import com.devian.detected.utils.domain.ServerResponse;
-import com.google.android.material.snackbar.Snackbar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -21,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     
     public static MainActivity mInstance;
     
+    @BindView(R.id.main_btnRefresh) Button btnRefresh;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
         
         NetworkService.getInstance();
         LocalStorage.getInstance(this);
+    
+        ButterKnife.bind(this);
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                testConnection();
+            }
+        });
         
         testConnection();
     
@@ -38,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
     
     private void testConnection() {
     
+        btnRefresh.setVisibility(View.INVISIBLE);
         final TextView textView = findViewById(R.id.main_text);
+        textView.setText("Загрузка ...");
         
         NetworkService.getInstance().getJSONApi().testConnection().enqueue(new Callback<ServerResponse>() {
             @Override
@@ -49,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                             .commit();
                 } else {
                     textView.setText("Нет соединения с сервером, попробуйте зайти позже");
+                    btnRefresh.setVisibility(View.VISIBLE);
                 }
             }
     
@@ -56,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<ServerResponse> call, Throwable t) {
                 t.printStackTrace();
                 textView.setText("Нет соединения с сервером, попробуйте зайти позже");
+                btnRefresh.setVisibility(View.VISIBLE);
             }
         });
     }

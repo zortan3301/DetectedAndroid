@@ -65,7 +65,6 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
     
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
         mAuth = FirebaseAuth.getInstance();
-        signOut();
         
         return v;
     }
@@ -148,11 +147,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
     
     private void updateUI(FirebaseUser user) {
         if (user != null) {
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .add(R.id.activity_main, new MainFragment(), "main")
-                    .detach(getActivity().getSupportFragmentManager().findFragmentByTag("auth"))
-                    .addToBackStack(null)
-                    .commit();
+            Intent intent = new Intent(getActivity(), MainFragment.class);
+            startActivity(intent);
         }
     }
     
