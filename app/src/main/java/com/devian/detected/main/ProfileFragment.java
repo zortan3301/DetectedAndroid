@@ -2,10 +2,12 @@ package com.devian.detected.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,24 +15,36 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.devian.detected.MainActivity;
-import com.devian.detected.MainFragment;
 import com.devian.detected.R;
+import com.devian.detected.utils.LevelManager;
+import com.devian.detected.utils.Network.NetworkService;
+import com.devian.detected.utils.domain.ServerResponse;
+import com.devian.detected.utils.domain.UserStats;
+import com.devian.detected.utils.security.AES256;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
     
     private static final String TAG = "ProfileFragment";
     
     private FirebaseAuth mAuth;
+    
+    private Gson gson = new Gson();
     
     @BindView(R.id.profile_tvName) TextView tvName;
     @BindView(R.id.profile_tvEmail) TextView tvEmail;
@@ -39,6 +53,7 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.profile_tvLevel) TextView tvLevel;
     @BindView(R.id.profile_tvScannedTags) TextView tvScannedTags;
     @BindView(R.id.profile_tvRating) TextView tvRating;
+    @BindView(R.id.profile_progressLevel) ProgressBar progressLevel;
     
     @Nullable
     @Override
@@ -59,9 +74,16 @@ public class ProfileFragment extends Fragment {
         return v;
     }
     
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateStatistics();
+    }
+    
     private void init() {
         tvName.setText(mAuth.getCurrentUser().getDisplayName());
         tvEmail.setText(mAuth.getCurrentUser().getEmail());
+        updateStatistics();
     }
     
     void logout() {
@@ -84,7 +106,34 @@ public class ProfileFragment extends Fragment {
                 });
     }
     
-    void updateStatisctics() {
+    private void updateStatistics() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("data", AES256.encrypt(mAuth.getUid()));
+        Log.d(TAG, "updateStatistics: " + AES256.encrypt(mAuth.getUid()));
+        NetworkService.getInstance().getJSONApi().getStats(headers).enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
+                if (response.body().getType() == 20) {
+                    UserStats userStats = gson.fromJson(response.body().getData(), UserStats.class);
+                    updateUI(userStats);
+                } else {
+                    Log.e(TAG, "onResponse: user stats does not exist on the server");
+                }
+            }
     
+            @Override
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+    }
+    
+    void updateUI(UserStats userStats) {
+        if (userStats == null)
+            return;
+        tvLevel.setText(String.valueOf(userStats.getLevel()));
+        tvScannedTags.setText(String.valueOf(userStats.getTags()));
+        progressLevel.setProgress(LevelManager.getPercentsCompleted(userStats.getPoints()));
     }
 }

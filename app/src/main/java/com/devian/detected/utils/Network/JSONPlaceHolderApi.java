@@ -14,4 +14,7 @@ public interface JSONPlaceHolderApi {
     
     @GET("/auth")
     Call<ServerResponse> auth(@HeaderMap Map<String, String> headers);
+    
+    @GET("/getStats")
+    Call<ServerResponse> getStats(@HeaderMap Map<String, String> headers);
 }
