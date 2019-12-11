@@ -36,6 +36,10 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.profile_tvEmail) TextView tvEmail;
     @BindView(R.id.profile_btnLogout) Button btnLogout;
     
+    @BindView(R.id.profile_tvLevel) TextView tvLevel;
+    @BindView(R.id.profile_tvScannedTags) TextView tvScannedTags;
+    @BindView(R.id.profile_tvRating) TextView tvRating;
+    
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -78,5 +82,9 @@ public class ProfileFragment extends Fragment {
                         startActivity(intent);
                     }
                 });
+    }
+    
+    void updateStatisctics() {
+    
     }
 }

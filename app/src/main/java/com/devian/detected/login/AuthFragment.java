@@ -73,6 +73,9 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
     public void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            authOnServer(currentUser);
+        }
         updateUI(currentUser);
     }
     
@@ -114,7 +117,7 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             Log.d(TAG, "onComplete: " + user.getUid());
-                            authOnServer(acct, user);
+                            authOnServer(user);
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -131,20 +134,6 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
     
-    private void signOut() {
-        // Firebase sign out
-        mAuth.signOut();
-        
-        // Google sign out
-        mGoogleSignInClient.signOut().addOnCompleteListener(getActivity(),
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        updateUI(null);
-                    }
-                });
-    }
-    
     private void updateUI(FirebaseUser user) {
         if (user != null) {
             Intent intent = new Intent(getActivity(), MainFragment.class);
@@ -152,8 +141,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
         }
     }
     
-    private void authOnServer(GoogleSignInAccount account, FirebaseUser firebaseUser) {
-        User user = new User(firebaseUser.getUid(), account.getDisplayName(), account.getEmail());
+    private void authOnServer(FirebaseUser firebaseUser) {
+        User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail());
         Map<String, String> headers = new HashMap<>();
         headers.put("data", AES256.encrypt(gson.toJson(user)));
         NetworkService.getInstance().getJSONApi().auth(headers).enqueue(new Callback<ServerResponse>() {
