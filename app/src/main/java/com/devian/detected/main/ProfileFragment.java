@@ -1,5 +1,7 @@
 package com.devian.detected.main;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,7 +40,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements View.OnClickListener {
     
     private static final String TAG = "ProfileFragment";
     
@@ -64,12 +66,7 @@ public class ProfileFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         init();
         
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                logout();
-            }
-        });
+        btnLogout.setOnClickListener(this);
         
         return v;
     }
@@ -84,6 +81,25 @@ public class ProfileFragment extends Fragment {
         tvName.setText(mAuth.getCurrentUser().getDisplayName());
         tvEmail.setText(mAuth.getCurrentUser().getEmail());
         updateStatistics();
+    }
+    
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.profile_btnLogout:
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Выход из аккаунта")
+                        .setMessage("Вы уверены, что хотите выйти из аккаунта?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                logout();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+                break;
+        }
     }
     
     void logout() {
@@ -130,6 +146,7 @@ public class ProfileFragment extends Fragment {
     }
     
     void updateUI(UserStats userStats) {
+        Log.d(TAG, "updateUI: " + gson.toJson(userStats));
         if (userStats == null)
             return;
         tvLevel.setText(String.valueOf(userStats.getLevel()));

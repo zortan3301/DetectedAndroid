@@ -12,6 +12,7 @@ public class LevelManager {
     6: 601 - 900
     ...
      */
+    
     public static int getLevelByPoints(long points) {
         if (points <= 50)
             return 0;
