@@ -1,0 +1,16 @@
+<vector
+    android:height="24dp"
+    android:tint="#FF7146"
+    android:viewportHeight="24.0"
+    android:viewportWidth="24.0"
+    android:shadowDx="0.0"
+    android:shadowDy="0.0"
+    android:shadowColor="#cf1d1d"
+    android:padding="5dp"
+    android:shadowRadius="8"
+    android:width="24dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <path
+        android:fillColor="#010101"
+        android:pathData="M12,12m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0"/>
+</vector>

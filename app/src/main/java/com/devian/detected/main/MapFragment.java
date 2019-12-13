@@ -1,72 +1,139 @@
 package com.devian.detected.main;
 
-import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.devian.detected.R;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 
-public class MapFragment extends Fragment
-        implements
-            OnMapReadyCallback {
+import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
+
+public class MapFragment extends Fragment implements OnMapReadyCallback {
     
     private static final String TAG = "MapFragment";
     
-    private GoogleMap mMap;
-    private UiSettings mUiSettings;
+    private static final String MAP_STYLE = "mapbox://styles/aminovmaksim/ck4397jle16vo1cpalemp5ddc";
+    
+    private MapView mapView;
     
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_map, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        
+        Mapbox.getInstance(getContext(), "pk.eyJ1IjoiYW1pbm92bWFrc2ltIiwiYSI6ImNrNDM2OXJqZzA0N3Izbm9icWc2ZGxhMGYifQ.mZzd2YEu-PpsODWkQMSB2g");
     
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        View v = inflater.inflate(R.layout.fragment_map2, container, false);
+        mapView = v.findViewById(R.id.mapView);
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
         
         return v;
     }
     
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mUiSettings = mMap.getUiSettings();
+    public void onMapReady(@NonNull final MapboxMap mapboxMap) {
+    
+        final Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.circle);
+    
+        mapboxMap.setStyle(new Style.Builder().fromUri(MAP_STYLE), new Style.OnStyleLoaded() {
+            @Override
+            public void onStyleLoaded(@NonNull Style style) {
+                style.addImage("my-marker", bm);
+                SymbolManager symbolManager = new SymbolManager(mapView, mapboxMap, style);
+                addMarkers(symbolManager);
+            }
+        });
         
-        styleMap(googleMap);
+        mapboxMap.getUiSettings().setZoomGesturesEnabled(true);
+        CameraPosition position = new CameraPosition.Builder()
+                .target(new LatLng(55.7, 37.6)) // Sets the new camera position
+                .zoom(10) // Sets the zoom
+                .bearing(360) // Rotate the camera
+                .tilt(45) // Set the camera tilt
+                .build(); // Creates a CameraPosition from the builder
+    
+        mapboxMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(position), 7000);
         
-        mUiSettings.setZoomControlsEnabled(true);
-        mUiSettings.setCompassEnabled(true);
         
-        LatLng moscow = new LatLng(55.7, 37.6);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(moscow));
-        mMap.setMinZoomPreference(10);
     }
     
-    private void styleMap(GoogleMap googleMap) {
-        try {
-            boolean success = googleMap.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(
-                            getContext(), R.raw.map_style));
+    public void addMarkers(SymbolManager symbolManager) {
         
-            if (!success) {
-                Log.e(TAG, "Style parsing failed.");
-            }
-        } catch (Resources.NotFoundException e) {
-            Log.e(TAG, "Can't find style. Error: ", e);
-        }
+        // set non-data-driven properties, such as:
+        symbolManager.setIconAllowOverlap(true);
+        symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
+        
+        // Add symbol at specified lat/lon
+        symbolManager.create(new SymbolOptions()
+                .withLatLng(new LatLng(55.7, 37.5))
+                .withIconImage("my-marker")
+                .withIconSize(0.015f));
+        
+    }
+    
+    @Override
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
+    
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+    
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
+    
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+    
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 }

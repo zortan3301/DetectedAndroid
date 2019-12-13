@@ -67,6 +67,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         init();
         
         btnLogout.setOnClickListener(this);
+        updateStatistics();
         
         return v;
     }
@@ -130,7 +131,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
-                if (response.body().getType() == 20) {
+                if (response.body().getType() == ServerResponse.TYPE_STATS_EXISTS) {
                     UserStats userStats = gson.fromJson(response.body().getData(), UserStats.class);
                     updateUI(userStats);
                 } else {

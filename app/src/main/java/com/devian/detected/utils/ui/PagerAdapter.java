@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.devian.detected.main.MapFragment;
-import com.devian.detected.main.MapFragment2;
 import com.devian.detected.main.ProfileFragment;
 import com.devian.detected.main.TaskFragment;
 
@@ -25,8 +24,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 fragment = new TaskFragment();
                 break;
             case 2:
-                fragment = new MapFragment2();
-                //fragment = new MapFragment();
+                fragment = new MapFragment();
                 break;
         }
         return fragment;

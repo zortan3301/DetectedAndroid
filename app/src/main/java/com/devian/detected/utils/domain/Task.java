@@ -1,11 +1,11 @@
 package com.devian.detected.utils.domain;
 
-import java.util.Date;
-import java.util.UUID;
+
+import java.sql.Date;
 
 public class Task {
     private long id;
-    private UUID tagId;
+    private String tagId;
     private int reward;
     private int type;
     private float Latitude;
@@ -14,17 +14,53 @@ public class Task {
     private String executor;
     private Date completedTime;
     
-    public Task(UUID tagId, String executor) {
+    public Task(String tagId, String executor) {
         this.tagId = tagId;
         this.executor = executor;
     }
     
-    public void setTagId(UUID tagId) {
+    public void setTagId(String tagId) {
         this.tagId = tagId;
     }
     
     public void setExecutor(String executor) {
         this.executor = executor;
+    }
+    
+    public long getId() {
+        return id;
+    }
+    
+    public String getTagId() {
+        return tagId;
+    }
+    
+    public int getReward() {
+        return reward;
+    }
+    
+    public int getType() {
+        return type;
+    }
+    
+    public float getLatitude() {
+        return Latitude;
+    }
+    
+    public float getLongitude() {
+        return Longitude;
+    }
+    
+    public boolean isCompleted() {
+        return completed;
+    }
+    
+    public String getExecutor() {
+        return executor;
+    }
+    
+    public Date getCompletedTime() {
+        return completedTime;
     }
     
     public static final int TYPE_MAP = 1;
