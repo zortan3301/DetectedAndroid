@@ -1,11 +1,15 @@
 package com.devian.detected.main;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +19,7 @@ import com.devian.detected.R;
 import com.devian.detected.utils.Network.NetworkService;
 import com.devian.detected.utils.domain.ServerResponse;
 import com.devian.detected.utils.domain.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -25,10 +30,14 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 
 import java.lang.reflect.Type;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -49,6 +58,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     
     private MapView mapView;
     private SymbolManager symbolManager = null;
+    private MapboxMap mapbox = null;
     
     @Nullable
     @Override
@@ -72,10 +82,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
     
         final Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.marker_1);
-    
+        
         mapboxMap.setStyle(new Style.Builder().fromUri(MAP_STYLE), new Style.OnStyleLoaded() {
             @Override
-            public void onStyleLoaded(@NonNull Style style) {
+            public void onStyleLoaded(@NonNull final Style style) {
                 style.addImage("my-marker", bm);
                 for (int i = 0; i < markers.length; i++) {
                     String mDrawableName = markers[i];
@@ -87,6 +97,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 // set non-data-driven properties, such as:
                 symbolManager.setIconAllowOverlap(true);
                 symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
+                symbolManager.addClickListener(new OnSymbolClickListener() {
+                    @Override
+                    public void onAnnotationClick(Symbol symbol) {
+                        DecimalFormat df = new DecimalFormat("#.######");
+                        df.setRoundingMode(RoundingMode.CEILING);
+                        String lat = df.format(symbol.getLatLng().getLatitude() + 1e-7);
+                        String lng = df.format(symbol.getLatLng().getLongitude() + 1e-7);
+                        final String snack_text = lat + ", " + lng;
+    
+                        Snackbar.make(getView(), snack_text, Snackbar.LENGTH_LONG)
+                                .setAction("Копировать координаты", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                                        ClipData clip = ClipData.newPlainText("LatLng", snack_text);
+                                        clipboard.setPrimaryClip(clip);
+                                    }
+                                }).show();
+                    }
+                });
                 getMarkers();
             }
         });
@@ -105,7 +135,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         
     }
     
-    public void getMarkers() {
+    private void getMarkers() {
         NetworkService.getInstance().getJSONApi().getMapTasks().enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
@@ -126,15 +156,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
     }
     
-    public void updateMarkers(List<Task> listTask) {
-        
+    private void updateMarkers(List<Task> listTask) {
         if (symbolManager == null)
             return;
     
         for (Task t : listTask) {
             symbolManager.create(new SymbolOptions()
                     .withLatLng(new LatLng(t.getLatitude(), t.getLongitude()))
-                    .withIconImage(markers[(new Random()).nextInt(3)])
+                    .withIconImage(markers[(new Random()).nextInt(markers.length)])
                     .withIconSize(0.3f));
         }
         
