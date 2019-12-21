@@ -20,6 +20,7 @@ import com.devian.detected.MainActivity;
 import com.devian.detected.R;
 import com.devian.detected.utils.LevelManager;
 import com.devian.detected.utils.Network.NetworkService;
+import com.devian.detected.utils.domain.RankRow;
 import com.devian.detected.utils.domain.ServerResponse;
 import com.devian.detected.utils.domain.UserStats;
 import com.devian.detected.utils.security.AES256;
@@ -30,9 +31,16 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,14 +56,23 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     
     private Gson gson = new Gson();
     
-    @BindView(R.id.profile_tvName) TextView tvName;
-    @BindView(R.id.profile_tvEmail) TextView tvEmail;
-    @BindView(R.id.profile_btnLogout) Button btnLogout;
+    @BindView(R.id.profile_tvName)
+    TextView tvName;
+    @BindView(R.id.profile_tvEmail)
+    TextView tvEmail;
+    @BindView(R.id.profile_btnLogout)
+    Button btnLogout;
     
-    @BindView(R.id.profile_tvLevel) TextView tvLevel;
-    @BindView(R.id.profile_tvScannedTags) TextView tvScannedTags;
-    @BindView(R.id.profile_tvRating) TextView tvRating;
-    @BindView(R.id.profile_progressLevel) ProgressBar progressLevel;
+    @BindView(R.id.profile_tvLevel)
+    TextView tvLevel;
+    @BindView(R.id.profile_tvScannedTags)
+    TextView tvScannedTags;
+    @BindView(R.id.profile_tvRating)
+    TextView tvRating;
+    @BindView(R.id.profile_tvListTop10)
+    TextView tvListTop10;
+    @BindView(R.id.profile_progressLevel)
+    ProgressBar progressLevel;
     
     @Nullable
     @Override
@@ -65,6 +82,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         ButterKnife.bind(this, v);
         mAuth = FirebaseAuth.getInstance();
         init();
+        initTimer();
         
         btnLogout.setOnClickListener(this);
         updateStatistics();
@@ -106,7 +124,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     void logout() {
         // Firebase sign out
         mAuth.signOut();
-    
+        
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -133,12 +151,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
                 if (response.body().getType() == ServerResponse.TYPE_STATS_EXISTS) {
                     UserStats userStats = gson.fromJson(response.body().getData(), UserStats.class);
-                    updateUI(userStats);
+                    updateUI(userStats, null, null);
                 } else {
                     Log.e(TAG, "onResponse: user stats does not exist on the server");
                 }
             }
-    
+            
             @Override
             public void onFailure(Call<ServerResponse> call, Throwable t) {
                 t.printStackTrace();
@@ -146,12 +164,71 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
     }
     
-    void updateUI(UserStats userStats) {
+    void updateUI(UserStats userStats, List<RankRow> top10, RankRow selfRank) {
         Log.d(TAG, "updateUI: " + gson.toJson(userStats));
-        if (userStats == null)
-            return;
-        tvLevel.setText(String.valueOf(userStats.getLevel()));
-        tvScannedTags.setText(String.valueOf(userStats.getTags()));
-        progressLevel.setProgress(LevelManager.getPercentsCompleted(userStats.getPoints()));
+        if (userStats != null) {
+            tvLevel.setText(String.valueOf(userStats.getLevel()));
+            tvScannedTags.setText(String.valueOf(userStats.getTags()));
+            progressLevel.setProgress(LevelManager.getPercentsCompleted(userStats.getPoints()));
+        }
+        if (top10 != null) {
+            tvListTop10.setText(gson.toJson(top10));
+        }
+        if (selfRank != null) {
+            tvRating.setText(String.valueOf(selfRank.getRank()));
+        }
+    }
+    
+    // schedule ranking updating task
+    void initTimer() {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            synchronized public void run() {
+                Log.e(TAG, "Timer run: updating rankings");
+                // Get top 10 users
+                NetworkService.getInstance().getJSONApi().getRankTop10().enqueue(new Callback<ServerResponse>() {
+                    @Override
+                    public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                        if (response.body() == null)
+                            return;
+                        if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
+                            Type listType = new TypeToken<ArrayList<RankRow>>() {
+                            }.getType();
+                            List<RankRow> top10 = gson.fromJson(response.body().getData(), listType);
+                            updateUI(null, top10, null);
+                        } else
+                            Log.e(TAG, "onResponse (top10): type != TYPE_RANK_SUCCESS");
+                        
+                    }
+                    
+                    @Override
+                    public void onFailure(Call<ServerResponse> call, Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+                
+                // Get personal rank
+                Map<String, String> headers = new HashMap<>();
+                headers.put("data", AES256.encrypt(mAuth.getUid()));
+                NetworkService.getInstance().getJSONApi().getPersonalRank(headers).enqueue(new Callback<ServerResponse>() {
+                    @Override
+                    public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                        if (response.body() == null)
+                            return;
+                        if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
+                            RankRow rankRow = gson.fromJson(response.body().getData(), RankRow.class);
+                            updateUI(null, null, rankRow);
+                        } else
+                            Log.e(TAG, "onResponse (personal rank): type != TYPE_RANK_SUCCESS");
+                    }
+                    
+                    @Override
+                    public void onFailure(Call<ServerResponse> call, Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+            }
+        }, 0, 60000);
     }
 }

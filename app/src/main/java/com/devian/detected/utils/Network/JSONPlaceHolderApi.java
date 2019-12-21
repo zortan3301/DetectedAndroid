@@ -28,4 +28,9 @@ public interface JSONPlaceHolderApi {
     @POST("/scanTag")
     Call<ServerResponse> scanTag(@HeaderMap Map<String, String> headers);
     
+    @GET("/getRankTop10")
+    Call<ServerResponse> getRankTop10();
+    
+    @GET("/getPersonalRank")
+    Call<ServerResponse> getPersonalRank(@HeaderMap Map<String, String> headers);
 }
