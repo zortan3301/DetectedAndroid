@@ -161,5 +161,9 @@ public class MainFragment extends AppCompatActivity
     public void showSnackbar(String text, int duration) {
         Snackbar.make(findViewById(R.id.fragment_main), text, duration).show();
     }
+    
+    @Override
+    public void onBackPressed() {
+    }
 }
 

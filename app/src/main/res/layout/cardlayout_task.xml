@@ -29,7 +29,6 @@
         android:layout_width="0dp"
         android:layout_height="200dp"
         android:background="@drawable/image_gradient"
-        android:clickable="false"
         app:layout_constraintBottom_toBottomOf="@+id/task_imageView"
         app:layout_constraintEnd_toEndOf="@+id/task_imageView"
         app:layout_constraintStart_toStartOf="@+id/task_imageView"
@@ -37,25 +36,36 @@
 
     <TextView
         android:id="@+id/task_tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="48sp"
+        android:maxLines="2"
+        android:gravity="start|bottom"
         android:fontFamily="@font/hacked"
-        android:text="Заголовок"
-        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@+id/task_imageView"
-        app:layout_constraintStart_toStartOf="@+id/view3" />
+        app:layout_constraintEnd_toStartOf="@+id/task_tvPoints"
+        app:layout_constraintStart_toStartOf="@+id/view3"
+        app:layout_constraintTop_toTopOf="@+id/view3" />
 
     <TextView
         android:id="@+id/task_tvPoints"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="75dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        android:autoSizeTextType="uniform"
         android:fontFamily="@font/hacked"
-        android:textSize="24sp"
+        android:gravity="end|bottom"
+        android:maxLines="1"
+        android:textColor="#CDFF00"
         app:layout_constraintBottom_toBottomOf="@+id/view3"
-        app:layout_constraintEnd_toEndOf="@+id/view3" />
+        app:layout_constraintEnd_toEndOf="@+id/view3"
+        app:layout_constraintTop_toTopOf="@+id/task_imageView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
