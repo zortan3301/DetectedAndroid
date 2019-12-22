@@ -65,12 +65,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         
         Mapbox.getInstance(getContext(), "pk.eyJ1IjoiYW1pbm92bWFrc2ltIiwiYSI6ImNrNDM2OXJqZzA0N3Izbm9icWc2ZGxhMGYifQ.mZzd2YEu-PpsODWkQMSB2g");
     
-        View v = inflater.inflate(R.layout.fragment_map2, container, false);
+        View v = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-        
-        getMarkers();
         
         return v;
     }
@@ -91,7 +89,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     style.addImage(markers[i], bm);
                 }
                 symbolManager = new SymbolManager(mapView, mapboxMap, style);
-                // set non-data-driven properties, such as:
                 symbolManager.setIconAllowOverlap(true);
                 symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
                 symbolManager.addClickListener(new OnSymbolClickListener() {
@@ -176,7 +173,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
         mapView.onResume();
-        getMarkers();
     }
     
     @Override

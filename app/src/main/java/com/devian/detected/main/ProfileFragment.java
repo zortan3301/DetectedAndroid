@@ -81,7 +81,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         init();
         
         btnLogout.setOnClickListener(this);
-        updateStatistics();
         
         return v;
     }
@@ -89,13 +88,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+        updateStatistics();
+        updateRankings();
     }
     
     private void init() {
         tvName.setText(mAuth.getCurrentUser().getDisplayName());
         tvEmail.setText(mAuth.getCurrentUser().getEmail());
-        updateStatistics();
-        updateRankings();
     }
     
     @Override
@@ -125,10 +124,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             progressLevel.setProgress(LevelManager.getPercentsCompleted(userStats.getPoints()));
         }
         if (top10 != null) {
-            tvListTop10.setText(gson.toJson(top10));
+            String text = String.valueOf(gson.toJson(top10));
+            tvListTop10.setText(text);
         }
         if (selfRank != null) {
-            tvRating.setText(String.valueOf(selfRank.getRank()));
+            String rank = String.valueOf(selfRank.getRank());
+            tvRating.setText(rank);
         }
     }
     

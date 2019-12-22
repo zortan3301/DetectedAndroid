@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
 
-    <com.github.chrisbanes.photoview.PhotoView
+    <ImageView
         android:id="@+id/task_imageView"
         android:layout_width="0dp"
         android:layout_height="200dp"

@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.devian.detected.R;
 import com.devian.detected.utils.Network.NetworkService;
@@ -32,13 +33,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TaskFragment extends Fragment {
+public class TaskFragment extends Fragment
+        implements SwipeRefreshLayout.OnRefreshListener {
     
     private static final String TAG = "TaskFragment";
     
     private Gson gson = new Gson();
     
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.task_refreshLayout) SwipeRefreshLayout refreshLayout;
     
     private RecyclerAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -49,6 +52,8 @@ public class TaskFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_task, container, false);
         ButterKnife.bind(this, v);
+        
+        refreshLayout.setOnRefreshListener(this);
     
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
@@ -71,7 +76,7 @@ public class TaskFragment extends Fragment {
         updateTasks();
     }
     
-    public void updateTasks() {
+    private void updateTasks() {
         NetworkService.getInstance().getJSONApi().getTextTasks().enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
@@ -80,6 +85,7 @@ public class TaskFragment extends Fragment {
                     Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
                     List<Task> listTask = gson.fromJson(response.body().getData(), listType);
                     mAdapter.setTaskList(listTask);
+                    refreshLayout.setRefreshing(false);
                 } else {
                     Log.e(TAG, "onResponse: user stats does not exist on the server");
                 }
@@ -90,5 +96,11 @@ public class TaskFragment extends Fragment {
                 t.printStackTrace();
             }
         });
+    }
+    
+    @Override
+    public void onRefresh() {
+        refreshLayout.setRefreshing(true);
+        updateTasks();
     }
 }
