@@ -20,6 +20,7 @@ import com.devian.detected.utils.security.AES256;
 import com.devian.detected.utils.ui.CustomViewPager;
 import com.devian.detected.utils.ui.PagerAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
@@ -115,7 +116,7 @@ public class MainFragment extends AppCompatActivity
         String tagId = AES256.decrypt(text);
         
         if (tagId == null) {
-            showToast("Недействительная метка", Toast.LENGTH_SHORT);
+            showSnackbar("Недействительная метка", Toast.LENGTH_SHORT);
             return;
         }
         
@@ -130,19 +131,19 @@ public class MainFragment extends AppCompatActivity
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body() == null) {
-                    showToast("Недействительная метка", Toast.LENGTH_LONG);
+                    showSnackbar("Недействительная метка", Toast.LENGTH_LONG);
                     return;
                 }
                 switch (response.body().getType()) {
                     case ServerResponse.TYPE_TASK_ALREADY_COMPLETED:
-                        showToast("Данное задание уже выполнено", Toast.LENGTH_LONG);
+                        showSnackbar("Данное задание уже выполнено", Toast.LENGTH_LONG);
                         break;
                     case ServerResponse.TYPE_TASK_FAILURE:
-                        showToast("Недействительная метка", Toast.LENGTH_LONG);
+                        showSnackbar("Недействительная метка", Toast.LENGTH_LONG);
                         break;
                     case ServerResponse.TYPE_TASK_COMPLETED:
                         Task completedTask = gson.fromJson(response.body().getData(), Task.class);
-                        showToast("Успешно, вы получили " + completedTask.getReward() + " поинтов", Toast.LENGTH_LONG);
+                        showSnackbar("Успешно, вы получили " + completedTask.getReward() + " поинтов", Toast.LENGTH_LONG);
                 }
             }
     
@@ -155,6 +156,10 @@ public class MainFragment extends AppCompatActivity
     
     public void showToast(String text, int duration) {
         Toast.makeText(this, text, duration).show();
+    }
+    
+    public void showSnackbar(String text, int duration) {
+        Snackbar.make(findViewById(R.id.fragment_main), text, duration).show();
     }
 }
 

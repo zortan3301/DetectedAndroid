@@ -7,24 +7,55 @@
     android:orientation="vertical">
 
 
-    <TextView
-        android:id="@+id/task_tvHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/task_imageView"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Заголовок"
-        android:textSize="24sp"
+        android:layout_marginEnd="16dp"
+        android:clickable="false"
+        android:contextClickable="false"
+        android:longClickable="false"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_image_darkblue_24dp" />
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:background="@drawable/image_gradient"
+        android:clickable="false"
+        app:layout_constraintBottom_toBottomOf="@+id/task_imageView"
+        app:layout_constraintEnd_toEndOf="@+id/task_imageView"
+        app:layout_constraintStart_toStartOf="@+id/task_imageView"
+        app:layout_constraintTop_toTopOf="@+id/task_imageView" />
 
     <TextView
-        android:id="@+id/task_tvDescription"
+        android:id="@+id/task_tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Описание"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/task_tvHeader" />
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/hacked"
+        android:text="Заголовок"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/task_imageView"
+        app:layout_constraintStart_toStartOf="@+id/view3" />
+
+    <TextView
+        android:id="@+id/task_tvPoints"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/hacked"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/view3"
+        app:layout_constraintEnd_toEndOf="@+id/view3" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

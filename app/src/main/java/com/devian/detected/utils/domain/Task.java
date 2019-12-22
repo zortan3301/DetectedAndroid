@@ -14,6 +14,10 @@ public class Task {
     private String executor;
     private Date completedTime;
     
+    private String title;
+    private String description;
+    private String imgUrl;
+    
     public Task(String tagId, String executor) {
         this.tagId = tagId;
         this.executor = executor;
@@ -61,6 +65,18 @@ public class Task {
     
     public Date getCompletedTime() {
         return completedTime;
+    }
+    
+    public String getTitle() {
+        return title;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public String getImgUrl() {
+        return imgUrl;
     }
     
     public static final int TYPE_MAP = 1;

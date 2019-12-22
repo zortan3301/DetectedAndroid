@@ -2,6 +2,7 @@ package com.devian.detected.main;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +17,14 @@ import com.devian.detected.R;
 import com.devian.detected.utils.Network.NetworkService;
 import com.devian.detected.utils.domain.ServerResponse;
 import com.devian.detected.utils.domain.Task;
-import com.devian.detected.utils.domain.UserStats;
 import com.devian.detected.utils.ui.RecyclerAdapter;
+import com.devian.detected.utils.ui.RecyclerItemDecorator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,6 +56,9 @@ public class TaskFragment extends Fragment {
         
         mAdapter = new RecyclerAdapter(null);
         recyclerView.setAdapter(mAdapter);
+        int space = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 74,
+                getResources().getDisplayMetrics());
+        recyclerView.addItemDecoration(new RecyclerItemDecorator(space));
         
         updateTasks();
         

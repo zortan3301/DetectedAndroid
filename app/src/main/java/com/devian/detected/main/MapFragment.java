@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +37,7 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 import java.lang.reflect.Type;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -53,9 +53,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "MapFragment";
     
     private static final String MAP_STYLE = "mapbox://styles/aminovmaksim/ck4397jle16vo1cpalemp5ddc";
-    
+    private final static String[] markers = {"marker_1", "marker_2", "marker_3"};
     private Gson gson = new Gson();
-    
     private MapView mapView;
     private SymbolManager symbolManager = null;
     private MapboxMap mapbox = null;
@@ -75,8 +74,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         
         return v;
     }
-    
-    private final static String[] markers = {"marker_1", "marker_2", "marker_3"};
     
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
@@ -101,13 +98,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onAnnotationClick(Symbol symbol) {
                         DecimalFormat df = new DecimalFormat("#.######");
+                        DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
+                        formatSymbols.setDecimalSeparator('.');
+                        df.setDecimalFormatSymbols(formatSymbols);
                         df.setRoundingMode(RoundingMode.CEILING);
-                        String lat = df.format(symbol.getLatLng().getLatitude() + 1e-7);
-                        String lng = df.format(symbol.getLatLng().getLongitude() + 1e-7);
+                        String lat = df.format(symbol.getLatLng().getLatitude());
+                        String lng = df.format(symbol.getLatLng().getLongitude());
                         final String snack_text = lat + ", " + lng;
     
                         Snackbar.make(getView(), snack_text, Snackbar.LENGTH_LONG)
-                                .setAction("Копировать координаты", new View.OnClickListener() {
+                                .setAction("Копировать", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
                                         ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -131,8 +131,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     
         mapboxMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(position), 7000);
-        
-        
     }
     
     private void getMarkers() {
@@ -166,8 +164,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     .withIconImage(markers[(new Random()).nextInt(markers.length)])
                     .withIconSize(0.3f));
         }
-        
-        
     }
     
     @Override

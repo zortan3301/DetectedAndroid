@@ -38,8 +38,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,7 +79,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         ButterKnife.bind(this, v);
         mAuth = FirebaseAuth.getInstance();
         init();
-        initTimer();
         
         btnLogout.setOnClickListener(this);
         updateStatistics();
@@ -92,13 +89,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        updateStatistics();
     }
     
     private void init() {
         tvName.setText(mAuth.getCurrentUser().getDisplayName());
         tvEmail.setText(mAuth.getCurrentUser().getEmail());
         updateStatistics();
+        updateRankings();
     }
     
     @Override
@@ -120,24 +117,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
     }
     
-    void logout() {
-        // Firebase sign out
-        mAuth.signOut();
-        
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
-        // Google sign out
-        mGoogleSignInClient.signOut().addOnCompleteListener(getActivity(),
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                        startActivity(intent);
-                    }
-                });
+    void updateUI(UserStats userStats, List<RankRow> top10, RankRow selfRank) {
+        Log.d(TAG, "updateUI: " + gson.toJson(userStats));
+        if (userStats != null) {
+            tvLevel.setText(String.valueOf(userStats.getLevel()));
+            tvScannedTags.setText(String.valueOf(userStats.getTags()));
+            progressLevel.setProgress(LevelManager.getPercentsCompleted(userStats.getPoints()));
+        }
+        if (top10 != null) {
+            tvListTop10.setText(gson.toJson(top10));
+        }
+        if (selfRank != null) {
+            tvRating.setText(String.valueOf(selfRank.getRank()));
+        }
     }
     
     private void updateStatistics() {
@@ -163,71 +155,69 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         });
     }
     
-    void updateUI(UserStats userStats, List<RankRow> top10, RankRow selfRank) {
-        Log.d(TAG, "updateUI: " + gson.toJson(userStats));
-        if (userStats != null) {
-            tvLevel.setText(String.valueOf(userStats.getLevel()));
-            tvScannedTags.setText(String.valueOf(userStats.getTags()));
-            progressLevel.setProgress(LevelManager.getPercentsCompleted(userStats.getPoints()));
-        }
-        if (top10 != null) {
-            tvListTop10.setText(gson.toJson(top10));
-        }
-        if (selfRank != null) {
-            tvRating.setText(String.valueOf(selfRank.getRank()));
-        }
+    void updateRankings() {
+        Log.d(TAG, "updateRankings");
+        // Get top 10 users
+        NetworkService.getInstance().getJSONApi().getRankTop10().enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                if (response.body() == null)
+                    return;
+                if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
+                    Type listType = new TypeToken<ArrayList<RankRow>>() {
+                    }.getType();
+                    List<RankRow> top10 = gson.fromJson(response.body().getData(), listType);
+                    updateUI(null, top10, null);
+                } else
+                    Log.e(TAG, "onResponse (top10): type != TYPE_RANK_SUCCESS");
+            
+            }
+            
+            @Override
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+    
+        // Get personal rank
+        Map<String, String> headers = new HashMap<>();
+        headers.put("data", AES256.encrypt(mAuth.getUid()));
+        NetworkService.getInstance().getJSONApi().getPersonalRank(headers).enqueue(new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+                if (response.body() == null)
+                    return;
+                if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
+                    RankRow rankRow = gson.fromJson(response.body().getData(), RankRow.class);
+                    updateUI(null, null, rankRow);
+                } else
+                    Log.e(TAG, "onResponse (personal rank): type != TYPE_RANK_SUCCESS");
+            }
+        
+            @Override
+            public void onFailure(Call<ServerResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
     
-    // schedule ranking updating task
-    void initTimer() {
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            synchronized public void run() {
-                Log.e(TAG, "Timer run: updating rankings");
-                // Get top 10 users
-                NetworkService.getInstance().getJSONApi().getRankTop10().enqueue(new Callback<ServerResponse>() {
+    void logout() {
+        // Firebase sign out
+        mAuth.signOut();
+        
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+        // Google sign out
+        mGoogleSignInClient.signOut().addOnCompleteListener(getActivity(),
+                new OnCompleteListener<Void>() {
                     @Override
-                    public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                        if (response.body() == null)
-                            return;
-                        if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
-                            Type listType = new TypeToken<ArrayList<RankRow>>() {
-                            }.getType();
-                            List<RankRow> top10 = gson.fromJson(response.body().getData(), listType);
-                            updateUI(null, top10, null);
-                        } else
-                            Log.e(TAG, "onResponse (top10): type != TYPE_RANK_SUCCESS");
-                        
-                    }
-                    
-                    @Override
-                    public void onFailure(Call<ServerResponse> call, Throwable t) {
-                        t.printStackTrace();
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
                     }
                 });
-                
-                // Get personal rank
-                Map<String, String> headers = new HashMap<>();
-                headers.put("data", AES256.encrypt(mAuth.getUid()));
-                NetworkService.getInstance().getJSONApi().getPersonalRank(headers).enqueue(new Callback<ServerResponse>() {
-                    @Override
-                    public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                        if (response.body() == null)
-                            return;
-                        if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
-                            RankRow rankRow = gson.fromJson(response.body().getData(), RankRow.class);
-                            updateUI(null, null, rankRow);
-                        } else
-                            Log.e(TAG, "onResponse (personal rank): type != TYPE_RANK_SUCCESS");
-                    }
-                    
-                    @Override
-                    public void onFailure(Call<ServerResponse> call, Throwable t) {
-                        t.printStackTrace();
-                    }
-                });
-            }
-        }, 0, 60000);
     }
 }

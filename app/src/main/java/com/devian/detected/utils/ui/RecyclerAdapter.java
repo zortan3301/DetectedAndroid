@@ -1,8 +1,10 @@
 package com.devian.detected.utils.ui;
 
+import android.graphics.Matrix;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.devian.detected.R;
 import com.devian.detected.utils.domain.Task;
+import com.github.chrisbanes.photoview.PhotoView;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -47,11 +51,18 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         // - replace the contents of the view with that element
         if (taskList == null)
             return;
-        TextView header = holder.view.findViewById(R.id.task_tvHeader);
-        TextView description = holder.view.findViewById(R.id.task_tvDescription);
+        TextView title = holder.view.findViewById(R.id.task_tvTitle);
+        TextView points = holder.view.findViewById(R.id.task_tvPoints);
+        title.setText(taskList.get(position).getTitle());
+        points.setText(String.valueOf(taskList.get(position).getReward()));
         
-        header.setText(String.valueOf(taskList.get(position).getReward()));
-        description.setText(taskList.get(position).getTagId());
+        PhotoView photoView = holder.view.findViewById(R.id.task_imageView);
+        photoView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        
+        Picasso.with(holder.view.getContext())
+                .load(taskList.get(position).getImgUrl())
+                .into(photoView);
+        
     }
     
     // Return the size of your dataset (invoked by the layout manager)
@@ -71,5 +82,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         this.taskList = taskList;
         notifyDataSetChanged();
     }
+    
+    
     
 }
