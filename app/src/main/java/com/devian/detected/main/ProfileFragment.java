@@ -141,11 +141,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
-                if (response.body().getType() == ServerResponse.TYPE_STATS_EXISTS) {
-                    UserStats userStats = gson.fromJson(response.body().getData(), UserStats.class);
-                    updateUI(userStats, null, null);
-                } else {
-                    Log.e(TAG, "onResponse: user stats does not exist on the server");
+                if (response.body() == null)
+                    return;
+                try {
+                    if (response.body().getType() == ServerResponse.TYPE_STATS_EXISTS) {
+                        UserStats userStats = gson.fromJson(response.body().getData(), UserStats.class);
+                        updateUI(userStats, null, null);
+                    } else {
+                        Log.e(TAG, "onResponse: user stats does not exist on the server");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             
@@ -164,13 +170,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body() == null)
                     return;
-                if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
-                    Type listType = new TypeToken<ArrayList<RankRow>>() {
-                    }.getType();
-                    List<RankRow> top10 = gson.fromJson(response.body().getData(), listType);
-                    updateUI(null, top10, null);
-                } else
-                    Log.e(TAG, "onResponse (top10): type != TYPE_RANK_SUCCESS");
+                try {
+                    if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
+                        Type listType = new TypeToken<ArrayList<RankRow>>() {
+                        }.getType();
+                        List<RankRow> top10 = gson.fromJson(response.body().getData(), listType);
+                        updateUI(null, top10, null);
+                    } else
+                        Log.e(TAG, "onResponse (top10): type != TYPE_RANK_SUCCESS");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             
             }
             
@@ -188,11 +198,15 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body() == null)
                     return;
-                if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
-                    RankRow rankRow = gson.fromJson(response.body().getData(), RankRow.class);
-                    updateUI(null, null, rankRow);
-                } else
-                    Log.e(TAG, "onResponse (personal rank): type != TYPE_RANK_SUCCESS");
+                try {
+                    if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
+                        RankRow rankRow = gson.fromJson(response.body().getData(), RankRow.class);
+                        updateUI(null, null, rankRow);
+                    } else
+                        Log.e(TAG, "onResponse (personal rank): type != TYPE_RANK_SUCCESS");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         
             @Override

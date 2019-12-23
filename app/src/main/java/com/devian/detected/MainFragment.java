@@ -188,7 +188,7 @@ public class MainFragment extends AppCompatActivity
     @Override
     public void onTaskItemSelected(Task task) {
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_main, new TaskInfoFragment(task), "taskinfo")
+                .add(R.id.fragment_main, TaskInfoFragment.newInstance(task), "taskinfo")
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right)
                 .addToBackStack(null)

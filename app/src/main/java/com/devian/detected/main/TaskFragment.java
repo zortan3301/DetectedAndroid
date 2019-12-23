@@ -44,8 +44,10 @@ public class TaskFragment extends Fragment
     
     private Gson gson = new Gson();
     
-    @BindView(R.id.recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.task_refreshLayout) SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.recycler_view)
+    RecyclerView recyclerView;
+    @BindView(R.id.task_refreshLayout)
+    SwipeRefreshLayout refreshLayout;
     
     private RecyclerAdapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
@@ -85,16 +87,23 @@ public class TaskFragment extends Fragment
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
-                if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
-                    Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
-                    List<Task> listTask = gson.fromJson(response.body().getData(), listType);
-                    mAdapter.setTaskList(listTask);
-                    refreshLayout.setRefreshing(false);
-                } else {
-                    Log.e(TAG, "onResponse: user stats does not exist on the server");
+                if (response.body() == null)
+                    return;
+                try {
+                    if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
+                        Type listType = new TypeToken<ArrayList<Task>>() {
+                        }.getType();
+                        List<Task> listTask = gson.fromJson(response.body().getData(), listType);
+                        mAdapter.setTaskList(listTask);
+                        refreshLayout.setRefreshing(false);
+                    } else {
+                        Log.e(TAG, "onResponse: user stats does not exist on the server");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-        
+    
             @Override
             public void onFailure(Call<ServerResponse> call, Throwable t) {
                 t.printStackTrace();

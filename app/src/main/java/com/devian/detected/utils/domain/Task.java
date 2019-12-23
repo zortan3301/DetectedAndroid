@@ -1,9 +1,10 @@
 package com.devian.detected.utils.domain;
 
 
+import java.io.Serializable;
 import java.sql.Date;
 
-public class Task {
+public class Task implements Serializable {
     private long id;
     private String tagId;
     private int reward;
@@ -81,4 +82,5 @@ public class Task {
     
     public static final int TYPE_MAP = 1;
     public static final int TYPE_TEXT = 2;
+    
 }
