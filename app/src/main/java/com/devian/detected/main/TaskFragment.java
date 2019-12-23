@@ -16,8 +16,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.devian.detected.R;
 import com.devian.detected.utils.Network.NetworkService;
-import com.devian.detected.utils.domain.ServerResponse;
+import com.devian.detected.utils.Network.ServerResponse;
 import com.devian.detected.utils.domain.Task;
+import com.devian.detected.utils.ui.OnItemClickListener;
 import com.devian.detected.utils.ui.RecyclerAdapter;
 import com.devian.detected.utils.ui.RecyclerItemDecorator;
 import com.google.gson.Gson;
@@ -34,9 +35,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class TaskFragment extends Fragment
-        implements SwipeRefreshLayout.OnRefreshListener {
+        implements SwipeRefreshLayout.OnRefreshListener,
+        OnItemClickListener {
     
     private static final String TAG = "TaskFragment";
+    
+    OnTaskItemSelectedListener callback;
     
     private Gson gson = new Gson();
     
@@ -58,8 +62,8 @@ public class TaskFragment extends Fragment
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        
-        mAdapter = new RecyclerAdapter(null);
+    
+        mAdapter = new RecyclerAdapter(null, this);
         recyclerView.setAdapter(mAdapter);
         int space = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 74,
                 getResources().getDisplayMetrics());
@@ -77,7 +81,7 @@ public class TaskFragment extends Fragment
     }
     
     private void updateTasks() {
-        NetworkService.getInstance().getJSONApi().getTextTasks().enqueue(new Callback<ServerResponse>() {
+        NetworkService.getInstance().getApi().getTextTasks().enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
@@ -102,5 +106,19 @@ public class TaskFragment extends Fragment
     public void onRefresh() {
         refreshLayout.setRefreshing(true);
         updateTasks();
+    }
+    
+    @Override
+    public void OnItemClicked(Task task) {
+        Log.d(TAG, "OnItemClicked: " + task.getTitle());
+        callback.onTaskItemSelected(task);
+    }
+    
+    public void setOnTaskItemSelectedListener(OnTaskItemSelectedListener callback) {
+        this.callback = callback;
+    }
+    
+    public interface OnTaskItemSelectedListener {
+        void onTaskItemSelected(Task task);
     }
 }

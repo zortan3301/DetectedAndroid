@@ -1,4 +1,4 @@
-package com.devian.detected.utils.domain;
+package com.devian.detected.utils.Network;
 
 import com.devian.detected.utils.security.AES256;
 

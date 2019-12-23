@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.devian.detected.R;
 import com.devian.detected.utils.Network.NetworkService;
-import com.devian.detected.utils.domain.ServerResponse;
+import com.devian.detected.utils.Network.ServerResponse;
 import com.devian.detected.utils.domain.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
@@ -131,7 +131,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
     
     private void getMarkers() {
-        NetworkService.getInstance().getJSONApi().getMapTasks().enqueue(new Callback<ServerResponse>() {
+        NetworkService.getInstance().getApi().getMapTasks().enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body() == null)

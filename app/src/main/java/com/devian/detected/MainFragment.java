@@ -11,10 +11,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.devian.detected.main.ScanActivity;
+import com.devian.detected.main.TaskFragment;
+import com.devian.detected.main.TaskInfoFragment;
 import com.devian.detected.utils.Network.NetworkService;
-import com.devian.detected.utils.domain.ServerResponse;
+import com.devian.detected.utils.Network.ServerResponse;
 import com.devian.detected.utils.domain.Task;
 import com.devian.detected.utils.security.AES256;
 import com.devian.detected.utils.ui.CustomViewPager;
@@ -36,7 +40,8 @@ import retrofit2.Response;
 
 public class MainFragment extends AppCompatActivity
         implements
-            View.OnClickListener{
+        View.OnClickListener,
+        TaskFragment.OnTaskItemSelectedListener {
     
     private static final String TAG = "MainFragment";
     
@@ -126,8 +131,8 @@ public class MainFragment extends AppCompatActivity
     
         Map<String, String> headers = new HashMap<>();
         headers.put("data", AES256.encrypt(user_data));
-        
-        NetworkService.getInstance().getJSONApi().scanTag(headers).enqueue(new Callback<ServerResponse>() {
+    
+        NetworkService.getInstance().getApi().scanTag(headers).enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body() == null) {
@@ -164,6 +169,30 @@ public class MainFragment extends AppCompatActivity
     
     @Override
     public void onBackPressed() {
+    
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+    
+        if (count != 0) {
+            getSupportFragmentManager().popBackStack();
+        }
+    }
+    
+    @Override
+    public void onAttachFragment(@NonNull Fragment fragment) {
+        if (fragment instanceof TaskFragment) {
+            TaskFragment taskFragment = (TaskFragment) fragment;
+            taskFragment.setOnTaskItemSelectedListener(this);
+        }
+    }
+    
+    @Override
+    public void onTaskItemSelected(Task task) {
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_main, new TaskInfoFragment(task), "taskinfo")
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right)
+                .addToBackStack(null)
+                .commit();
     }
 }
 

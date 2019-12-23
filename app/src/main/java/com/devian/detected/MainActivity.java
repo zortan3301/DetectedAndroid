@@ -10,11 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.devian.detected.login.AuthFragment;
 import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.Network.NetworkService;
-import com.devian.detected.utils.domain.ServerResponse;
+import com.devian.detected.utils.Network.ServerResponse;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -55,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
         btnRefresh.setVisibility(View.INVISIBLE);
         final TextView textView = findViewById(R.id.main_text);
         textView.setText("Загрузка ...");
-        
-        NetworkService.getInstance().getJSONApi().testConnection().enqueue(new Callback<ServerResponse>() {
+    
+        NetworkService.getInstance().getApi().testConnection().enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body().getType() == 0) {

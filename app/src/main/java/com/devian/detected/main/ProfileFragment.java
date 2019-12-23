@@ -20,8 +20,8 @@ import com.devian.detected.MainActivity;
 import com.devian.detected.R;
 import com.devian.detected.utils.LevelManager;
 import com.devian.detected.utils.Network.NetworkService;
+import com.devian.detected.utils.Network.ServerResponse;
 import com.devian.detected.utils.domain.RankRow;
-import com.devian.detected.utils.domain.ServerResponse;
 import com.devian.detected.utils.domain.UserStats;
 import com.devian.detected.utils.security.AES256;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -137,7 +137,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         Map<String, String> headers = new HashMap<>();
         headers.put("data", AES256.encrypt(mAuth.getUid()));
         Log.d(TAG, "updateStatistics: " + AES256.encrypt(mAuth.getUid()));
-        NetworkService.getInstance().getJSONApi().getStats(headers).enqueue(new Callback<ServerResponse>() {
+        NetworkService.getInstance().getApi().getStats(headers).enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
@@ -159,7 +159,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     void updateRankings() {
         Log.d(TAG, "updateRankings");
         // Get top 10 users
-        NetworkService.getInstance().getJSONApi().getRankTop10().enqueue(new Callback<ServerResponse>() {
+        NetworkService.getInstance().getApi().getRankTop10().enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body() == null)
@@ -183,7 +183,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // Get personal rank
         Map<String, String> headers = new HashMap<>();
         headers.put("data", AES256.encrypt(mAuth.getUid()));
-        NetworkService.getInstance().getJSONApi().getPersonalRank(headers).enqueue(new Callback<ServerResponse>() {
+        NetworkService.getInstance().getApi().getPersonalRank(headers).enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body() == null)

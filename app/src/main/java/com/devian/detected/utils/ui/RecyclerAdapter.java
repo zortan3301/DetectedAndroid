@@ -1,6 +1,5 @@
 package com.devian.detected.utils.ui;
 
-import android.graphics.Matrix;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.devian.detected.R;
 import com.devian.detected.utils.domain.Task;
-import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -20,18 +18,29 @@ import java.util.List;
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
     
     private List<Task> taskList;
+    private OnItemClickListener listener;
     
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         public View view;
-        public ViewHolder(View v) {
+    
+        ViewHolder(View v) {
             super(v);
             view = v;
         }
+    
+        void bind(final Task task, final OnItemClickListener clickListener) {
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickListener.OnItemClicked(task);
+                }
+            });
+        }
     }
     
-    public RecyclerAdapter(List<Task> taskList) {
+    public RecyclerAdapter(List<Task> taskList, OnItemClickListener listener) {
         this.taskList = taskList;
+        this.listener = listener;
     }
     
     @NonNull
@@ -46,7 +55,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
     
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         if (taskList == null)
@@ -63,6 +72,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 .fit()
                 .centerCrop()
                 .into(imageView);
+    
+        holder.bind(taskList.get(position), listener);
         
     }
     
@@ -83,7 +94,4 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         this.taskList = taskList;
         notifyDataSetChanged();
     }
-    
-    
-    
 }
