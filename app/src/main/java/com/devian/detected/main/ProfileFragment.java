@@ -55,8 +55,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     
     @BindView(R.id.profile_tvName)
     TextView tvName;
-    @BindView(R.id.profile_tvEmail)
-    TextView tvEmail;
     @BindView(R.id.profile_btnLogout)
     Button btnLogout;
     
@@ -94,7 +92,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     
     private void init() {
         tvName.setText(mAuth.getCurrentUser().getDisplayName());
-        tvEmail.setText(mAuth.getCurrentUser().getEmail());
     }
     
     @Override
