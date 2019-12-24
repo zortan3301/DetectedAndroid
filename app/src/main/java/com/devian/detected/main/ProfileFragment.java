@@ -8,7 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -29,6 +30,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -55,8 +57,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     
     @BindView(R.id.profile_tvName)
     TextView tvName;
-    @BindView(R.id.profile_btnLogout)
-    Button btnLogout;
     
     @BindView(R.id.profile_tvLevel)
     TextView tvLevel;
@@ -69,6 +69,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @BindView(R.id.profile_progressLevel)
     ProgressBar progressLevel;
     
+    private FloatingActionButton fab_settings, fab_exit, fab_edit;
+    private TextView tv_fab_exit, tv_fab_edit;
+    private Animation fab_open, fab_close, fab_clock, fab_anticlock;
+    private Boolean fab_settings_open = false;
+    
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -77,8 +82,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         ButterKnife.bind(this, v);
         mAuth = FirebaseAuth.getInstance();
         init();
-        
-        btnLogout.setOnClickListener(this);
+        init_fab(v);
         
         return v;
     }
@@ -97,19 +101,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.profile_btnLogout:
-                new AlertDialog.Builder(getContext())
-                        .setTitle("Выход из аккаунта")
-                        .setMessage("Вы уверены, что хотите выйти из аккаунта?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                logout();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-                break;
+    
         }
     }
     
@@ -231,5 +223,78 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                         startActivity(intent);
                     }
                 });
+    }
+    
+    private void init_fab(View v) {
+        fab_settings = v.findViewById(R.id.fab_settings);
+        fab_exit = v.findViewById(R.id.fab_exit);
+        fab_edit = v.findViewById(R.id.fab_edit);
+        
+        fab_close = AnimationUtils.loadAnimation(getContext(), R.anim.fab_close);
+        fab_open = AnimationUtils.loadAnimation(getContext(), R.anim.fab_open);
+        fab_clock = AnimationUtils.loadAnimation(getContext(), R.anim.fab_rotate_clock);
+        fab_anticlock = AnimationUtils.loadAnimation(getContext(), R.anim.fab_rotate_anticlock);
+        
+        tv_fab_exit = v.findViewById(R.id.profile_tv_fab_exit);
+        tv_fab_edit = v.findViewById(R.id.profile_tv_fab_edit);
+        
+        fab_settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (fab_settings_open) {
+                    fab_exit.startAnimation(fab_close);
+                    fab_edit.startAnimation(fab_close);
+                    fab_settings.startAnimation(fab_anticlock);
+                    
+                    fab_exit.setClickable(false);
+                    fab_edit.setClickable(false);
+                    
+                    tv_fab_exit.setVisibility(View.INVISIBLE);
+                    tv_fab_edit.setVisibility(View.INVISIBLE);
+                    tv_fab_exit.startAnimation(fab_close);
+                    tv_fab_edit.startAnimation(fab_close);
+                    
+                    fab_settings_open = false;
+                } else {
+                    fab_exit.startAnimation(fab_open);
+                    fab_edit.startAnimation(fab_open);
+                    fab_settings.startAnimation(fab_clock);
+                    
+                    fab_exit.setClickable(true);
+                    fab_edit.setClickable(true);
+                    
+                    tv_fab_exit.setVisibility(View.VISIBLE);
+                    tv_fab_edit.setVisibility(View.VISIBLE);
+                    tv_fab_exit.startAnimation(fab_open);
+                    tv_fab_edit.startAnimation(fab_open);
+                    
+                    fab_settings_open = true;
+                }
+            }
+        });
+        
+        fab_exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Выход из аккаунта")
+                        .setMessage("Вы уверены, что хотите выйти из аккаунта?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                logout();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+        
+        fab_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            
+            }
+        });
     }
 }
