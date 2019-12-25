@@ -254,27 +254,28 @@
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_marginStart="32dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="32dp"
-                    android:layout_marginBottom="72dp"
+                    android:layout_marginBottom="74dp"
                     android:background="@color/lightBlue"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/profile_tvRating1" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <TextView
                     android:id="@+id/profile_tvRating1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="16dp"
                     android:autoSizeMinTextSize="18sp"
-                    android:autoSizeTextType="uniform"
+                    android:autoSizeTextType="none"
                     android:fontFamily="@font/consola"
                     android:maxLines="10"
                     android:textColor="@color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@+id/view6"
                     app:layout_constraintEnd_toStartOf="@+id/profile_tvRating2"
                     app:layout_constraintStart_toStartOf="@+id/view5"
                     app:layout_constraintTop_toBottomOf="@+id/view5" />
@@ -282,16 +283,17 @@
                 <TextView
                     android:id="@+id/profile_tvRating2"
                     android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_height="0dp"
                     android:autoSizeMinTextSize="18sp"
-                    android:autoSizeTextType="uniform"
+                    android:autoSizeTextType="none"
                     android:fontFamily="@font/consola"
                     android:maxLines="10"
                     android:textAlignment="textEnd"
                     android:textColor="@color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/profile_tvRating1"
                     app:layout_constraintEnd_toEndOf="@+id/view5"
-                    app:layout_constraintTop_toBottomOf="@+id/view5" />
+                    app:layout_constraintTop_toTopOf="@+id/profile_tvRating1" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
