@@ -26,7 +26,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,7 +39,7 @@ public class TaskFragment extends Fragment
     
     private static final String TAG = "TaskFragment";
     
-    OnTaskItemSelectedListener callback;
+    private OnTaskItemSelectedListener callback;
     
     private Gson gson = new Gson();
     
@@ -50,7 +49,8 @@ public class TaskFragment extends Fragment
     SwipeRefreshLayout refreshLayout;
     
     private RecyclerAdapter mAdapter;
-    private RecyclerView.LayoutManager layoutManager;
+    
+    private ArrayList<Task> tasks;
     
     @Nullable
     @Override
@@ -62,7 +62,7 @@ public class TaskFragment extends Fragment
         refreshLayout.setOnRefreshListener(this);
     
         recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
     
         mAdapter = new RecyclerAdapter(null, this);
@@ -70,22 +70,32 @@ public class TaskFragment extends Fragment
         int space = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 74,
                 getResources().getDisplayMetrics());
         recyclerView.addItemDecoration(new RecyclerItemDecorator(space));
-        
-        updateTasks();
+    
+        checkSavedBundle(savedInstanceState);
         
         return v;
     }
     
+    private void checkSavedBundle(Bundle inState) {
+        if (inState != null) {
+            tasks = (ArrayList<Task>) inState.getSerializable("tasks");
+            mAdapter.setTaskList(tasks);
+        } else {
+            updateTasks();
+        }
+    }
+    
     @Override
-    public void onResume() {
-        super.onResume();
-        updateTasks();
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("tasks", tasks);
     }
     
     private void updateTasks() {
         NetworkService.getInstance().getApi().getTextTasks().enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
                 if (response.body() == null) {
                     Log.e(TAG, "updateTasks onResponse: response body is null");
                     return;
@@ -94,8 +104,8 @@ public class TaskFragment extends Fragment
                     if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
                         Type listType = new TypeToken<ArrayList<Task>>() {
                         }.getType();
-                        List<Task> listTask = gson.fromJson(response.body().getData(), listType);
-                        mAdapter.setTaskList(listTask);
+                        tasks = gson.fromJson(response.body().getData(), listType);
+                        mAdapter.setTaskList(tasks);
                         refreshLayout.setRefreshing(false);
                     } else {
                         Log.e(TAG, "onResponse: user stats does not exist on the server");
@@ -106,7 +116,8 @@ public class TaskFragment extends Fragment
             }
     
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
                 t.printStackTrace();
             }
         });

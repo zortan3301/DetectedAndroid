@@ -40,7 +40,6 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import retrofit2.Call;
@@ -58,20 +57,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Gson gson = new Gson();
     private MapView mapView;
     private SymbolManager symbolManager = null;
-    private MapboxMap mapbox = null;
+    private Bundle savedBundle;
+    
+    private ArrayList<Task> tasks;
     
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        
         Mapbox.getInstance(getContext(), "pk.eyJ1IjoiYW1pbm92bWFrc2ltIiwiYSI6ImNrNDM2OXJqZzA0N3Izbm9icWc2ZGxhMGYifQ.mZzd2YEu-PpsODWkQMSB2g");
-    
         View v = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = v.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+    
+        savedBundle = savedInstanceState;
         
         return v;
+    }
+    
+    private void checkSavedBundle(Bundle inState) {
+        if (inState != null) {
+            tasks = (ArrayList<Task>) inState.getSerializable("tasks");
+            updateMarkers();
+        } else {
+            getMarkers();
+        }
+    }
+    
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+        outState.putSerializable("tasks", tasks);
     }
     
     @Override
@@ -83,11 +100,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onStyleLoaded(@NonNull final Style style) {
                 style.addImage("my-marker", bm);
-                for (int i = 0; i < markers.length; i++) {
-                    String mDrawableName = markers[i];
-                    int resId = getResources().getIdentifier(mDrawableName , "drawable", getContext().getPackageName());
+                for (String mDrawableName : markers) {
+                    int resId = getResources().getIdentifier(mDrawableName, "drawable", getContext().getPackageName());
                     Bitmap bm = BitmapFactory.decodeResource(getResources(), resId);
-                    style.addImage(markers[i], bm);
+                    style.addImage(mDrawableName, bm);
                 }
                 symbolManager = new SymbolManager(mapView, mapboxMap, style);
                 symbolManager.setIconAllowOverlap(true);
@@ -115,7 +131,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 }).show();
                     }
                 });
-                getMarkers();
+                checkSavedBundle(savedBundle);
             }
         });
         
@@ -134,31 +150,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private void getMarkers() {
         NetworkService.getInstance().getApi().getMapTasks().enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
                 if (response.body() == null) {
                     Log.e(TAG, "updateTasks onResponse: response body is null");
                     return;
                 }
                 if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
-                    String json = response.body().getData();
                     Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
-                    List<Task> listTask = gson.fromJson(response.body().getData(), listType);
-                    updateMarkers(listTask);
+                    tasks = gson.fromJson(response.body().getData(), listType);
+                    updateMarkers();
                 }
             }
     
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
                 t.printStackTrace();
             }
         });
     }
     
-    private void updateMarkers(List<Task> listTask) {
+    private void updateMarkers() {
         if (symbolManager == null)
             return;
-    
-        for (Task t : listTask) {
+        if (tasks == null)
+            return;
+        
+        for (Task t : tasks) {
             symbolManager.create(new SymbolOptions()
                     .withLatLng(new LatLng(t.getLatitude(), t.getLongitude()))
                     .withIconImage(markers[(new Random()).nextInt(markers.length)])
@@ -200,11 +219,5 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
-    }
-    
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
     }
 }

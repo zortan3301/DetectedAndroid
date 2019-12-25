@@ -105,15 +105,34 @@ public class ProfileFragment extends Fragment
         refreshLayout.setOnRefreshListener(this);
         mAuth = FirebaseAuth.getInstance();
     
-        init();
         init_fab(v);
+    
+        checkSavedBundle(savedInstanceState);
         
         return v;
     }
     
+    private void checkSavedBundle(Bundle inState) {
+        if (inState != null) {
+            currentUser = (User) inState.getSerializable("currentUser");
+            userStats = (UserStats) inState.getSerializable("userStats");
+            selfRank = (RankRow) inState.getSerializable("selfRank");
+            top10 = (ArrayList<RankRow>) inState.getSerializable("top10");
+            currentEvent = (String) inState.getSerializable("currentEvent");
+        } else {
+            init();
+        }
+        updateUI();
+    }
+    
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("currentUser", currentUser);
+        outState.putSerializable("userStats", userStats);
+        outState.putSerializable("selfRank", selfRank);
+        outState.putSerializable("top10", top10);
+        outState.putSerializable("currentEvent", currentEvent);
     }
     
     private void init() {
@@ -164,16 +183,6 @@ public class ProfileFragment extends Fragment
             tvEvent.setText(spannable);
         }
         refreshLayout.setRefreshing(false);
-    }
-    
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("currentUser", currentUser);
-        outState.putSerializable("userStats", userStats);
-        outState.putSerializable("selfRank", selfRank);
-        outState.putSerializable("top10", top10);
-        outState.putSerializable("currentEvent", currentEvent);
     }
     
     private void updateUserInfo() {
