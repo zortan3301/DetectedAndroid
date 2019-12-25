@@ -57,6 +57,9 @@ public class TaskInfoFragment extends Fragment {
         if (savedInstanceState != null) {
             task = (Task) savedInstanceState.getSerializable("task");
         }
+        if (getArguments() != null) {
+            task = (Task) getArguments().getSerializable("task");
+        }
         View v = inflater.inflate(R.layout.fragment_taskinfo, container, false);
         ButterKnife.bind(this, v);
         mAuth = FirebaseAuth.getInstance();
@@ -77,9 +80,6 @@ public class TaskInfoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (getArguments() != null) {
-            task = (Task) getArguments().getSerializable("task");
-        }
     }
     
     @Override
