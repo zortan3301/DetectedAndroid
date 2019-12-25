@@ -54,10 +54,6 @@ public class TaskInfoFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-    
-        if (getArguments() != null) {
-            task = (Task) getArguments().getSerializable("task");
-        }
         if (savedInstanceState != null) {
             task = (Task) savedInstanceState.getSerializable("task");
         }
@@ -76,6 +72,14 @@ public class TaskInfoFragment extends Fragment {
                 .into(imageView);
         
         return v;
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getArguments() != null) {
+            task = (Task) getArguments().getSerializable("task");
+        }
     }
     
     @Override

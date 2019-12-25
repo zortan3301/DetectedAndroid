@@ -86,9 +86,10 @@ public class TaskFragment extends Fragment
         NetworkService.getInstance().getApi().getTextTasks().enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
-                if (response.body() == null)
+                if (response.body() == null) {
+                    Log.e(TAG, "updateTasks onResponse: response body is null");
                     return;
+                }
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
                         Type listType = new TypeToken<ArrayList<Task>>() {

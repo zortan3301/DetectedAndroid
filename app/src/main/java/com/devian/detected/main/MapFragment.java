@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -134,8 +135,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         NetworkService.getInstance().getApi().getMapTasks().enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                if (response.body() == null)
+                if (response.body() == null) {
+                    Log.e(TAG, "updateTasks onResponse: response body is null");
                     return;
+                }
                 if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
                     String json = response.body().getData();
                     Type listType = new TypeToken<ArrayList<Task>>(){}.getType();

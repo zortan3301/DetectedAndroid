@@ -136,15 +136,15 @@ public class MainFragment extends AppCompatActivity
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body() == null) {
-                    showSnackbar("Недействительная метка", Toast.LENGTH_LONG);
+                    showSnackbar("Недействительная метка", Snackbar.LENGTH_LONG);
                     return;
                 }
                 switch (response.body().getType()) {
                     case ServerResponse.TYPE_TASK_ALREADY_COMPLETED:
-                        showSnackbar("Данное задание уже выполнено", Toast.LENGTH_LONG);
+                        showSnackbar("Данное задание уже выполнено", Snackbar.LENGTH_LONG);
                         break;
                     case ServerResponse.TYPE_TASK_FAILURE:
-                        showSnackbar("Недействительная метка", Toast.LENGTH_LONG);
+                        showSnackbar("Недействительная метка", Snackbar.LENGTH_LONG);
                         break;
                     case ServerResponse.TYPE_TASK_COMPLETED:
                         Task completedTask = gson.fromJson(response.body().getData(), Task.class);

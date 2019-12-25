@@ -2,7 +2,9 @@ package com.devian.detected.utils.domain;
 
 import com.devian.detected.utils.LevelManager;
 
-public class UserStats {
+import java.io.Serializable;
+
+public class UserStats implements Serializable {
 
     private String uid;
     private long points;

@@ -1,6 +1,8 @@
 package com.devian.detected.utils.domain;
 
-public class RankRow {
+import java.io.Serializable;
+
+public class RankRow implements Serializable {
     private String uid;
     private long rank;
     private String nickname;

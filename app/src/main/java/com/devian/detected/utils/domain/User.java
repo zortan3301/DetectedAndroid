@@ -1,8 +1,9 @@
 package com.devian.detected.utils.domain;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.sql.Date;
 
-public class User {
+public class User implements Serializable {
     
     private String uid;
     private String displayName;
