@@ -3,7 +3,29 @@
     <string name="app_name">#DETECTED</string>
     <string name="title_activity_maps">Map</string>
 
-    <!-- Map -->
+    <!-- Profile tab -->
+    <string name="current_event">$> cat \'текущий ивент.txt\'\n\n</string>
+    <string name="account_exit">Выход из аккаунта</string>
+    <string name="account_exit_confirmation">Вы уверены, что хотите выйти из аккаунта?</string>
+    <string name="points">Баллов:</string>
+    <string name="level">уровень</string>
+    <string name="zero">0</string>
+    <string name="scanned_tags">Просканировано меток:</string>
+    <string name="rank">место</string>
+    <string name="common_ranking">Общий рейтинг:</string>
+    <string name="exit">выход</string>
+    <string name="edit">изменить</string>
+
+    <!-- Task tab -->
+    <string name="tasks_unavailable">Заданий пока нет…\nИли вам кажется, что их нет</string>
+
+    <!-- TaskInfo tab -->
+    <string name="execution_reward">За выполнение вы получите:</string>
+
+    <!-- Map tab-->
     <string name="map_style">mapbox://styles/aminovmaksim/ck4397jle16vo1cpalemp5ddc</string>
+
+    <!-- Other -->
+    <string name="task_image">image of the task</string>
 
 </resources>

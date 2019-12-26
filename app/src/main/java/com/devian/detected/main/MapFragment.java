@@ -47,6 +47,8 @@ import retrofit2.Response;
 
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
 
+// TODO: 26.12.2019 make update fab
+
 public class MapFragment extends Fragment implements OnMapReadyCallback {
     
     private static final String TAG = "MapFragment";
@@ -112,8 +114,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapboxMap.setStyle(new Style.Builder().fromUri(MAP_STYLE), new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull final Style style) {
-                Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
-                style.addImage("marker", bm);
+                Bitmap bitmapMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
+                style.addImage("marker", bitmapMarker);
                 
                 symbolManager = new SymbolManager(mapView, mapboxMap, style);
                 symbolManager.setIconAllowOverlap(true);
@@ -200,7 +202,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             symbolManager.create(new SymbolOptions()
                     .withLatLng(new LatLng(t.getLatitude(), t.getLongitude()))
                     .withIconImage("marker")
-                    .withIconSize(0.03f));
+                    .withIconSize(0.6f));
         }
     }
     

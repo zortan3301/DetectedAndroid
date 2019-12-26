@@ -204,7 +204,7 @@ public class ProfileFragment extends Fragment
             tvRating.setText(rank);
         }
         if (currentEvent != null) {
-            String text = "$> cat 'текущий ивент.txt'\n\n" + currentEvent;
+            String text = getString(R.string.current_event) + currentEvent;
             SpannableStringBuilder spannable = new SpannableStringBuilder(text);
             spannable.setSpan(
                     new ForegroundColorSpan(Color.BLUE),
@@ -458,8 +458,8 @@ public class ProfileFragment extends Fragment
             @Override
             public void onClick(View view) {
                 new AlertDialog.Builder(getContext())
-                        .setTitle("Выход из аккаунта")
-                        .setMessage("Вы уверены, что хотите выйти из аккаунта?")
+                        .setTitle(getString(R.string.account_exit))
+                        .setMessage(getString(R.string.account_exit_confirmation))
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 logout();

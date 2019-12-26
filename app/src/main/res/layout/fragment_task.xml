@@ -2,18 +2,21 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/textView5"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
         android:autoSizeTextType="uniform"
         android:fontFamily="@font/consola"
         android:maxLines="2"
-        android:text="Заданий пока нет...\nИли вам кажется, что их нет"
+        android:text="@string/tasks_unavailable"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="18sp"
@@ -33,7 +36,8 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            tools:itemCount="0">
 
         </androidx.recyclerview.widget.RecyclerView>
 

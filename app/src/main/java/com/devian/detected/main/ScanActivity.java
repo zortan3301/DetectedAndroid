@@ -12,6 +12,8 @@ import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
+// TODO: 26.12.2019 add flashlight
+
 public class ScanActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     
     private static final String TAG = "ScanActivity";

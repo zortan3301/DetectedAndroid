@@ -42,7 +42,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/hacked"
-            android:text="За выполнение вы получите:"
+            android:text="@string/execution_reward"
             android:textColor="@color/lightBlue"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
