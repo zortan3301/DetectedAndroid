@@ -41,7 +41,6 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:8.5.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-annotation-v8:0.7.0'
 
-    implementation 'com.budiyev.android:code-scanner:2.1.0'
     implementation 'com.google.android.gms:play-services-vision:19.0.0'
     implementation 'me.dm7.barcodescanner:zxing:1.9'
 

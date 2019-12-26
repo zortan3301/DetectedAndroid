@@ -47,7 +47,7 @@ import retrofit2.Response;
 
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
 
-// TODO: 26.12.2019 make update fab
+// TODO: 26.12.2019 make update circle_black
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
     

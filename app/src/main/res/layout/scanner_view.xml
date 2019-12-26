@@ -3,28 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/fragment_main"
-    android:background="@color/black">
+    android:layout_height="match_parent">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_qr"
+        android:id="@+id/fab_flashlight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
-        android:background="@color/black"
         android:backgroundTint="@color/black"
         android:tint="@color/yellow"
+        android:src="@drawable/ic_flashlight"
         android:clickable="true"
-        app:rippleColor="@color/lightBlue"
         app:borderWidth="1dp"
+        app:rippleColor="@color/lightBlue"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/pager"
-        app:srcCompat="@drawable/ic_qr_code" />
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <com.devian.detected.utils.ui.CustomViewPager
-        android:id="@+id/pager"
+    <me.dm7.barcodescanner.zxing.ZXingScannerView
+        android:id="@+id/scanner_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -32,13 +29,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabTextColor="@color/lightBlue"
-            app:tabSelectedTextColor="@color/white"/>
-
-    </com.devian.detected.utils.ui.CustomViewPager>
+    </me.dm7.barcodescanner.zxing.ZXingScannerView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
