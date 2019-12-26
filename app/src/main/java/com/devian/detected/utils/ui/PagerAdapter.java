@@ -1,5 +1,6 @@
 package com.devian.detected.utils.ui;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -9,25 +10,23 @@ import com.devian.detected.main.ProfileFragment;
 import com.devian.detected.main.TaskFragment;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
+    
     public PagerAdapter(FragmentManager fm) {
-        super(fm);
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
     }
     
+    @NonNull
     @Override
     public Fragment getItem(int position) {
-        Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = new ProfileFragment();
-                break;
+                return new ProfileFragment();
             case 1:
-                fragment = new TaskFragment();
-                break;
+                return new TaskFragment();
             case 2:
-                fragment = new MapFragment();
-                break;
+                return new MapFragment();
         }
-        return fragment;
+        return new ProfileFragment();
     }
     
     @Override

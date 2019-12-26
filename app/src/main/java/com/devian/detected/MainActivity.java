@@ -1,6 +1,7 @@
 package com.devian.detected;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -22,15 +23,15 @@ public class MainActivity extends AppCompatActivity {
     
     private static final String TAG = "MainActivity";
     
-    public static MainActivity mInstance;
-    
     @BindView(R.id.main_btnRefresh) Button btnRefresh;
+    
+    private Call<ServerResponse> callTestConn;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mInstance = this;
         
         NetworkService.getInstance();
         LocalStorage.getInstance(this);
@@ -50,12 +51,14 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void testConnection() {
-    
+        Log.d(TAG, "testConnection");
+        
         btnRefresh.setVisibility(View.INVISIBLE);
         final TextView textView = findViewById(R.id.main_text);
         textView.setText("Загрузка ...");
     
-        NetworkService.getInstance().getApi().testConnection().enqueue(new Callback<ServerResponse>() {
+        callTestConn = NetworkService.getInstance().getApi().testConnection();
+        callTestConn.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
                 if (response.body().getType() == 0) {
@@ -70,14 +73,27 @@ public class MainActivity extends AppCompatActivity {
     
             @Override
             public void onFailure(Call<ServerResponse> call, Throwable t) {
-                t.printStackTrace();
-                textView.setText("Нет соединения с сервером, попробуйте зайти позже");
-                btnRefresh.setVisibility(View.VISIBLE);
+                if (call.isCanceled())
+                    Log.d(TAG, "callTestConn is cancelled");
+                else {
+                    t.printStackTrace();
+                    textView.setText("Нет соединения с сервером, попробуйте зайти позже");
+                    btnRefresh.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
     
     @Override
     public void onBackPressed() {
+        Log.d(TAG, "onBackPressed");
+    }
+    
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+        if (callTestConn != null)
+            callTestConn.cancel();
     }
 }

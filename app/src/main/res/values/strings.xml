@@ -1,10 +1,9 @@
 <resources>
-    <string name="app_name">detected</string>
+    <!-- General -->
+    <string name="app_name">#DETECTED</string>
     <string name="title_activity_maps">Map</string>
 
-    <!--    Permissions    -->
-    <string name="permission_rationale_location">Чтобы выполнить задания, приложению необходим доступ к вашему месторасположению.</string>
-    <string name="location_permission_denied">Необходим доступ к вашему месторасположению. Включите его в настройках.</string>
-    <string name="permission_required_toast">Необходим доступ к вашему месторасположению</string>
+    <!-- Map -->
+    <string name="map_style">mapbox://styles/aminovmaksim/ck4397jle16vo1cpalemp5ddc</string>
 
 </resources>

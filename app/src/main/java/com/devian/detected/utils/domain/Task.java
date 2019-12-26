@@ -1,19 +1,18 @@
 package com.devian.detected.utils.domain;
 
 
-import java.io.Serializable;
-import java.sql.Date;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Task implements Serializable {
+public class Task implements Parcelable {
     private long id;
     private String tagId;
     private int reward;
     private int type;
     private float Latitude;
     private float Longitude;
-    private boolean completed;
+    private int completed;
     private String executor;
-    private Date completedTime;
     
     private String title;
     private String description;
@@ -23,6 +22,44 @@ public class Task implements Serializable {
         this.tagId = tagId;
         this.executor = executor;
     }
+    
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(this.id);
+        parcel.writeString(this.tagId);
+        parcel.writeInt(this.reward);
+        parcel.writeInt(this.type);
+        parcel.writeFloat(this.Latitude);
+        parcel.writeFloat(this.Longitude);
+        parcel.writeInt(this.completed);
+        parcel.writeString(this.executor);
+    }
+    
+    private Task(Parcel in) {
+        id = in.readLong();
+        tagId = in.readString();
+        reward = in.readInt();
+        type = in.readInt();
+        Latitude = in.readFloat();
+        Longitude = in.readFloat();
+        completed = in.readInt();
+        executor = in.readString();
+        title = in.readString();
+        description = in.readString();
+        imgUrl = in.readString();
+    }
+    
+    public static final Creator<Task> CREATOR = new Creator<Task>() {
+        @Override
+        public Task createFromParcel(Parcel in) {
+            return new Task(in);
+        }
+        
+        @Override
+        public Task[] newArray(int size) {
+            return new Task[size];
+        }
+    };
     
     public void setTagId(String tagId) {
         this.tagId = tagId;
@@ -56,16 +93,12 @@ public class Task implements Serializable {
         return Longitude;
     }
     
-    public boolean isCompleted() {
+    public int getCompleted() {
         return completed;
     }
     
     public String getExecutor() {
         return executor;
-    }
-    
-    public Date getCompletedTime() {
-        return completedTime;
     }
     
     public String getTitle() {
@@ -83,4 +116,8 @@ public class Task implements Serializable {
     public static final int TYPE_MAP = 1;
     public static final int TYPE_TEXT = 2;
     
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 }

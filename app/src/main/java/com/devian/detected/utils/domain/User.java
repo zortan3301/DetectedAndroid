@@ -17,14 +17,6 @@ public class User implements Serializable {
         this.lastLogin = null;
     }
     
-    public String getUid() {
-        return uid;
-    }
-    
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-    
     public String getDisplayName() {
         return displayName;
     }

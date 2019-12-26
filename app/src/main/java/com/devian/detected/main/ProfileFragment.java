@@ -1,5 +1,6 @@
 package com.devian.detected.main;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,6 +59,8 @@ public class ProfileFragment extends Fragment
     
     private static final String TAG = "ProfileFragment";
     
+    private Activity mActivity;
+    
     private FirebaseAuth mAuth;
     
     private Gson gson = new Gson();
@@ -95,30 +99,43 @@ public class ProfileFragment extends Fragment
     private ArrayList<RankRow> top10;
     private String currentEvent;
     
+    private Call<ServerResponse> callUpdateUserInfo, callUpdateStatistics, callUpdateTop10,
+            callUpdateSelfRank, callUpdateEvent;
+    
+    @Override
+    public void onAttachFragment(@NonNull Fragment childFragment) {
+        Log.d(TAG, "onAttachFragment");
+        super.onAttachFragment(childFragment);
+        mActivity = childFragment.getActivity();
+    }
+    
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_profile, container, false);
-        ButterKnife.bind(this, v);
-    
+        Log.d(TAG, "onCreateView");
+        View mView = inflater.inflate(R.layout.fragment_profile, container, false);
+        ButterKnife.bind(this, mView);
+        
         refreshLayout.setOnRefreshListener(this);
         mAuth = FirebaseAuth.getInstance();
     
-        init_fab(v);
-    
-        checkSavedBundle(savedInstanceState);
+        init_fab(mView);
         
-        return v;
+        checkSavedBundle(savedInstanceState);
+    
+        return mView;
     }
     
     private void checkSavedBundle(Bundle inState) {
+        Log.d(TAG, "checkSavedBundle");
         if (inState != null) {
             currentUser = (User) inState.getSerializable("currentUser");
             userStats = (UserStats) inState.getSerializable("userStats");
-            selfRank = (RankRow) inState.getSerializable("selfRank");
-            top10 = (ArrayList<RankRow>) inState.getSerializable("top10");
             currentEvent = (String) inState.getSerializable("currentEvent");
+            selfRank = inState.getParcelable("selfRank");
+            top10 = inState.getParcelableArrayList("top10");
         } else {
             init();
         }
@@ -127,15 +144,17 @@ public class ProfileFragment extends Fragment
     
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putSerializable("currentUser", currentUser);
         outState.putSerializable("userStats", userStats);
-        outState.putSerializable("selfRank", selfRank);
-        outState.putSerializable("top10", top10);
         outState.putSerializable("currentEvent", currentEvent);
+        outState.putParcelable("selfRank", selfRank);
+        outState.putParcelableArrayList("top10", top10);
     }
     
     private void init() {
+        Log.d(TAG, "init");
         updateUserInfo();
         updateStatistics();
         updateRankings();
@@ -143,6 +162,7 @@ public class ProfileFragment extends Fragment
     }
     
     private void updateUI() {
+        Log.d(TAG, "updateUI");
         if (currentUser != null) {
             tvName.setText(currentUser.getDisplayName());
         }
@@ -166,8 +186,18 @@ public class ProfileFragment extends Fragment
                     rating2.append("\n");
                 }
             }
-            tvRating1.setText(rating1.toString());
-            tvRating2.setText(rating2.toString());
+            SpannableStringBuilder spannable1 = new SpannableStringBuilder(rating1);
+            spannable1.setSpan(
+                    new ForegroundColorSpan(Color.RED),
+                    3, top10.get(0).getNickname().length() + 3,
+                    Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+            SpannableStringBuilder spannable2 = new SpannableStringBuilder(rating2);
+            spannable2.setSpan(
+                    new ForegroundColorSpan(Color.RED),
+                    0, String.valueOf(top10.get(0).getPoints()).length(),
+                    Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+            tvRating1.setText(spannable1);
+            tvRating2.setText(spannable2);
         }
         if (selfRank != null) {
             String rank = String.valueOf(selfRank.getRank());
@@ -186,11 +216,14 @@ public class ProfileFragment extends Fragment
     }
     
     private void updateUserInfo() {
+        Log.d(TAG, "updateUserInfo");
         Map<String, String> headers = new HashMap<>();
         headers.put("data", AES256.encrypt(mAuth.getUid()));
-        NetworkService.getInstance().getApi().getUserInfo(headers).enqueue(new Callback<ServerResponse>() {
+        callUpdateUserInfo = NetworkService.getInstance().getApi().getUserInfo(headers);
+        callUpdateUserInfo.enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
                 if (response.body() == null) {
                     Log.e(TAG, "updateUserInfo onResponse: response body is null");
                     return;
@@ -207,18 +240,25 @@ public class ProfileFragment extends Fragment
             }
             
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
-                t.printStackTrace();
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
+                if (call.isCanceled())
+                    Log.d(TAG, "callUpdateUserInfo is cancelled");
+                else
+                    t.printStackTrace();
             }
         });
     }
     
     private void updateStatistics() {
+        Log.d(TAG, "updateStatistics");
         Map<String, String> headers = new HashMap<>();
         headers.put("data", AES256.encrypt(mAuth.getUid()));
-        NetworkService.getInstance().getApi().getStats(headers).enqueue(new Callback<ServerResponse>() {
+        callUpdateStatistics = NetworkService.getInstance().getApi().getStats(headers);
+        callUpdateStatistics.enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "updateStatistics onResponse: " + gson.toJson(response.body()));
                 if (response.body() == null)
                     return;
@@ -233,10 +273,13 @@ public class ProfileFragment extends Fragment
                     e.printStackTrace();
                 }
             }
-            
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
-                t.printStackTrace();
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
+                if (call.isCanceled())
+                    Log.d(TAG, "callUpdateStatistics is cancelled");
+                else
+                    t.printStackTrace();
             }
         });
     }
@@ -244,9 +287,11 @@ public class ProfileFragment extends Fragment
     private void updateRankings() {
         Log.d(TAG, "updateRankings");
         // Get top 10 users
-        NetworkService.getInstance().getApi().getRankTop10().enqueue(new Callback<ServerResponse>() {
+        callUpdateTop10 = NetworkService.getInstance().getApi().getRankTop10();
+        callUpdateTop10.enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
                 if (response.body() == null) {
                     Log.e(TAG, "updateRankings (top 10) onResponse: response body is null");
                     return;
@@ -262,21 +307,25 @@ public class ProfileFragment extends Fragment
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                
             }
-            
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
-                t.printStackTrace();
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
+                if (call.isCanceled())
+                    Log.d(TAG, "callUpdateTop10 is cancelled");
+                else
+                    t.printStackTrace();
             }
         });
         
         // Get personal rank
         Map<String, String> headers = new HashMap<>();
         headers.put("data", AES256.encrypt(mAuth.getUid()));
-        NetworkService.getInstance().getApi().getPersonalRank(headers).enqueue(new Callback<ServerResponse>() {
+        callUpdateSelfRank = NetworkService.getInstance().getApi().getPersonalRank(headers);
+        callUpdateSelfRank.enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
                 if (response.body() == null) {
                     Log.e(TAG, "updateRankings (personal rank) onResponse: response body is null");
                     return;
@@ -293,18 +342,24 @@ public class ProfileFragment extends Fragment
             }
             
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
-                t.printStackTrace();
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
+                if (call.isCanceled())
+                    Log.d(TAG, "callUpdateSelfRank is cancelled");
+                else
+                    t.printStackTrace();
             }
         });
     }
     
     private void updateEvent() {
         Log.d(TAG, "updateEvent: ");
-        
-        NetworkService.getInstance().getApi().getEvent().enqueue(new Callback<ServerResponse>() {
+    
+        callUpdateEvent = NetworkService.getInstance().getApi().getEvent();
+        callUpdateEvent.enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
                 if (response.body() == null) {
                     Log.e(TAG, "updateEvent onResponse: response body is null");
                     return;
@@ -320,33 +375,38 @@ public class ProfileFragment extends Fragment
             }
             
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
-                t.printStackTrace();
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
+                if (call.isCanceled())
+                    Log.d(TAG, "callUpdateEvent is cancelled");
+                else
+                    t.printStackTrace();
             }
         });
     }
     
     private void logout() {
-        // Firebase sign out
+        Log.d(TAG, "logout");
         mAuth.signOut();
         
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
-        // Google sign out
-        mGoogleSignInClient.signOut().addOnCompleteListener(getActivity(),
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(mActivity, gso);
+        mGoogleSignInClient.signOut().addOnCompleteListener(mActivity,
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        Intent intent = new Intent(mActivity, MainActivity.class);
                         startActivity(intent);
                     }
                 });
     }
     
     private void init_fab(View v) {
+        Log.d(TAG, "init_fab");
+        
         fab_settings = v.findViewById(R.id.fab_settings);
         fab_exit = v.findViewById(R.id.fab_exit);
         fab_edit = v.findViewById(R.id.fab_edit);
@@ -421,7 +481,24 @@ public class ProfileFragment extends Fragment
     
     @Override
     public void onRefresh() {
+        Log.d(TAG, "onRefresh");
         refreshLayout.setRefreshing(true);
         init();
+    }
+    
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+        if (callUpdateUserInfo != null)
+            callUpdateUserInfo.cancel();
+        if (callUpdateStatistics != null)
+            callUpdateStatistics.cancel();
+        if (callUpdateTop10 != null)
+            callUpdateTop10.cancel();
+        if (callUpdateSelfRank != null)
+            callUpdateSelfRank.cancel();
+        if (callUpdateEvent != null)
+            callUpdateEvent.cancel();
     }
 }

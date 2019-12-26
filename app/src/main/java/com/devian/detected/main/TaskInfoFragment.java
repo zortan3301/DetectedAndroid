@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,7 @@ import com.devian.detected.R;
 import com.devian.detected.utils.domain.Task;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.gson.Gson;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -29,7 +30,6 @@ public class TaskInfoFragment extends Fragment {
     
     private static final String TAG = "TaskInfoFragment";
     
-    private Gson gson = new Gson();
     private FirebaseAuth mAuth;
     
     private Task task;
@@ -44,8 +44,9 @@ public class TaskInfoFragment extends Fragment {
     TextView tvDescription;
     
     public static TaskInfoFragment newInstance(Task task) {
+        Log.d(TAG, "newInstance");
         Bundle args = new Bundle();
-        args.putSerializable("task", task);
+        args.putParcelable("task", task);
         TaskInfoFragment fragment = new TaskInfoFragment();
         fragment.setArguments(args);
         return fragment;
@@ -54,11 +55,12 @@ public class TaskInfoFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         if (savedInstanceState != null) {
-            task = (Task) savedInstanceState.getSerializable("task");
+            task = savedInstanceState.getParcelable("task");
         }
         if (getArguments() != null) {
-            task = (Task) getArguments().getSerializable("task");
+            task = getArguments().getParcelable("task");
         }
         View v = inflater.inflate(R.layout.fragment_taskinfo, container, false);
         ButterKnife.bind(this, v);
@@ -79,19 +81,31 @@ public class TaskInfoFragment extends Fragment {
     
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume");
         super.onResume();
     }
     
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putSerializable("task", task);
+        outState.putParcelable("task", task);
     }
     
     private SpannableStringBuilder getLinuxLikeCommand() {
+        Log.d(TAG, "getLinuxLikeCommand");
+        SpannableStringBuilder defaultString = new SpannableStringBuilder(task.getDescription());
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null)
+            return defaultString;
         try {
-            String email = mAuth.getCurrentUser().getEmail();
-            String nickname = email.split("@")[0];
+            String email = currentUser.getEmail();
+            if (email == null)
+                return defaultString;
+            String[] split = email.split("@");
+            if (split[0] == null)
+                return defaultString;
+            String nickname = split[0];
             String command = nickname + "@detected:~$> cat task_" + task.getId() + ".txt\n\n" + task.getDescription();
             int prefix = nickname.length() + 9;
             SpannableStringBuilder spannable = new SpannableStringBuilder(command);
@@ -110,7 +124,7 @@ public class TaskInfoFragment extends Fragment {
             return spannable;
         } catch (Exception e) {
             e.printStackTrace();
-            return new SpannableStringBuilder(task.getDescription());
+            return defaultString;
         }
     }
     

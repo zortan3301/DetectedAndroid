@@ -40,7 +40,6 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,8 +51,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     
     private static final String TAG = "MapFragment";
     
-    private static final String MAP_STYLE = "mapbox://styles/aminovmaksim/ck4397jle16vo1cpalemp5ddc";
-    private final static String[] markers = {"marker_1", "marker_2", "marker_3"};
+    private Context mContext;
+    private View mView;
+    
+    private static String MAP_STYLE;
     private Gson gson = new Gson();
     private MapView mapView;
     private SymbolManager symbolManager = null;
@@ -61,23 +62,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     
     private ArrayList<Task> tasks;
     
+    private Call<ServerResponse> callGetTasks;
+    
+    @Override
+    public void onAttach(@NonNull Context context) {
+        Log.d(TAG, "onAttach");
+        super.onAttach(context);
+        mContext = context;
+    }
+    
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Mapbox.getInstance(getContext(), "pk.eyJ1IjoiYW1pbm92bWFrc2ltIiwiYSI6ImNrNDM2OXJqZzA0N3Izbm9icWc2ZGxhMGYifQ.mZzd2YEu-PpsODWkQMSB2g");
-        View v = inflater.inflate(R.layout.fragment_map, container, false);
-        mapView = v.findViewById(R.id.mapView);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
+        Mapbox.getInstance(mContext, getResources().getString(R.string.mapbox_access_token));
+        mView = inflater.inflate(R.layout.fragment_map, container, false);
+        MAP_STYLE = getResources().getString(R.string.map_style);
+        mapView = mView.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
     
         savedBundle = savedInstanceState;
-        
-        return v;
+    
+        return mView;
     }
     
     private void checkSavedBundle(Bundle inState) {
+        Log.d(TAG, "checkSavedBundle");
         if (inState != null) {
-            tasks = (ArrayList<Task>) inState.getSerializable("tasks");
+            tasks = inState.getParcelableArrayList("tasks");
             updateMarkers();
         } else {
             getMarkers();
@@ -88,23 +103,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
-        outState.putSerializable("tasks", tasks);
+        outState.putParcelableArrayList("tasks", tasks);
     }
     
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-    
-        final Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.marker_1);
-        
+        Log.d(TAG, "onMapReady");
         mapboxMap.setStyle(new Style.Builder().fromUri(MAP_STYLE), new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull final Style style) {
-                style.addImage("my-marker", bm);
-                for (String mDrawableName : markers) {
-                    int resId = getResources().getIdentifier(mDrawableName, "drawable", getContext().getPackageName());
-                    Bitmap bm = BitmapFactory.decodeResource(getResources(), resId);
-                    style.addImage(mDrawableName, bm);
-                }
+                Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
+                style.addImage("marker", bm);
+                
                 symbolManager = new SymbolManager(mapView, mapboxMap, style);
                 symbolManager.setIconAllowOverlap(true);
                 symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
@@ -120,13 +130,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         String lng = df.format(symbol.getLatLng().getLongitude());
                         final String snack_text = lat + ", " + lng;
     
-                        Snackbar.make(getView(), snack_text, Snackbar.LENGTH_LONG)
+                        Snackbar.make(mView, snack_text, Snackbar.LENGTH_LONG)
                                 .setAction("Копировать", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                                        ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
                                         ClipData clip = ClipData.newPlainText("LatLng", snack_text);
-                                        clipboard.setPrimaryClip(clip);
+                                        if (clipboard != null) {
+                                            clipboard.setPrimaryClip(clip);
+                                        }
                                     }
                                 }).show();
                     }
@@ -137,18 +149,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         
         mapboxMap.getUiSettings().setZoomGesturesEnabled(true);
         CameraPosition position = new CameraPosition.Builder()
-                .target(new LatLng(55.7, 37.6)) // Sets the new camera position
-                .zoom(10) // Sets the zoom
-                .bearing(360) // Rotate the camera
-                .tilt(45) // Set the camera tilt
-                .build(); // Creates a CameraPosition from the builder
+                .target(new LatLng(55.7, 37.6))
+                .zoom(10)
+                .bearing(360)
+                .tilt(45)
+                .build();
     
         mapboxMap.animateCamera(CameraUpdateFactory
-                .newCameraPosition(position), 7000);
+                .newCameraPosition(position), 5000);
     }
     
     private void getMarkers() {
-        NetworkService.getInstance().getApi().getMapTasks().enqueue(new Callback<ServerResponse>() {
+        Log.d(TAG, "getMarkers");
+        callGetTasks = NetworkService.getInstance().getApi().getMapTasks();
+        callGetTasks.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
@@ -166,12 +180,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
-                t.printStackTrace();
+                if (!call.isCanceled()) {
+                    Log.d(TAG, "callGetTasks onFailure: call is cancelled");
+                } else {
+                    t.printStackTrace();
+                }
             }
         });
     }
     
     private void updateMarkers() {
+        Log.d(TAG, "updateMarkers");
         if (symbolManager == null)
             return;
         if (tasks == null)
@@ -180,44 +199,52 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         for (Task t : tasks) {
             symbolManager.create(new SymbolOptions()
                     .withLatLng(new LatLng(t.getLatitude(), t.getLongitude()))
-                    .withIconImage(markers[(new Random()).nextInt(markers.length)])
-                    .withIconSize(0.3f));
+                    .withIconImage("marker")
+                    .withIconSize(0.03f));
         }
     }
     
     @Override
     public void onStart() {
+        Log.d(TAG, "onStart");
         super.onStart();
         mapView.onStart();
     }
     
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume");
         super.onResume();
         mapView.onResume();
     }
     
     @Override
     public void onPause() {
+        Log.d(TAG, "onPause");
         super.onPause();
         mapView.onPause();
     }
     
     @Override
     public void onStop() {
+        Log.d(TAG, "onStop");
         super.onStop();
         mapView.onStop();
     }
     
     @Override
     public void onLowMemory() {
+        Log.d(TAG, "onLowMemory");
         super.onLowMemory();
         mapView.onLowMemory();
     }
     
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
         mapView.onDestroy();
+        if (callGetTasks != null)
+            callGetTasks.cancel();
     }
 }

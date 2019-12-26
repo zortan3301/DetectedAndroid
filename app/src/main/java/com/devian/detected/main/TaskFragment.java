@@ -52,10 +52,13 @@ public class TaskFragment extends Fragment
     
     private ArrayList<Task> tasks;
     
+    private Call<ServerResponse> callGetTasks;
+    
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         View v = inflater.inflate(R.layout.fragment_task, container, false);
         ButterKnife.bind(this, v);
         
@@ -77,8 +80,9 @@ public class TaskFragment extends Fragment
     }
     
     private void checkSavedBundle(Bundle inState) {
+        Log.d(TAG, "checkSavedBundle");
         if (inState != null) {
-            tasks = (ArrayList<Task>) inState.getSerializable("tasks");
+            tasks = inState.getParcelableArrayList("tasks");
             mAdapter.setTaskList(tasks);
         } else {
             updateTasks();
@@ -87,12 +91,15 @@ public class TaskFragment extends Fragment
     
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        Log.d(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putSerializable("tasks", tasks);
+        outState.putParcelableArrayList("tasks", tasks);
     }
     
     private void updateTasks() {
-        NetworkService.getInstance().getApi().getTextTasks().enqueue(new Callback<ServerResponse>() {
+        Log.d(TAG, "updateTasks");
+        callGetTasks = NetworkService.getInstance().getApi().getTextTasks();
+        callGetTasks.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
@@ -118,13 +125,17 @@ public class TaskFragment extends Fragment
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
-                t.printStackTrace();
+                if (call.isCanceled())
+                    Log.d(TAG, "callGetTasks is cancelled");
+                else
+                    t.printStackTrace();
             }
         });
     }
     
     @Override
     public void onRefresh() {
+        Log.d(TAG, "onRefresh");
         refreshLayout.setRefreshing(true);
         updateTasks();
     }
@@ -136,10 +147,20 @@ public class TaskFragment extends Fragment
     }
     
     public void setOnTaskItemSelectedListener(OnTaskItemSelectedListener callback) {
+        Log.d(TAG, "setOnTaskItemSelectedListener");
         this.callback = callback;
     }
     
     public interface OnTaskItemSelectedListener {
         void onTaskItemSelected(Task task);
+    }
+    
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+        if (callGetTasks != null) {
+            callGetTasks.cancel();
+        }
     }
 }

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -49,8 +50,7 @@ public class MainFragment extends AppCompatActivity
     
     private Gson gson = new Gson();
     
-    PagerAdapter pagerAdapter;
-    CustomViewPager viewPager;
+    private CustomViewPager viewPager;
     
     @BindView(R.id.fab_qr)
     FloatingActionButton fab_qr;
@@ -59,6 +59,7 @@ public class MainFragment extends AppCompatActivity
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_main);
         
@@ -69,7 +70,7 @@ public class MainFragment extends AppCompatActivity
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
     
-        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
         viewPager = findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
         
@@ -79,17 +80,13 @@ public class MainFragment extends AppCompatActivity
     
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.fab_qr:
-                
-                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
-                } else {
-                    Intent i = new Intent(this, ScanActivity.class);
-                    startActivityForResult(i, 1);
-                }
-                
-                break;
+        if (view.getId() == R.id.fab_qr) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
+            } else {
+                Intent i = new Intent(this, ScanActivity.class);
+                startActivityForResult(i, 1);
+            }
         }
     }
     
@@ -98,8 +95,10 @@ public class MainFragment extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
-                String result = data.getStringExtra("result");
-                proceedTask(result);
+                if (data != null) {
+                    String result = data.getStringExtra("result");
+                    proceedTask(result);
+                }
             }
         }
     }

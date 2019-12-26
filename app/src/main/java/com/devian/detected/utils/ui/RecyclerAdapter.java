@@ -49,15 +49,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                                                          int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.cardlayout_task, parent, false);
-        
-        ViewHolder viewHolder = new ViewHolder(v);
-        return viewHolder;
+    
+        return new ViewHolder(v);
     }
     
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         if (taskList == null)
             return;
         TextView title = holder.view.findViewById(R.id.task_tvTitle);
@@ -83,11 +80,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         if (taskList == null)
             return 0;
         return taskList.size();
-    }
-    
-    public void addItem(Task task) {
-        taskList.add(task);
-        notifyItemInserted(taskList.size() - 1);
     }
     
     public void setTaskList(List<Task> taskList) {

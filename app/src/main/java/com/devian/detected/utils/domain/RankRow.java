@@ -1,18 +1,39 @@
 package com.devian.detected.utils.domain;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class RankRow implements Serializable {
+public class RankRow implements Parcelable {
     private String uid;
     private long rank;
     private String nickname;
     private long points;
     
-    public RankRow() {
+    private RankRow(Parcel in) {
+        uid = in.readString();
+        rank = in.readLong();
+        nickname = in.readString();
+        points = in.readLong();
     }
     
-    public String getUid() {
-        return uid;
+    public static final Creator<RankRow> CREATOR = new Creator<RankRow>() {
+        @Override
+        public RankRow createFromParcel(Parcel in) {
+            return new RankRow(in);
+        }
+        
+        @Override
+        public RankRow[] newArray(int size) {
+            return new RankRow[size];
+        }
+    };
+    
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(this.uid);
+        parcel.writeLong(this.rank);
+        parcel.writeString(this.nickname);
+        parcel.writeLong(this.points);
     }
     
     public long getRank() {
@@ -27,19 +48,9 @@ public class RankRow implements Serializable {
         return points;
     }
     
-    public void setUid(String uid) {
-        this.uid = uid;
+    @Override
+    public int describeContents() {
+        return 0;
     }
     
-    public void setRank(long rank) {
-        this.rank = rank;
-    }
-    
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-    
-    public void setPoints(long points) {
-        this.points = points;
-    }
 }

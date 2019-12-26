@@ -32,7 +32,7 @@ public class LevelManager {
             return 50 * (n/50 + 1);
     }
     
-    public static long getMaxPointsOfTheLevel(int level) {
+    private static long getMaxPointsOfTheLevel(int level) {
         if (level == 0)
             return 50;
         long points = 50;

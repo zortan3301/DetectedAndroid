@@ -10,7 +10,7 @@ public class LocalStorage {
     private static final String APP_PREFERENCES = "APP_PREFERENCES";
     private static SharedPreferences mSharedPreferences;
     
-    public LocalStorage(Activity activity) {
+    private LocalStorage(Activity activity) {
         mSharedPreferences =
                 activity.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
     }

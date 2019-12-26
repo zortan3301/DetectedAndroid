@@ -7,35 +7,12 @@ public class ServerResponse {
     private int type;
     private String data;
     
-    public ServerResponse(int type, String data) {
-        this.type = type;
-        this.data = AES256.encrypt(data);
-    }
-    
-    public ServerResponse(int type) {
-        this.type = type;
-        this.data = "";
-    }
-    
-    public ServerResponse() {
-        this.type = 0;
-        this.data = "";
-    }
-    
     public int getType() {
         return type;
     }
     
-    public void setType(int type) {
-        this.type = type;
-    }
-    
     public String getData() {
         return AES256.decrypt(data);
-    }
-    
-    public void setData(String data) {
-        this.data = AES256.encrypt(data);
     }
     
     public static final int TYPE_DEFAULT = 0;
