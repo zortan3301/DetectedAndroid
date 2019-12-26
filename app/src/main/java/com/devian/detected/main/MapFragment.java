@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +21,7 @@ import com.devian.detected.R;
 import com.devian.detected.utils.Network.NetworkService;
 import com.devian.detected.utils.Network.ServerResponse;
 import com.devian.detected.utils.domain.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -41,15 +44,15 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
 
-// TODO: 26.12.2019 make update circle_black
-
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
     
     private static final String TAG = "MapFragment";
     
@@ -61,6 +64,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private MapView mapView;
     private SymbolManager symbolManager = null;
     private Bundle savedBundle;
+    
+    @BindView(R.id.fab_map_refresh)
+    FloatingActionButton fab_refresh;
+    private Animation fab_rotate;
     
     private ArrayList<Task> tasks;
     
@@ -81,12 +88,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Log.d(TAG, "onCreateView");
         Mapbox.getInstance(mContext, getResources().getString(R.string.mapbox_access_token));
         mView = inflater.inflate(R.layout.fragment_map, container, false);
+        ButterKnife.bind(this, mView);
+        
         MAP_STYLE = getResources().getString(R.string.map_style);
         mapView = mView.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
     
         savedBundle = savedInstanceState;
+        fab_refresh.setOnClickListener(this);
+        fab_rotate = AnimationUtils.loadAnimation(getContext(), R.anim.fab_full_rotate);
     
         return mView;
     }
@@ -106,6 +117,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
         outState.putParcelableArrayList("tasks", tasks);
+    }
+    
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.fab_map_refresh) {
+            fab_refresh.startAnimation(fab_rotate);
+            getMarkers();
+        }
     }
     
     @Override
@@ -131,7 +150,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         String lat = df.format(symbol.getLatLng().getLatitude());
                         String lng = df.format(symbol.getLatLng().getLongitude());
                         final String snack_text = lat + ", " + lng;
-    
+                        
                         Snackbar.make(mView, snack_text, Snackbar.LENGTH_LONG)
                                 .setAction("Копировать", new View.OnClickListener() {
                                     @Override
@@ -156,7 +175,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .bearing(360)
                 .tilt(45)
                 .build();
-    
+        
         mapboxMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(position), 5000);
     }
@@ -197,7 +216,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return;
         if (tasks == null)
             return;
-        
+        fab_refresh.clearAnimation();
         for (Task t : tasks) {
             symbolManager.create(new SymbolOptions()
                     .withLatLng(new LatLng(t.getLatitude(), t.getLongitude()))
