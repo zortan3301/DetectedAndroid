@@ -20,7 +20,7 @@ public class RecyclerItemDecorator extends RecyclerView.ItemDecoration {
         boolean isLast = position == state.getItemCount()-1;
         if(isLast){
             outRect.bottom = space;
-            outRect.top = 0; //don't forget about recycling...
+            outRect.top = 0;
         }
     }
 }

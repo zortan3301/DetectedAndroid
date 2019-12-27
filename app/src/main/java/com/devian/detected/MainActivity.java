@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.devian.detected.login.AuthFragment;
@@ -45,9 +46,6 @@ public class MainActivity extends AppCompatActivity {
         });
         
         testConnection();
-    
-        // TODO: 05.12.2019 loading wheel
-
     }
     
     private void testConnection() {
@@ -60,8 +58,12 @@ public class MainActivity extends AppCompatActivity {
         callTestConn = NetworkService.getInstance().getApi().testConnection();
         callTestConn.enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                if (response.body().getType() == 0) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
+                if (response.body() == null) {
+                    return;
+                }
+                if (response.body().getType() == ServerResponse.TYPE_DEFAULT) {
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.activity_main, new AuthFragment(), "auth")
                             .commit();
@@ -72,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
             }
     
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
                 if (call.isCanceled())
                     Log.d(TAG, "callTestConn is cancelled");
                 else {

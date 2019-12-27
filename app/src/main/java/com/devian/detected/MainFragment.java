@@ -28,6 +28,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -46,7 +47,7 @@ public class MainFragment extends AppCompatActivity
     
     private static final String TAG = "MainFragment";
     
-    private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
     
     private Gson gson = new Gson();
     
@@ -64,8 +65,9 @@ public class MainFragment extends AppCompatActivity
         setContentView(R.layout.fragment_main);
         
         ButterKnife.bind(this);
-        
-        mAuth = FirebaseAuth.getInstance();
+    
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        firebaseUser = mAuth.getCurrentUser();
     
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
@@ -123,8 +125,8 @@ public class MainFragment extends AppCompatActivity
             showSnackbar("Недействительная метка", Toast.LENGTH_SHORT);
             return;
         }
-        
-        String executor = mAuth.getCurrentUser().getUid();
+    
+        String executor = firebaseUser.getUid();
         Task task = new Task(tagId, executor);
         String user_data = gson.toJson(task);
     
@@ -133,7 +135,8 @@ public class MainFragment extends AppCompatActivity
     
         NetworkService.getInstance().getApi().scanTag(headers).enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
                 if (response.body() == null) {
                     showSnackbar("Недействительная метка", Snackbar.LENGTH_LONG);
                     return;
@@ -152,7 +155,8 @@ public class MainFragment extends AppCompatActivity
             }
     
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
                 t.printStackTrace();
             }
         });

@@ -36,8 +36,12 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:tabGravity="fill"
+            app:tabMode="fixed"
+            app:tabRippleColor="@color/lightBlue"
+            app:tabSelectedTextColor="@color/white"
             app:tabTextColor="@color/lightBlue"
-            app:tabSelectedTextColor="@color/white"/>
+            app:tabTextAppearance="@style/TabLayoutTextFont" />
 
     </com.devian.detected.utils.ui.CustomViewPager>
 

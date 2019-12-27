@@ -201,6 +201,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
+                fab_refresh.clearAnimation();
                 if (!call.isCanceled()) {
                     Log.d(TAG, "callGetTasks onFailure: call is cancelled");
                 } else {

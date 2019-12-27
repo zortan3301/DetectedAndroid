@@ -13,7 +13,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.devian.detected.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,6 +41,9 @@ public class ScanActivity extends AppCompatActivity implements ZXingScannerView.
         setContentView(R.layout.scanner_view);
         ButterKnife.bind(this);
         scannerView = findViewById(R.id.scanner_view);
+        List<BarcodeFormat> formats = new ArrayList<>();
+        formats.add(BarcodeFormat.QR_CODE);
+        scannerView.setFormats(formats);
     
         fab_clock = AnimationUtils.loadAnimation(this, R.anim.fab_rotate_clock);
         fab_anticlock = AnimationUtils.loadAnimation(this, R.anim.fab_rotate_anticlock);
