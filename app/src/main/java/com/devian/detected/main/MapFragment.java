@@ -33,8 +33,6 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
-import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 
@@ -130,42 +128,33 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, View.On
     @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
         Log.d(TAG, "onMapReady");
-        mapboxMap.setStyle(new Style.Builder().fromUri(MAP_STYLE), new Style.OnStyleLoaded() {
-            @Override
-            public void onStyleLoaded(@NonNull final Style style) {
-                Bitmap bitmapMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
-                style.addImage("marker", bitmapMarker);
-                
-                symbolManager = new SymbolManager(mapView, mapboxMap, style);
-                symbolManager.setIconAllowOverlap(true);
-                symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
-                symbolManager.addClickListener(new OnSymbolClickListener() {
-                    @Override
-                    public void onAnnotationClick(Symbol symbol) {
-                        DecimalFormat df = new DecimalFormat("#.######");
-                        DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
-                        formatSymbols.setDecimalSeparator('.');
-                        df.setDecimalFormatSymbols(formatSymbols);
-                        df.setRoundingMode(RoundingMode.CEILING);
-                        String lat = df.format(symbol.getLatLng().getLatitude());
-                        String lng = df.format(symbol.getLatLng().getLongitude());
-                        final String snack_text = lat + ", " + lng;
-                        
-                        Snackbar.make(mView, snack_text, Snackbar.LENGTH_LONG)
-                                .setAction("Копировать", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-                                        ClipData clip = ClipData.newPlainText("LatLng", snack_text);
-                                        if (clipboard != null) {
-                                            clipboard.setPrimaryClip(clip);
-                                        }
-                                    }
-                                }).show();
-                    }
-                });
-                checkSavedBundle(savedBundle);
-            }
+        mapboxMap.setStyle(new Style.Builder().fromUri(MAP_STYLE), style -> {
+            Bitmap bitmapMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
+            style.addImage("marker", bitmapMarker);
+        
+            symbolManager = new SymbolManager(mapView, mapboxMap, style);
+            symbolManager.setIconAllowOverlap(true);
+            symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
+            symbolManager.addClickListener(symbol -> {
+                DecimalFormat df = new DecimalFormat("#.######");
+                DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
+                formatSymbols.setDecimalSeparator('.');
+                df.setDecimalFormatSymbols(formatSymbols);
+                df.setRoundingMode(RoundingMode.CEILING);
+                String lat = df.format(symbol.getLatLng().getLatitude());
+                String lng = df.format(symbol.getLatLng().getLongitude());
+                final String snack_text = lat + ", " + lng;
+            
+                Snackbar.make(mView, snack_text, Snackbar.LENGTH_LONG)
+                        .setAction("Копировать", view -> {
+                            ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                            ClipData clip = ClipData.newPlainText("LatLng", snack_text);
+                            if (clipboard != null) {
+                                clipboard.setPrimaryClip(clip);
+                            }
+                        }).show();
+            });
+            checkSavedBundle(savedBundle);
         });
         
         mapboxMap.getUiSettings().setZoomGesturesEnabled(true);

@@ -72,7 +72,7 @@ public class TaskInfoFragment extends Fragment {
         
         imageView.setZoomable(true);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        Picasso.with(getContext())
+        Picasso.get()
                 .load(task.getImgUrl())
                 .into(imageView);
         

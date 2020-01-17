@@ -63,8 +63,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         points.setText(String.valueOf(taskList.get(position).getReward()));
         
         ImageView imageView = holder.view.findViewById(R.id.task_imageView);
-        
-        Picasso.with(holder.view.getContext())
+    
+        Picasso.get()
                 .load(taskList.get(position).getImgUrl())
                 .fit()
                 .centerCrop()

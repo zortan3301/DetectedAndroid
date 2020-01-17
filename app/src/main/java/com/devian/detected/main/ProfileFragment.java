@@ -2,7 +2,6 @@ package com.devian.detected.main;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -27,6 +26,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.devian.detected.MainActivity;
 import com.devian.detected.R;
 import com.devian.detected.utils.LevelManager;
+import com.devian.detected.utils.Network.GsonSerializer;
 import com.devian.detected.utils.Network.NetworkService;
 import com.devian.detected.utils.Network.ServerResponse;
 import com.devian.detected.utils.domain.RankRow;
@@ -36,8 +36,6 @@ import com.devian.detected.utils.security.AES256;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
@@ -63,7 +61,7 @@ public class ProfileFragment extends Fragment
     
     private FirebaseAuth mAuth;
     
-    private Gson gson = new Gson();
+    private Gson gson = GsonSerializer.getInstance().getGson();
     
     @BindView(R.id.profile_tvName)
     TextView tvName;
@@ -395,12 +393,9 @@ public class ProfileFragment extends Fragment
                 .build();
         GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(mActivity, gso);
         mGoogleSignInClient.signOut().addOnCompleteListener(mActivity,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Intent intent = new Intent(mActivity, MainActivity.class);
-                        startActivity(intent);
-                    }
+                task -> {
+                    Intent intent = new Intent(mActivity, MainActivity.class);
+                    startActivity(intent);
                 });
     }
     
@@ -418,64 +413,49 @@ public class ProfileFragment extends Fragment
         
         tv_fab_exit = v.findViewById(R.id.profile_tv_fab_exit);
         tv_fab_edit = v.findViewById(R.id.profile_tv_fab_edit);
-        
-        fab_settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (fab_settings_open) {
-                    fab_exit.startAnimation(fab_close);
-                    fab_edit.startAnimation(fab_close);
-                    fab_settings.startAnimation(fab_anticlock);
-                    
-                    fab_exit.setClickable(false);
-                    fab_edit.setClickable(false);
-                    
-                    tv_fab_exit.setVisibility(View.INVISIBLE);
-                    tv_fab_edit.setVisibility(View.INVISIBLE);
-                    tv_fab_exit.startAnimation(fab_close);
-                    tv_fab_edit.startAnimation(fab_close);
-                    
-                    fab_settings_open = false;
-                } else {
-                    fab_exit.startAnimation(fab_open);
-                    fab_edit.startAnimation(fab_open);
-                    fab_settings.startAnimation(fab_clock);
-                    
-                    fab_exit.setClickable(true);
-                    fab_edit.setClickable(true);
-                    
-                    tv_fab_exit.setVisibility(View.VISIBLE);
-                    tv_fab_edit.setVisibility(View.VISIBLE);
-                    tv_fab_exit.startAnimation(fab_open);
-                    tv_fab_edit.startAnimation(fab_open);
-                    
-                    fab_settings_open = true;
-                }
-            }
-        });
-        
-        fab_exit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new AlertDialog.Builder(getContext())
-                        .setTitle(getString(R.string.account_exit))
-                        .setMessage(getString(R.string.account_exit_confirmation))
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                logout();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });
-        
-        fab_edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+    
+        fab_settings.setOnClickListener(view -> {
+            if (fab_settings_open) {
+                fab_exit.startAnimation(fab_close);
+                fab_edit.startAnimation(fab_close);
+                fab_settings.startAnimation(fab_anticlock);
             
+                fab_exit.setClickable(false);
+                fab_edit.setClickable(false);
+            
+                tv_fab_exit.setVisibility(View.INVISIBLE);
+                tv_fab_edit.setVisibility(View.INVISIBLE);
+                tv_fab_exit.startAnimation(fab_close);
+                tv_fab_edit.startAnimation(fab_close);
+            
+                fab_settings_open = false;
+            } else {
+                fab_exit.startAnimation(fab_open);
+                fab_edit.startAnimation(fab_open);
+                fab_settings.startAnimation(fab_clock);
+            
+                fab_exit.setClickable(true);
+                fab_edit.setClickable(true);
+            
+                tv_fab_exit.setVisibility(View.VISIBLE);
+                tv_fab_edit.setVisibility(View.VISIBLE);
+                tv_fab_exit.startAnimation(fab_open);
+                tv_fab_edit.startAnimation(fab_open);
+            
+                fab_settings_open = true;
             }
+        });
+    
+        fab_exit.setOnClickListener(view -> new AlertDialog.Builder(getContext())
+                .setTitle(getString(R.string.account_exit))
+                .setMessage(getString(R.string.account_exit_confirmation))
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> logout())
+                .setNegativeButton(android.R.string.no, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show());
+    
+        fab_edit.setOnClickListener(view -> {
+        
         });
     }
     

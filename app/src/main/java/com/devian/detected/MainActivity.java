@@ -38,12 +38,7 @@ public class MainActivity extends AppCompatActivity {
         LocalStorage.getInstance(this);
     
         ButterKnife.bind(this);
-        btnRefresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                testConnection();
-            }
-        });
+        btnRefresh.setOnClickListener(view -> testConnection());
         
         testConnection();
     }
