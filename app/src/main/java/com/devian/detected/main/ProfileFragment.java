@@ -57,8 +57,6 @@ public class ProfileFragment extends Fragment
     
     private static final String TAG = "ProfileFragment";
     
-    private Activity mActivity;
-    
     private FirebaseAuth mAuth;
     
     private Gson gson = GsonSerializer.getInstance().getGson();
@@ -99,14 +97,7 @@ public class ProfileFragment extends Fragment
     
     private Call<ServerResponse> callUpdateUserInfo, callUpdateStatistics, callUpdateTop10,
             callUpdateSelfRank, callUpdateEvent;
-    
-    @Override
-    public void onAttachFragment(@NonNull Fragment childFragment) {
-        Log.d(TAG, "onAttachFragment");
-        super.onAttachFragment(childFragment);
-        mActivity = childFragment.getActivity();
-    }
-    
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -391,10 +382,10 @@ public class ProfileFragment extends Fragment
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(mActivity, gso);
-        mGoogleSignInClient.signOut().addOnCompleteListener(mActivity,
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivityNonNull(), gso);
+        mGoogleSignInClient.signOut().addOnCompleteListener(getActivityNonNull(),
                 task -> {
-                    Intent intent = new Intent(mActivity, MainActivity.class);
+                    Intent intent = new Intent(getActivityNonNull(), MainActivity.class);
                     startActivity(intent);
                 });
     }
@@ -480,5 +471,13 @@ public class ProfileFragment extends Fragment
             callUpdateSelfRank.cancel();
         if (callUpdateEvent != null)
             callUpdateEvent.cancel();
+    }
+
+    private Activity getActivityNonNull() {
+        if (super.getActivity() != null) {
+            return super.getActivity();
+        } else {
+            throw new RuntimeException("null returned from getActivity()");
+        }
     }
 }
