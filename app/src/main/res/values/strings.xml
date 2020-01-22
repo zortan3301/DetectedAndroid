@@ -27,5 +27,8 @@
 
     <!-- Other -->
     <string name="task_image">image of the task</string>
+    <string name="popup_logout_info">Вы действительно хотите выйти из своего аккаунта?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 
 </resources>

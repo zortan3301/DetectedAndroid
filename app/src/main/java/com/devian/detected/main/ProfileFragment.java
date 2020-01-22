@@ -1,5 +1,6 @@
 package com.devian.detected.main;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -56,7 +58,7 @@ public class ProfileFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener {
     
     private static final String TAG = "ProfileFragment";
-    
+
     private FirebaseAuth mAuth;
     
     private Gson gson = GsonSerializer.getInstance().getGson();
@@ -389,6 +391,28 @@ public class ProfileFragment extends Fragment
                     startActivity(intent);
                 });
     }
+
+    @SuppressLint("InflateParams")
+    private void popup_logout() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+        View mView = getLayoutInflater().inflate(R.layout.popup_logout, null);
+        Button btnYes = mView.findViewById(R.id.popup_logout_btnYes);
+        Button btnNo = mView.findViewById(R.id.popup_logout_btnNo);
+
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+        btnYes.setOnClickListener(v -> {
+            logout();
+            dialog.dismiss();
+        });
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+    }
+
+    // TODO: 22.01.2020
+    private void popup_change() {
+
+    }
     
     private void init_fab(View v) {
         Log.d(TAG, "init_fab");
@@ -436,18 +460,10 @@ public class ProfileFragment extends Fragment
                 fab_settings_open = true;
             }
         });
-    
-        fab_exit.setOnClickListener(view -> new AlertDialog.Builder(getContext())
-                .setTitle(getString(R.string.account_exit))
-                .setMessage(getString(R.string.account_exit_confirmation))
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> logout())
-                .setNegativeButton(android.R.string.no, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show());
-    
-        fab_edit.setOnClickListener(view -> {
-        
-        });
+
+        fab_exit.setOnClickListener(view -> popup_logout());
+
+        fab_edit.setOnClickListener(view -> popup_change());
     }
     
     @Override
