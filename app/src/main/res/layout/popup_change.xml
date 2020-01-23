@@ -27,7 +27,7 @@
             android:gravity="center_horizontal|center_vertical"
             android:text="@string/dollar_more"
             android:textAlignment="center"
-            android:textColor="@color/lightBlue"
+            android:textColor="@color/yellow"
             android:textSize="22sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -47,7 +47,8 @@
             android:textColor="@color/white"
             app:layout_constraintEnd_toStartOf="@+id/changeNickname_imgError"
             app:layout_constraintStart_toEndOf="@+id/textView12"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:autofillHints="username" />
 
         <ImageView
             android:id="@+id/changeNickname_imgError"
@@ -58,7 +59,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_error_red_24dp" />
+            app:srcCompat="@drawable/ic_error_red_24dp"
+            android:contentDescription="@string/nickname_is_incorrect" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
@@ -69,7 +71,10 @@
         android:background="@color/black"
         android:clickable="true"
         android:fontFamily="@font/consola"
+        android:paddingStart="0dp"
+        android:paddingEnd="8dp"
         android:text="@string/ok"
+        android:textAlignment="viewEnd"
         android:textColor="@color/yellow"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="@+id/constraintLayout2"
@@ -86,6 +91,7 @@
         android:clickable="true"
         android:fontFamily="@font/consola"
         android:text="@string/cancel"
+        android:textAlignment="viewEnd"
         android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/changeNickname_btnOk"
