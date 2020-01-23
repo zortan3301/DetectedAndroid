@@ -109,17 +109,17 @@ public class ProfileFragment extends Fragment
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-        View mView = inflater.inflate(R.layout.fragment_profile, container, false);
-        ButterKnife.bind(this, mView);
+        View v = inflater.inflate(R.layout.fragment_profile, container, false);
+        ButterKnife.bind(this, v);
         
         refreshLayout.setOnRefreshListener(this);
         mAuth = FirebaseAuth.getInstance();
     
-        init_fab(mView);
+        init_fab(v);
         
         checkSavedBundle(savedInstanceState);
     
-        return mView;
+        return v;
     }
     
     private void checkSavedBundle(Bundle inState) {
@@ -565,7 +565,7 @@ public class ProfileFragment extends Fragment
         if (callChangeNickname != null)
             callChangeNickname.cancel();
     }
-
+    
     private Activity getActivityNonNull() {
         if (super.getActivity() != null) {
             return super.getActivity();

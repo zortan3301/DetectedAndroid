@@ -36,5 +36,8 @@
 
     <!-- Other -->
     <string name="task_image">image of the task</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Отмена</string>
+    <string name="new_nickname">новый никнейм</string>
 
 </resources>

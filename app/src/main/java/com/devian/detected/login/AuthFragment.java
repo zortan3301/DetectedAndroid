@@ -1,5 +1,6 @@
 package com.devian.detected.login;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,6 +43,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "AuthFragment";
     private static final int RC_SIGN_IN = 9001;
     
+    private View mView;
+    
     private static Gson gson = new Gson();
     
     private FirebaseAuth mAuth;
@@ -53,6 +56,7 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_auth, container, false);
+        mView = v;
         
         v.findViewById(R.id.auth_btnAuth).setOnClickListener(this);
     
@@ -61,7 +65,7 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
                 .requestEmail()
                 .build();
     
-        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(getActivityNonNull(), gso);
         mAuth = FirebaseAuth.getInstance();
         
         return v;
@@ -79,10 +83,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
     
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.auth_btnAuth:
-                signIn();
-                break;
+        if (view.getId() == R.id.auth_btnAuth) {
+            signIn();
         }
     }
     
@@ -95,7 +97,8 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
+                if (account != null)
+                    firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 Log.w(TAG, "Google sign in failed", e);
             }
@@ -107,18 +110,22 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(getActivity(), task -> {
+                .addOnCompleteListener(getActivityNonNull(), task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithCredential:success");
                         FirebaseUser user = mAuth.getCurrentUser();
+                        if (user == null)
+                            return;
                         Log.d(TAG, "onComplete: " + user.getUid());
                         authOnServer(user);
                         updateUI(user);
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Snackbar.make(getView().findViewById(R.id.fragment_auth), "Ошибка аутентификации", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(mView,
+                                getResources().getString(R.string.try_later),
+                                Snackbar.LENGTH_SHORT).show();
                         updateUI(null);
                     }
                 });
@@ -142,16 +149,25 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
         headers.put("data", AES256.encrypt(gson.toJson(user)));
         NetworkService.getInstance().getApi().auth(headers).enqueue(new Callback<ServerResponse>() {
             @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
             }
     
             @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
                 t.printStackTrace();
             }
         });
     }
     
+    private Activity getActivityNonNull() {
+        if (super.getActivity() != null) {
+            return super.getActivity();
+        } else {
+            throw new RuntimeException("null returned from getActivity()");
+        }
+    }
     
 }
