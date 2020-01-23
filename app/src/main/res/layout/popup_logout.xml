@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@color/black"
     android:orientation="vertical"
-    android:padding="5dp">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/popup_logout_info"
@@ -32,12 +32,12 @@
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
         android:background="@drawable/black_shape_with_yellow_stroke"
-        android:text="@string/yes"
         android:clickable="true"
-        app:rippleColor="@color/lightBlue"
+        android:text="@string/yes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/popup_logout_info" />
+        app:layout_constraintTop_toBottomOf="@+id/popup_logout_info"
+        app:rippleColor="@color/lightBlue" />
 
     <Button
         android:id="@+id/popup_logout_btnNo"
@@ -46,11 +46,11 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/black_shape_with_yellow_stroke"
-        android:text="@string/no"
         android:clickable="true"
-        app:rippleColor="@color/lightBlue"
+        android:text="@string/no"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/popup_logout_info" />
+        app:layout_constraintTop_toBottomOf="@+id/popup_logout_info"
+        app:rippleColor="@color/lightBlue" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

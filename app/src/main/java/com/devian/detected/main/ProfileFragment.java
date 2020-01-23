@@ -17,8 +17,11 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -98,7 +101,7 @@ public class ProfileFragment extends Fragment
     private String currentEvent;
     
     private Call<ServerResponse> callUpdateUserInfo, callUpdateStatistics, callUpdateTop10,
-            callUpdateSelfRank, callUpdateEvent;
+            callUpdateSelfRank, callUpdateEvent, callChangeNickname;
 
     @Nullable
     @Override
@@ -408,10 +411,82 @@ public class ProfileFragment extends Fragment
         });
         btnNo.setOnClickListener(v -> dialog.dismiss());
     }
-
-    // TODO: 22.01.2020
+    
+    @SuppressLint("InflateParams")
     private void popup_change() {
-
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
+        View mView = getLayoutInflater().inflate(R.layout.popup_change, null);
+        Button btnOK = mView.findViewById(R.id.changeNickname_btnOk);
+        Button btnCancel = mView.findViewById(R.id.changeNickname_btnCancel);
+        EditText etNickname = mView.findViewById(R.id.changeNickname_etNickname);
+        ImageView imgError = mView.findViewById(R.id.changeNickname_imgError);
+        
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.show();
+        btnOK.setOnClickListener(v -> {
+            String newNickname = etNickname.getText().toString();
+            if (newNickname.length() < 6) {
+                imgError.setVisibility(View.VISIBLE);
+                Toast.makeText(
+                        getContext(),
+                        getResources().getString(R.string.nickname_less6),
+                        Toast.LENGTH_LONG).show();
+            } else {
+                Log.d(TAG, "changeNickname");
+                currentUser.setDisplayName(newNickname);
+                Map<String, String> headers = new HashMap<>();
+                headers.put("data", AES256.encrypt(gson.toJson(currentUser)));
+                
+                callChangeNickname = NetworkService.getInstance().getApi().changeNickname(headers);
+                callChangeNickname.enqueue(new Callback<ServerResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ServerResponse> call,
+                                           @NonNull Response<ServerResponse> response) {
+                        if (response.body() == null) {
+                            Log.e(TAG, "changeNickname onResponse: response body is null");
+                            return;
+                        }
+                        try {
+                            if (response.body().getType() == ServerResponse.TYPE_CHANGE_NICKNAME_SUCCESS) {
+                                currentUser = gson.fromJson(response.body().getData(), User.class);
+                                dialog.dismiss();
+                                updateUI();
+                            } else if (response.body().getType() == ServerResponse.TYPE_CHANGE_NICKNAME_EXISTS) {
+                                imgError.setVisibility(View.VISIBLE);
+                                Toast.makeText(
+                                        getContext(),
+                                        getResources().getString(R.string.nickname_exists),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(
+                                    getContext(),
+                                    getResources().getString(R.string.try_later),
+                                    Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                        }
+                    }
+                    
+                    @Override
+                    public void onFailure(@NonNull Call<ServerResponse> call,
+                                          @NonNull Throwable t) {
+                        if (call.isCanceled())
+                            Log.d(TAG, "callChangeNickname is cancelled");
+                        else
+                            t.printStackTrace();
+                        Toast.makeText(
+                                getContext(),
+                                getResources().getString(R.string.try_later),
+                                Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                    }
+                });
+                updateUI();
+            }
+        });
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
     }
     
     private void init_fab(View v) {
@@ -487,6 +562,8 @@ public class ProfileFragment extends Fragment
             callUpdateSelfRank.cancel();
         if (callUpdateEvent != null)
             callUpdateEvent.cancel();
+        if (callChangeNickname != null)
+            callChangeNickname.cancel();
     }
 
     private Activity getActivityNonNull() {

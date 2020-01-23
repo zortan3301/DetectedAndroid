@@ -37,4 +37,7 @@ public interface ApiService {
     
     @GET("/getEvent")
     Call<ServerResponse> getEvent();
+    
+    @POST("/changeNickname")
+    Call<ServerResponse> changeNickname(@HeaderMap Map<String, String> headers);
 }

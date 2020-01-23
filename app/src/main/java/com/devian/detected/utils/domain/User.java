@@ -17,6 +17,10 @@ public class User implements Serializable {
         this.lastLogin = null;
     }
     
+    public User(String uid) {
+        this.uid = uid;
+    }
+    
     public String getDisplayName() {
         return displayName;
     }
