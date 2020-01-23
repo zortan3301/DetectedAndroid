@@ -29,6 +29,7 @@
 
     <!-- TaskInfo tab -->
     <string name="execution_reward">За выполнение вы получите:</string>
+    <string name="image_saved">Изображение сохранено</string>
 
     <!-- Map tab-->
     <string name="map_style">mapbox://styles/aminovmaksim/ck4397jle16vo1cpalemp5ddc</string>
@@ -42,5 +43,6 @@
 
     <!-- Other -->
     <string name="task_image">image of the task</string>
+    <string name="save_image_on_device">save image on device</string>
 
 </resources>

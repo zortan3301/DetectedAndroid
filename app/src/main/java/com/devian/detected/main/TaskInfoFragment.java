@@ -1,7 +1,11 @@
 package com.devian.detected.main;
 
+import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -11,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,7 +31,7 @@ import com.squareup.picasso.Picasso;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TaskInfoFragment extends Fragment {
+public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     
     private static final String TAG = "TaskInfoFragment";
     
@@ -42,6 +47,8 @@ public class TaskInfoFragment extends Fragment {
     TextView tvReward;
     @BindView(R.id.taskinfo_tvDescription)
     TextView tvDescription;
+    @BindView(R.id.taskinfo_btnDownload)
+    ImageView btnDownload;
     
     public static TaskInfoFragment newInstance(Task task) {
         Log.d(TAG, "newInstance");
@@ -75,6 +82,8 @@ public class TaskInfoFragment extends Fragment {
         Picasso.get()
                 .load(task.getImgUrl())
                 .into(imageView);
+    
+        btnDownload.setOnClickListener(this);
         
         return v;
     }
@@ -128,4 +137,27 @@ public class TaskInfoFragment extends Fragment {
         }
     }
     
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.taskinfo_btnDownload) {
+            Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+            MediaStore.Images.Media.insertImage(
+                    getActivityNonNull().getContentResolver(),
+                    bitmap,
+                    task.getTitle(),
+                    task.getDescription()
+            );
+            Toast.makeText(getActivityNonNull(),
+                    getResources().getString(R.string.image_saved),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+    
+    private Activity getActivityNonNull() {
+        if (super.getActivity() != null) {
+            return super.getActivity();
+        } else {
+            throw new RuntimeException("null returned from getActivity()");
+        }
+    }
 }
