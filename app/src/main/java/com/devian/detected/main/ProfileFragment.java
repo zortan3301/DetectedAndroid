@@ -404,12 +404,12 @@ public class ProfileFragment extends Fragment
 
         mBuilder.setView(mView);
         final AlertDialog dialog = mBuilder.create();
-        dialog.show();
         btnYes.setOnClickListener(v -> {
             logout();
             dialog.dismiss();
         });
         btnNo.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
     }
     
     @SuppressLint("InflateParams")
@@ -537,7 +537,6 @@ public class ProfileFragment extends Fragment
         });
 
         fab_exit.setOnClickListener(view -> popup_logout());
-
         fab_edit.setOnClickListener(view -> popup_change());
     }
     

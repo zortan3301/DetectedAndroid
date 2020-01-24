@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/black_shape_with_white_stroke"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+
+    <Button
+        android:id="@+id/popup_permissions_btnCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/black"
+        android:fontFamily="@font/consola"
+        android:text="@string/cancel"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/popup_permissions_btnAllow"
+        app:layout_constraintTop_toBottomOf="@+id/popup_permissions_tvInfo" />
+
+    <TextView
+        android:id="@+id/popup_permissions_tvInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/consola"
+        android:gravity="center_horizontal|center_vertical"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/view7"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/popup_permissions_tvInfo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/popup_permissions_tvInfo"
+        app:srcCompat="@drawable/ic_settings"
+        android:contentDescription="@string/settings_icon" />
+
+    <Button
+        android:id="@+id/popup_permissions_btnAllow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/black"
+        android:fontFamily="@font/consola"
+        android:text="@string/allow"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/popup_permissions_tvInfo"
+        app:layout_constraintTop_toBottomOf="@+id/popup_permissions_tvInfo" />
+
+    <View
+        android:id="@+id/view7"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:background="@color/yellow"
+        app:layout_constraintBottom_toBottomOf="@+id/popup_permissions_tvInfo"
+        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintTop_toTopOf="@+id/popup_permissions_tvInfo" />
+</androidx.constraintlayout.widget.ConstraintLayout>

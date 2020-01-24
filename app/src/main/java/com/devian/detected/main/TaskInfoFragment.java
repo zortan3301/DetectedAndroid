@@ -1,6 +1,8 @@
 package com.devian.detected.main;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -23,6 +25,7 @@ import androidx.fragment.app.Fragment;
 
 import com.devian.detected.R;
 import com.devian.detected.utils.domain.Task;
+import com.devian.detected.utils.ui.PermissionsPopup;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,6 +37,8 @@ import butterknife.ButterKnife;
 public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     
     private static final String TAG = "TaskInfoFragment";
+    
+    private final static int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 100;
     
     private FirebaseAuth mAuth;
     
@@ -140,17 +145,55 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.taskinfo_btnDownload) {
-            Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-            MediaStore.Images.Media.insertImage(
-                    getActivityNonNull().getContentResolver(),
-                    bitmap,
-                    task.getTitle(),
-                    task.getDescription()
-            );
-            Toast.makeText(getActivityNonNull(),
-                    getResources().getString(R.string.image_saved),
-                    Toast.LENGTH_SHORT).show();
+            if (getActivityNonNull().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                PermissionsPopup permissionsPopup =
+                        new PermissionsPopup(
+                                getResources().getString(R.string.storage_permission),
+                                getActivityNonNull());
+                permissionsPopup.getAllowOption().setOnClickListener(v -> {
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
+                    permissionsPopup.dismiss();
+                });
+                permissionsPopup.getCancelOption().setOnClickListener(v -> {
+                    Toast.makeText(getActivityNonNull(),
+                            getResources().getString(R.string.storage_permission_denied),
+                            Toast.LENGTH_LONG).show();
+                    permissionsPopup.dismiss();
+                });
+                permissionsPopup.show();
+            } else {
+                saveImage();
+            }
         }
+    }
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == WRITE_EXTERNAL_STORAGE_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                saveImage();
+            } else {
+                Toast.makeText(getActivityNonNull(),
+                        getResources().getString(R.string.storage_permission_denied),
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    
+    private void saveImage() {
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        MediaStore.Images.Media.insertImage(
+                getActivityNonNull().getContentResolver(),
+                bitmap,
+                task.getTitle(),
+                task.getDescription()
+        );
+        Toast.makeText(getActivityNonNull(),
+                getResources().getString(R.string.image_saved),
+                Toast.LENGTH_SHORT).show();
     }
     
     private Activity getActivityNonNull() {

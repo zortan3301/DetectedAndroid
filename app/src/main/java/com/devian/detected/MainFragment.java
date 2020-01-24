@@ -24,6 +24,7 @@ import com.devian.detected.utils.domain.Task;
 import com.devian.detected.utils.security.AES256;
 import com.devian.detected.utils.ui.CustomViewPager;
 import com.devian.detected.utils.ui.PagerAdapter;
+import com.devian.detected.utils.ui.PermissionsPopup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
@@ -56,7 +57,7 @@ public class MainFragment extends AppCompatActivity
     @BindView(R.id.fab_qr)
     FloatingActionButton fab_qr;
     
-    private static final int MY_CAMERA_REQUEST_CODE = 100;
+    private static final int CAMERA_REQUEST_CODE = 100;
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,8 +84,23 @@ public class MainFragment extends AppCompatActivity
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab_qr) {
-            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
+            if (checkSelfPermission(Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                PermissionsPopup permissionsPopup =
+                        new PermissionsPopup(
+                                getResources().getString(R.string.camera_permission),
+                                this);
+                permissionsPopup.getAllowOption().setOnClickListener(v -> {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
+                    permissionsPopup.dismiss();
+                });
+                permissionsPopup.getCancelOption().setOnClickListener(v -> {
+                    showToast(
+                            getResources().getString(R.string.camera_permission_denied),
+                            Toast.LENGTH_LONG);
+                    permissionsPopup.dismiss();
+                });
+                permissionsPopup.show();
             } else {
                 Intent i = new Intent(this, ScanActivity.class);
                 startActivityForResult(i, 1);
@@ -106,14 +122,19 @@ public class MainFragment extends AppCompatActivity
     }
     
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == MY_CAMERA_REQUEST_CODE) {
+        if (requestCode == CAMERA_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Intent i = new Intent(this, ScanActivity.class);
                 startActivityForResult(i, 1);
             } else {
-                showToast("Для считывания QR, необходим доступ к камере", Toast.LENGTH_LONG);
+                showToast(
+                        getResources().getString(R.string.camera_permission_denied),
+                        Toast.LENGTH_LONG);
             }
         }
     }
