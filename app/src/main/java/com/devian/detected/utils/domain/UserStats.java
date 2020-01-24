@@ -10,7 +10,10 @@ public class UserStats implements Serializable {
     private long points;
     private int level;
     private int tags;
-
+    
+    public UserStats() {
+    }
+    
     public UserStats(String uid, long points, int tags) {
         this.uid = uid;
         this.points = points;

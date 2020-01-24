@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/black_shape_with_yellow_stroke"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:paddingStart="48dp"
+    android:paddingEnd="48dp">
+
+
+    <ImageView
+        android:id="@+id/popupResult_img"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:contentDescription="@string/scan_result"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_check_circle_green" />
+
+    <View
+        android:id="@+id/popupResult_line"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/green"
+        app:layout_constraintEnd_toEndOf="@+id/popupResult_tvInfo"
+        app:layout_constraintStart_toStartOf="@+id/popupResult_tvInfo"
+        app:layout_constraintTop_toBottomOf="@+id/popupResult_img" />
+
+    <TextView
+        android:id="@+id/popupResult_tvInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/consola"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="@string/result_success"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/popupResult_tvReward"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/popupResult_line" />
+
+    <TextView
+        android:id="@+id/popupResult_tvReward"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_weight="0.6"
+        android:fontFamily="@font/consola"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="@string/reward"
+        android:textColor="@color/green"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="@+id/popupResult_tvInfo"
+        app:layout_constraintStart_toStartOf="@+id/popupResult_tvInfo"
+        app:layout_constraintTop_toBottomOf="@+id/popupResult_tvInfo" />
+
+    <Button
+        android:id="@+id/popupResult_btnOk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/black_shape_with_yellow_stroke"
+        android:clickable="true"
+        android:fontFamily="@font/consola"
+        android:foreground="@drawable/selectable_item_background"
+        android:text="@string/ok"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/popupResult_tvReward"
+        app:layout_constraintStart_toStartOf="@+id/popupResult_tvReward"
+        app:layout_constraintTop_toBottomOf="@+id/popupResult_tvReward" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

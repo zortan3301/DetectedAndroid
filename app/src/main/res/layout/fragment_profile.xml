@@ -310,7 +310,7 @@
         android:backgroundTint="@color/black"
         android:tint="@color/yellow"
         android:clickable="true"
-        android:src="@drawable/ic_settings"
+        android:src="@drawable/ic_settings_yellow"
         app:borderWidth="1dp"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"

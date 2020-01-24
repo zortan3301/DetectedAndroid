@@ -93,7 +93,7 @@
             android:foreground="@drawable/selectable_item_background"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_file_download_yellow_24dp"
+            app:srcCompat="@drawable/ic_download"
             android:contentDescription="@string/save_image_on_device" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -25,8 +25,8 @@ import com.devian.detected.utils.security.AES256;
 import com.devian.detected.utils.ui.CustomViewPager;
 import com.devian.detected.utils.ui.PagerAdapter;
 import com.devian.detected.utils.ui.PermissionsPopup;
+import com.devian.detected.utils.ui.PopupResult;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -139,11 +139,12 @@ public class MainFragment extends AppCompatActivity
         }
     }
     
-    public void proceedTask(String text) {
-        String tagId = AES256.decrypt(text);
+    public void proceedTask(String tagId) {
         
         if (tagId == null) {
-            showSnackbar("Недействительная метка", Toast.LENGTH_SHORT);
+            PopupResult popupResult = new PopupResult(
+                    PopupResult.RESULT_FAILURE, 0, this);
+            popupResult.show();
             return;
         }
     
@@ -159,19 +160,19 @@ public class MainFragment extends AppCompatActivity
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 if (response.body() == null) {
-                    showSnackbar("Недействительная метка", Snackbar.LENGTH_LONG);
+                    showPopup(PopupResult.RESULT_FAILURE, 0);
                     return;
                 }
                 switch (response.body().getType()) {
                     case ServerResponse.TYPE_TASK_ALREADY_COMPLETED:
-                        showSnackbar("Данное задание уже выполнено", Snackbar.LENGTH_LONG);
+                        showPopup(PopupResult.RESULT_ACTIVATED, 0);
                         break;
                     case ServerResponse.TYPE_TASK_FAILURE:
-                        showSnackbar("Недействительная метка", Snackbar.LENGTH_LONG);
+                        showPopup(PopupResult.RESULT_FAILURE, 0);
                         break;
                     case ServerResponse.TYPE_TASK_COMPLETED:
                         Task completedTask = gson.fromJson(response.body().getData(), Task.class);
-                        showSnackbar("Успешно, вы получили " + completedTask.getReward() + " поинтов", Toast.LENGTH_LONG);
+                        showPopup(PopupResult.RESULT_SUCCESS, completedTask.getReward());
                 }
             }
     
@@ -187,8 +188,10 @@ public class MainFragment extends AppCompatActivity
         Toast.makeText(this, text, duration).show();
     }
     
-    public void showSnackbar(String text, int duration) {
-        Snackbar.make(findViewById(R.id.fragment_main), text, duration).show();
+    public void showPopup(int resultCode, int reward) {
+        PopupResult popupResult = new PopupResult(
+                resultCode, reward, this);
+        popupResult.show();
     }
     
     @Override

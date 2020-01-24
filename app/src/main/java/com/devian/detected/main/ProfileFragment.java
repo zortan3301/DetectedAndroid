@@ -420,18 +420,17 @@ public class ProfileFragment extends Fragment
         Button btnCancel = mView.findViewById(R.id.changeNickname_btnCancel);
         EditText etNickname = mView.findViewById(R.id.changeNickname_etNickname);
         ImageView imgError = mView.findViewById(R.id.changeNickname_imgError);
+        TextView tvWarning = mView.findViewById(R.id.changeNickname_tvWarning);
         
         mBuilder.setView(mView);
         final AlertDialog dialog = mBuilder.create();
         dialog.show();
         btnOK.setOnClickListener(v -> {
-            String newNickname = etNickname.getText().toString();
-            if (newNickname.length() < 6) {
+            String newNickname = etNickname.getText().toString().toLowerCase();
+            if (newNickname.length() < 6 || newNickname.length() > 16) {
                 imgError.setVisibility(View.VISIBLE);
-                Toast.makeText(
-                        getContext(),
-                        getResources().getString(R.string.nickname_less6),
-                        Toast.LENGTH_LONG).show();
+                tvWarning.setVisibility(View.VISIBLE);
+                tvWarning.setText(getResources().getString(R.string.nickname_warning));
             } else {
                 Log.d(TAG, "changeNickname");
                 currentUser.setDisplayName(newNickname);
@@ -449,22 +448,20 @@ public class ProfileFragment extends Fragment
                         }
                         try {
                             if (response.body().getType() == ServerResponse.TYPE_CHANGE_NICKNAME_SUCCESS) {
-                                currentUser = gson.fromJson(response.body().getData(), User.class);
                                 dialog.dismiss();
-                                updateUI();
                             } else if (response.body().getType() == ServerResponse.TYPE_CHANGE_NICKNAME_EXISTS) {
                                 imgError.setVisibility(View.VISIBLE);
                                 Toast.makeText(
                                         getContext(),
                                         getResources().getString(R.string.nickname_exists),
-                                        Toast.LENGTH_LONG).show();
+                                        Toast.LENGTH_SHORT).show();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                             Toast.makeText(
                                     getContext(),
                                     getResources().getString(R.string.try_later),
-                                    Toast.LENGTH_LONG).show();
+                                    Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
                         }
                     }

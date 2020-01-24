@@ -9,6 +9,9 @@ public class RankRow implements Parcelable {
     private String nickname;
     private long points;
     
+    public RankRow() {
+    }
+    
     private RankRow(Parcel in) {
         uid = in.readString();
         rank = in.readLong();

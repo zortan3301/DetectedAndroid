@@ -43,7 +43,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/popup_permissions_tvInfo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/popup_permissions_tvInfo"
-        app:srcCompat="@drawable/ic_settings"
+        app:srcCompat="@drawable/ic_settings_yellow"
         android:contentDescription="@string/settings_icon" />
 
     <Button

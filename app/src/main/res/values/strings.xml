@@ -44,12 +44,20 @@
     <!-- Map tab-->
     <string name="map_style">mapbox://styles/aminovmaksim/ck4397jle16vo1cpalemp5ddc</string>
 
-    <!-- Pop up logout -->
+    <!-- Popup logout -->
     <string name="popup_logout_info">Вы действительно хотите выйти из своего аккаунта?</string>
 
-    <!-- Pop up change -->
+    <!-- Popup change -->
     <string name="new_nickname">новый никнейм</string>
     <string name="nickname_is_incorrect">nickname is incorrect</string>
+    <string name="nickname_warning">Минимальная длина никнейма 6 символов</string>
+
+    <!-- Popup result -->
+    <string name="result_success">Вы успешно активировали метку</string>
+    <string name="result_failure">Ошибка считывания метки</string>
+    <string name="result_activated">Данная метка уже была активирована</string>
+    <string name="scan_result">scan result</string>
+    <string name="reward">Награда: %s</string>
 
     <!-- Other -->
 
