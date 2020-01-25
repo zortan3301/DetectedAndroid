@@ -31,6 +31,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.gson.Gson;
 
+import org.jraf.android.alibglitch.GlitchEffect;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +71,12 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
         mAuth = FirebaseAuth.getInstance();
         
         return v;
+    }
+    
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        GlitchEffect.showGlitch(getActivityNonNull());
     }
     
     @Override
