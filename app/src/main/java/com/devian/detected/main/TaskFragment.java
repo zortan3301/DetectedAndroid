@@ -109,9 +109,10 @@ public class TaskFragment extends Fragment
                 }
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
-                        Type listType = new TypeToken<ArrayList<Task>>() {
-                        }.getType();
-                        tasks = gson.fromJson(response.body().getData(), listType);
+                        tasks = gson.fromJson(
+                                NetworkService.getInstance().proceedResponse(response.body()),
+                                new TypeToken<ArrayList<Task>>() {
+                                }.getType());
                         mAdapter.setTaskList(tasks);
                         refreshLayout.setRefreshing(false);
                     } else {

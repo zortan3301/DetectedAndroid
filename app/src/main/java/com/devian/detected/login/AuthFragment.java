@@ -17,7 +17,6 @@ import com.devian.detected.R;
 import com.devian.detected.utils.Network.NetworkService;
 import com.devian.detected.utils.Network.ServerResponse;
 import com.devian.detected.utils.domain.User;
-import com.devian.detected.utils.security.AES256;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -152,14 +151,17 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
     }
     
     private void authOnServer(FirebaseUser firebaseUser) {
-        User user = new User(firebaseUser.getUid(), firebaseUser.getDisplayName(), firebaseUser.getEmail());
-        Map<String, String> headers = new HashMap<>();
-        headers.put("data", AES256.encrypt(gson.toJson(user)));
+        User user = new User(
+                firebaseUser.getUid(),
+                firebaseUser.getDisplayName(),
+                firebaseUser.getEmail());
+        Map<String, String> headers = NetworkService.getInstance().proceedHeader(gson.toJson(user));
         NetworkService.getInstance().getApi().auth(headers).enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
-                Log.d(TAG, "onResponse: " + gson.toJson(response.body()));
+                Log.d(TAG, "onResponse: " +
+                        gson.toJson(NetworkService.getInstance().proceedResponse(response.body())));
             }
     
             @Override

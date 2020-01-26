@@ -1,7 +1,5 @@
 package com.devian.detected.utils.Network;
 
-import com.devian.detected.utils.security.AES256;
-
 public class ServerResponse {
     
     private int type;
@@ -12,10 +10,12 @@ public class ServerResponse {
     }
     
     public String getData() {
-        return AES256.decrypt(data);
+        return data;
     }
     
     public static final int TYPE_DEFAULT = 0;
+
+    public static final int TYPE_ERROR = -1;
     
     public static final int TYPE_AUTH_SUCCESS = 10;
     

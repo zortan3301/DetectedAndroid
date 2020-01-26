@@ -46,7 +46,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -211,8 +210,7 @@ public class ProfileFragment extends Fragment
     
     private void updateUserInfo() {
         Log.d(TAG, "updateUserInfo");
-        Map<String, String> headers = new HashMap<>();
-        headers.put("data", AES256.encrypt(mAuth.getUid()));
+        Map<String, String> headers = NetworkService.getInstance().proceedHeader(mAuth.getUid());
         callUpdateUserInfo = NetworkService.getInstance().getApi().getUserInfo(headers);
         callUpdateUserInfo.enqueue(new Callback<ServerResponse>() {
             @Override
@@ -224,8 +222,11 @@ public class ProfileFragment extends Fragment
                 }
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_AUTH_SUCCESS) {
-                        currentUser = gson.fromJson(response.body().getData(), User.class);
-                        Log.d(TAG, "updateUserInfo onResponse: current user = " + response.body().getData());
+                        currentUser = gson.fromJson(
+                                NetworkService.getInstance().proceedResponse(response.body()),
+                                User.class);
+                        Log.d(TAG, "updateUserInfo onResponse: current user = " +
+                                response.body().getData());
                         updateUI();
                     }
                 } catch (Exception e) {
@@ -246,8 +247,7 @@ public class ProfileFragment extends Fragment
     
     private void updateStatistics() {
         Log.d(TAG, "updateStatistics");
-        Map<String, String> headers = new HashMap<>();
-        headers.put("data", AES256.encrypt(mAuth.getUid()));
+        Map<String, String> headers = NetworkService.getInstance().proceedHeader(mAuth.getUid());
         callUpdateStatistics = NetworkService.getInstance().getApi().getStats(headers);
         callUpdateStatistics.enqueue(new Callback<ServerResponse>() {
             @Override
@@ -258,7 +258,9 @@ public class ProfileFragment extends Fragment
                     return;
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_STATS_EXISTS) {
-                        userStats = gson.fromJson(response.body().getData(), UserStats.class);
+                        userStats = gson.fromJson(
+                                NetworkService.getInstance().proceedResponse(response.body()),
+                                UserStats.class);
                         updateUI();
                     } else {
                         Log.e(TAG, "onResponse: user stats does not exist on the server");
@@ -292,12 +294,14 @@ public class ProfileFragment extends Fragment
                 }
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
-                        Type listType = new TypeToken<ArrayList<RankRow>>() {
-                        }.getType();
-                        top10 = gson.fromJson(response.body().getData(), listType);
+                        top10 = gson.fromJson(
+                                NetworkService.getInstance().proceedResponse(response.body()),
+                                new TypeToken<ArrayList<RankRow>>() {
+                                }.getType());
                         updateUI();
-                    } else
+                    } else {
                         Log.e(TAG, "onResponse (top10): type != TYPE_RANK_SUCCESS");
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -313,8 +317,7 @@ public class ProfileFragment extends Fragment
         });
         
         // Get personal rank
-        Map<String, String> headers = new HashMap<>();
-        headers.put("data", AES256.encrypt(mAuth.getUid()));
+        Map<String, String> headers = NetworkService.getInstance().proceedHeader(mAuth.getUid());
         callUpdateSelfRank = NetworkService.getInstance().getApi().getPersonalRank(headers);
         callUpdateSelfRank.enqueue(new Callback<ServerResponse>() {
             @Override
@@ -326,7 +329,9 @@ public class ProfileFragment extends Fragment
                 }
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
-                        selfRank = gson.fromJson(response.body().getData(), RankRow.class);
+                        selfRank = gson.fromJson(
+                                NetworkService.getInstance().proceedResponse(response.body()),
+                                RankRow.class);
                         updateUI();
                     } else
                         Log.e(TAG, "onResponse (personal rank): type != TYPE_RANK_SUCCESS");
@@ -360,7 +365,7 @@ public class ProfileFragment extends Fragment
                 }
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
-                        currentEvent = response.body().getData();
+                        currentEvent = NetworkService.getInstance().proceedResponse(response.body());
                         updateUI();
                     }
                 } catch (Exception e) {
