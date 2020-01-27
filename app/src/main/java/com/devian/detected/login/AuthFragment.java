@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment;
 
 import com.devian.detected.MainFragment;
 import com.devian.detected.R;
-import com.devian.detected.utils.Network.NetworkService;
-import com.devian.detected.utils.Network.ServerResponse;
+import com.devian.detected.utils.network.NetworkManager;
+import com.devian.detected.utils.network.ServerResponse;
 import com.devian.detected.utils.domain.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -30,9 +30,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.gson.Gson;
 
-import org.jraf.android.alibglitch.GlitchEffect;
-
-import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -75,7 +72,6 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        GlitchEffect.showGlitch(getActivityNonNull());
     }
     
     @Override
@@ -155,13 +151,13 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
                 firebaseUser.getUid(),
                 firebaseUser.getDisplayName(),
                 firebaseUser.getEmail());
-        Map<String, String> headers = NetworkService.getInstance().proceedHeader(gson.toJson(user));
-        NetworkService.getInstance().getApi().auth(headers).enqueue(new Callback<ServerResponse>() {
+        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(gson.toJson(user));
+        NetworkManager.getInstance().getApi().auth(headers).enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: " +
-                        gson.toJson(NetworkService.getInstance().proceedResponse(response.body())));
+                        gson.toJson(NetworkManager.getInstance().proceedResponse(response.body())));
             }
     
             @Override

@@ -5,9 +5,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.devian.detected.main.MapFragment;
-import com.devian.detected.main.ProfileFragment;
-import com.devian.detected.main.TaskFragment;
+import com.devian.detected.main.map.MapFragment;
+import com.devian.detected.main.profile.ProfileFragment;
+import com.devian.detected.main.task_list.TaskFragment;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
     
@@ -22,9 +22,9 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
             case 0:
                 return new ProfileFragment();
             case 1:
-                return new TaskFragment();
-            case 2:
                 return new MapFragment();
+            case 2:
+                return new TaskFragment();
         }
         return new ProfileFragment();
     }
@@ -40,9 +40,9 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
             case 0:
                 return "Профиль";
             case 1:
-                return "Задачи";
-            case 2:
                 return "Карта";
+            case 2:
+                return "Задачи";
         }
         return "";
     }

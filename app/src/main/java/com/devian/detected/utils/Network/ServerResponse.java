@@ -1,4 +1,4 @@
-package com.devian.detected.utils.Network;
+package com.devian.detected.utils.network;
 
 public class ServerResponse {
     

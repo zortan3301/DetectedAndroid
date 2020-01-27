@@ -16,10 +16,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.devian.detected.main.ScanActivity;
-import com.devian.detected.main.TaskFragment;
+import com.devian.detected.main.task_list.TaskFragment;
 import com.devian.detected.main.TaskInfoFragment;
-import com.devian.detected.utils.Network.NetworkService;
-import com.devian.detected.utils.Network.ServerResponse;
+import com.devian.detected.utils.network.NetworkManager;
+import com.devian.detected.utils.network.ServerResponse;
 import com.devian.detected.utils.domain.Task;
 import com.devian.detected.utils.security.AES256;
 import com.devian.detected.utils.ui.CustomViewPager;
@@ -154,8 +154,8 @@ public class MainFragment extends AppCompatActivity
     
         Map<String, String> headers = new HashMap<>();
         headers.put("data", AES256.encrypt(user_data));
-    
-        NetworkService.getInstance().getApi().scanTag(headers).enqueue(new Callback<ServerResponse>() {
+
+        NetworkManager.getInstance().getApi().scanTag(headers).enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {

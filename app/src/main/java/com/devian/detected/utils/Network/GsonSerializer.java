@@ -1,4 +1,4 @@
-package com.devian.detected.utils.Network;
+package com.devian.detected.utils.network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

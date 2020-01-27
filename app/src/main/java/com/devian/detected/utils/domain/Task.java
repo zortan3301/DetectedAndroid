@@ -4,7 +4,9 @@ package com.devian.detected.utils.domain;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class Task implements Parcelable {
+import androidx.annotation.NonNull;
+
+public class Task implements Parcelable, Comparable<Task> {
     private long id;
     private String tagId;
     private int reward;
@@ -119,5 +121,10 @@ public class Task implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    @Override
+    public int compareTo(@NonNull Task o) {
+        return tagId.compareTo(o.getTagId());
     }
 }

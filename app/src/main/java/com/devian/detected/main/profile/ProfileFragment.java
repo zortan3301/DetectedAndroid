@@ -1,4 +1,4 @@
-package com.devian.detected.main;
+package com.devian.detected.main.profile;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -31,9 +31,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.devian.detected.MainActivity;
 import com.devian.detected.R;
 import com.devian.detected.utils.LevelManager;
-import com.devian.detected.utils.Network.GsonSerializer;
-import com.devian.detected.utils.Network.NetworkService;
-import com.devian.detected.utils.Network.ServerResponse;
+import com.devian.detected.utils.network.GsonSerializer;
+import com.devian.detected.utils.network.NetworkManager;
+import com.devian.detected.utils.network.ServerResponse;
 import com.devian.detected.utils.domain.RankRow;
 import com.devian.detected.utils.domain.User;
 import com.devian.detected.utils.domain.UserStats;
@@ -58,16 +58,16 @@ import retrofit2.Response;
 
 public class ProfileFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener {
-    
+
     private static final String TAG = "ProfileFragment";
 
     private FirebaseAuth mAuth;
-    
+
     private Gson gson = GsonSerializer.getInstance().getGson();
-    
+
     @BindView(R.id.profile_tvName)
     TextView tvName;
-    
+
     @BindView(R.id.profile_tvPoints)
     TextView tvPoints;
     @BindView(R.id.profile_tvLevel)
@@ -84,21 +84,21 @@ public class ProfileFragment extends Fragment
     TextView tvRating1;
     @BindView(R.id.profile_tvRating2)
     TextView tvRating2;
-    
+
     @BindView(R.id.profile_refreshLayout)
     SwipeRefreshLayout refreshLayout;
-    
+
     private FloatingActionButton fab_settings, fab_exit, fab_edit;
     private TextView tv_fab_exit, tv_fab_edit;
     private Animation fab_open, fab_close, fab_clock, fab_anticlock;
     private Boolean fab_settings_open = false;
-    
+
     private User currentUser;
     private UserStats userStats;
     private RankRow selfRank;
     private ArrayList<RankRow> top10;
     private String currentEvent;
-    
+
     private Call<ServerResponse> callUpdateUserInfo, callUpdateStatistics, callUpdateTop10,
             callUpdateSelfRank, callUpdateEvent, callChangeNickname;
 
@@ -110,17 +110,17 @@ public class ProfileFragment extends Fragment
         Log.d(TAG, "onCreateView");
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this, v);
-        
+
         refreshLayout.setOnRefreshListener(this);
         mAuth = FirebaseAuth.getInstance();
-    
+
         init_fab(v);
-        
+
         checkSavedBundle(savedInstanceState);
-    
+
         return v;
     }
-    
+
     private void checkSavedBundle(Bundle inState) {
         Log.d(TAG, "checkSavedBundle");
         if (inState != null) {
@@ -134,7 +134,7 @@ public class ProfileFragment extends Fragment
         }
         updateUI();
     }
-    
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         Log.d(TAG, "onSaveInstanceState");
@@ -145,7 +145,7 @@ public class ProfileFragment extends Fragment
         outState.putParcelable("selfRank", selfRank);
         outState.putParcelableArrayList("top10", top10);
     }
-    
+
     private void init() {
         Log.d(TAG, "init");
         updateUserInfo();
@@ -153,7 +153,7 @@ public class ProfileFragment extends Fragment
         updateRankings();
         updateEvent();
     }
-    
+
     private void updateUI() {
         Log.d(TAG, "updateUI");
         if (currentUser != null) {
@@ -207,11 +207,11 @@ public class ProfileFragment extends Fragment
         }
         refreshLayout.setRefreshing(false);
     }
-    
+
     private void updateUserInfo() {
         Log.d(TAG, "updateUserInfo");
-        Map<String, String> headers = NetworkService.getInstance().proceedHeader(mAuth.getUid());
-        callUpdateUserInfo = NetworkService.getInstance().getApi().getUserInfo(headers);
+        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(mAuth.getUid());
+        callUpdateUserInfo = NetworkManager.getInstance().getApi().getUserInfo(headers);
         callUpdateUserInfo.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -223,7 +223,7 @@ public class ProfileFragment extends Fragment
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_AUTH_SUCCESS) {
                         currentUser = gson.fromJson(
-                                NetworkService.getInstance().proceedResponse(response.body()),
+                                NetworkManager.getInstance().proceedResponse(response.body()),
                                 User.class);
                         Log.d(TAG, "updateUserInfo onResponse: current user = " +
                                 response.body().getData());
@@ -233,7 +233,7 @@ public class ProfileFragment extends Fragment
                     e.printStackTrace();
                 }
             }
-            
+
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
@@ -244,11 +244,11 @@ public class ProfileFragment extends Fragment
             }
         });
     }
-    
+
     private void updateStatistics() {
         Log.d(TAG, "updateStatistics");
-        Map<String, String> headers = NetworkService.getInstance().proceedHeader(mAuth.getUid());
-        callUpdateStatistics = NetworkService.getInstance().getApi().getStats(headers);
+        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(mAuth.getUid());
+        callUpdateStatistics = NetworkManager.getInstance().getApi().getStats(headers);
         callUpdateStatistics.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -259,7 +259,7 @@ public class ProfileFragment extends Fragment
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_STATS_EXISTS) {
                         userStats = gson.fromJson(
-                                NetworkService.getInstance().proceedResponse(response.body()),
+                                NetworkManager.getInstance().proceedResponse(response.body()),
                                 UserStats.class);
                         updateUI();
                     } else {
@@ -269,6 +269,7 @@ public class ProfileFragment extends Fragment
                     e.printStackTrace();
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
@@ -279,11 +280,11 @@ public class ProfileFragment extends Fragment
             }
         });
     }
-    
+
     private void updateRankings() {
         Log.d(TAG, "updateRankings");
         // Get top 10 users
-        callUpdateTop10 = NetworkService.getInstance().getApi().getRankTop10();
+        callUpdateTop10 = NetworkManager.getInstance().getApi().getRankTop10();
         callUpdateTop10.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -295,7 +296,7 @@ public class ProfileFragment extends Fragment
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
                         top10 = gson.fromJson(
-                                NetworkService.getInstance().proceedResponse(response.body()),
+                                NetworkManager.getInstance().proceedResponse(response.body()),
                                 new TypeToken<ArrayList<RankRow>>() {
                                 }.getType());
                         updateUI();
@@ -306,6 +307,7 @@ public class ProfileFragment extends Fragment
                     e.printStackTrace();
                 }
             }
+
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
@@ -315,10 +317,10 @@ public class ProfileFragment extends Fragment
                     t.printStackTrace();
             }
         });
-        
+
         // Get personal rank
-        Map<String, String> headers = NetworkService.getInstance().proceedHeader(mAuth.getUid());
-        callUpdateSelfRank = NetworkService.getInstance().getApi().getPersonalRank(headers);
+        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(mAuth.getUid());
+        callUpdateSelfRank = NetworkManager.getInstance().getApi().getPersonalRank(headers);
         callUpdateSelfRank.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -330,7 +332,7 @@ public class ProfileFragment extends Fragment
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
                         selfRank = gson.fromJson(
-                                NetworkService.getInstance().proceedResponse(response.body()),
+                                NetworkManager.getInstance().proceedResponse(response.body()),
                                 RankRow.class);
                         updateUI();
                     } else
@@ -339,7 +341,7 @@ public class ProfileFragment extends Fragment
                     e.printStackTrace();
                 }
             }
-            
+
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
@@ -350,11 +352,11 @@ public class ProfileFragment extends Fragment
             }
         });
     }
-    
+
     private void updateEvent() {
         Log.d(TAG, "updateEvent: ");
-    
-        callUpdateEvent = NetworkService.getInstance().getApi().getEvent();
+
+        callUpdateEvent = NetworkManager.getInstance().getApi().getEvent();
         callUpdateEvent.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -365,14 +367,14 @@ public class ProfileFragment extends Fragment
                 }
                 try {
                     if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
-                        currentEvent = NetworkService.getInstance().proceedResponse(response.body());
+                        currentEvent = NetworkManager.getInstance().proceedResponse(response.body());
                         updateUI();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            
+
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
@@ -383,11 +385,11 @@ public class ProfileFragment extends Fragment
             }
         });
     }
-    
+
     private void logout() {
         Log.d(TAG, "logout");
         mAuth.signOut();
-        
+
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -416,7 +418,7 @@ public class ProfileFragment extends Fragment
         btnNo.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
-    
+
     @SuppressLint("InflateParams")
     private void popup_change() {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
@@ -426,7 +428,7 @@ public class ProfileFragment extends Fragment
         EditText etNickname = mView.findViewById(R.id.changeNickname_etNickname);
         ImageView imgError = mView.findViewById(R.id.changeNickname_imgError);
         TextView tvWarning = mView.findViewById(R.id.changeNickname_tvWarning);
-        
+
         mBuilder.setView(mView);
         final AlertDialog dialog = mBuilder.create();
         dialog.show();
@@ -439,10 +441,10 @@ public class ProfileFragment extends Fragment
             } else {
                 Log.d(TAG, "changeNickname");
                 currentUser.setDisplayName(newNickname);
-                Map<String, String> headers = new HashMap<>();
-                headers.put("data", AES256.encrypt(gson.toJson(currentUser)));
-                
-                callChangeNickname = NetworkService.getInstance().getApi().changeNickname(headers);
+                Map<String, String> headers =
+                        NetworkManager.getInstance().proceedHeader(gson.toJson(currentUser));
+
+                callChangeNickname = NetworkManager.getInstance().getApi().changeNickname(headers);
                 callChangeNickname.enqueue(new Callback<ServerResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<ServerResponse> call,
@@ -470,7 +472,7 @@ public class ProfileFragment extends Fragment
                             dialog.dismiss();
                         }
                     }
-                    
+
                     @Override
                     public void onFailure(@NonNull Call<ServerResponse> call,
                                           @NonNull Throwable t) {
@@ -490,50 +492,50 @@ public class ProfileFragment extends Fragment
         });
         btnCancel.setOnClickListener(v -> dialog.dismiss());
     }
-    
+
     private void init_fab(View v) {
         Log.d(TAG, "init_fab");
-        
+
         fab_settings = v.findViewById(R.id.fab_settings);
         fab_exit = v.findViewById(R.id.fab_exit);
         fab_edit = v.findViewById(R.id.fab_edit);
-        
+
         fab_close = AnimationUtils.loadAnimation(getContext(), R.anim.fab_close);
         fab_open = AnimationUtils.loadAnimation(getContext(), R.anim.fab_open);
         fab_clock = AnimationUtils.loadAnimation(getContext(), R.anim.fab_rotate_clock);
         fab_anticlock = AnimationUtils.loadAnimation(getContext(), R.anim.fab_rotate_anticlock);
-        
+
         tv_fab_exit = v.findViewById(R.id.profile_tv_fab_exit);
         tv_fab_edit = v.findViewById(R.id.profile_tv_fab_edit);
-    
+
         fab_settings.setOnClickListener(view -> {
             if (fab_settings_open) {
                 fab_exit.startAnimation(fab_close);
                 fab_edit.startAnimation(fab_close);
                 fab_settings.startAnimation(fab_anticlock);
-            
+
                 fab_exit.setClickable(false);
                 fab_edit.setClickable(false);
-            
+
                 tv_fab_exit.setVisibility(View.INVISIBLE);
                 tv_fab_edit.setVisibility(View.INVISIBLE);
                 tv_fab_exit.startAnimation(fab_close);
                 tv_fab_edit.startAnimation(fab_close);
-            
+
                 fab_settings_open = false;
             } else {
                 fab_exit.startAnimation(fab_open);
                 fab_edit.startAnimation(fab_open);
                 fab_settings.startAnimation(fab_clock);
-            
+
                 fab_exit.setClickable(true);
                 fab_edit.setClickable(true);
-            
+
                 tv_fab_exit.setVisibility(View.VISIBLE);
                 tv_fab_edit.setVisibility(View.VISIBLE);
                 tv_fab_exit.startAnimation(fab_open);
                 tv_fab_edit.startAnimation(fab_open);
-            
+
                 fab_settings_open = true;
             }
         });
@@ -541,14 +543,14 @@ public class ProfileFragment extends Fragment
         fab_exit.setOnClickListener(view -> popup_logout());
         fab_edit.setOnClickListener(view -> popup_change());
     }
-    
+
     @Override
     public void onRefresh() {
         Log.d(TAG, "onRefresh");
         refreshLayout.setRefreshing(true);
         init();
     }
-    
+
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
@@ -566,7 +568,7 @@ public class ProfileFragment extends Fragment
         if (callChangeNickname != null)
             callChangeNickname.cancel();
     }
-    
+
     private Activity getActivityNonNull() {
         if (super.getActivity() != null) {
             return super.getActivity();
