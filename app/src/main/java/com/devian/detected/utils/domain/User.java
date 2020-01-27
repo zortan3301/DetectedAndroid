@@ -23,7 +23,11 @@ public class User implements Serializable {
     public User(String uid) {
         this.uid = uid;
     }
-    
+
+    public String getUid() {
+        return uid;
+    }
+
     public String getDisplayName() {
         return displayName;
     }

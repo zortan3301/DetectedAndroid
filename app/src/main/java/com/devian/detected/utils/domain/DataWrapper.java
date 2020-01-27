@@ -13,6 +13,7 @@ public class DataWrapper<T> {
 
     public DataWrapper(int code) {
         this.code = code;
+        this.error = true;
     }
 
     public T getObject() {

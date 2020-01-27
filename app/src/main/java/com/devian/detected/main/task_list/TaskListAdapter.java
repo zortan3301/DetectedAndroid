@@ -19,9 +19,9 @@ import java.util.List;
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHolder> {
 
     private List<Task> taskList;
-    private TaskListContract.OnTaskItemClickListener listener;
+    private OnTaskItemClickListener listener;
 
-    TaskListAdapter(List<Task> taskList, TaskListContract.OnTaskItemClickListener listener) {
+    TaskListAdapter(List<Task> taskList, OnTaskItemClickListener listener) {
         this.taskList = taskList;
         this.listener = listener;
     }
@@ -78,7 +78,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
             ivCover = view.findViewById(R.id.task_imageView);
         }
 
-        void bind(final Task task, final TaskListContract.OnTaskItemClickListener clickListener) {
+        void bind(final Task task, final OnTaskItemClickListener clickListener) {
             view.setOnClickListener(view -> clickListener.OnItemClicked(task));
         }
     }
@@ -100,5 +100,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
                 outRect.top = 0;
             }
         }
+    }
+
+    interface OnTaskItemClickListener {
+        void OnItemClicked(Task task);
     }
 }

@@ -25,7 +25,7 @@ public interface NetworkInterface {
     Observable<ServerResponse> getMapTasks();
 
     @GET("/getTextTasks")
-    Observable<ServerResponse> getTextTasks();
+    Call<ServerResponse> getTextTasks();
 
     @POST("/scanTag")
     Call<ServerResponse> scanTag(@HeaderMap Map<String, String> headers);

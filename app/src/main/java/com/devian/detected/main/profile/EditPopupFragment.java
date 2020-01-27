@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
 import com.devian.detected.utils.domain.User;
+import com.devian.detected.utils.network.GsonSerializer;
 import com.devian.detected.utils.network.ServerResponse;
 
 import butterknife.BindView;
@@ -29,6 +30,7 @@ public class EditPopupFragment extends DialogFragment implements View.OnClickLis
     private static final String TAG = "EditPopupFragment";
 
     private ProfileViewModel viewModel;
+    private OnProfileChanged callback;
 
     @BindView(R.id.changeNickname_btnOk)
     Button btnOk;
@@ -82,14 +84,17 @@ public class EditPopupFragment extends DialogFragment implements View.OnClickLis
             displayError(TYPE_INCORRECT_NEW_NICKNAME);
         } else {
             showProgress();
-            currentUser.setDisplayName(newNickname);
-            viewModel.changeNickname(currentUser).observe(this, (userDataWrapper) -> {
+            User user = new User(currentUser.getUid(), newNickname, currentUser.getEmail());
+            viewModel.changeNickname(user).observe(this, (userDataWrapper) -> {
+                Log.d(TAG, "changeNickname: " + GsonSerializer.getInstance().getGson().toJson(userDataWrapper));
                 hideProgress();
-                currentUser = userDataWrapper.getObject();
                 if (userDataWrapper.isError())
                     displayError(userDataWrapper.getCode());
-                else
+                else {
+                    currentUser = userDataWrapper.getObject();
+                    callback.onDisplayNameChanged(newNickname);
                     dismiss();
+                }
             });
         }
     }
@@ -125,5 +130,14 @@ public class EditPopupFragment extends DialogFragment implements View.OnClickLis
         }
     }
 
+    void setOnProfileChangedListener(OnProfileChanged callback) {
+        this.callback = callback;
+    }
+
+    public interface OnProfileChanged {
+        void onDisplayNameChanged(String displayName);
+    }
+
     private static final int TYPE_INCORRECT_NEW_NICKNAME = -19201;
+
 }

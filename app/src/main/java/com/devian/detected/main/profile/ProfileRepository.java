@@ -201,7 +201,7 @@ class ProfileRepository {
     }
 
     MutableLiveData<DataWrapper<User>> changeDisplayName(User user) {
-        Log.d(TAG, "getMldUser: ");
+        Log.d(TAG, "changeDisplayName: ");
         Map<String, String> headers = NetworkManager.getInstance().proceedHeader(gson.toJson(user));
         Call<ServerResponse> call = NetworkManager.getInstance().getApi().changeNickname(headers);
         call.enqueue(new Callback<ServerResponse>() {

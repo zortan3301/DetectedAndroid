@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -25,8 +26,7 @@ import butterknife.ButterKnife;
 
 public class TaskFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener,
-        TaskListContract.OnTaskItemClickListener,
-        TaskListContract.View {
+        TaskListAdapter.OnTaskItemClickListener {
 
     private static final String TAG = "TaskFragment";
 
@@ -38,7 +38,7 @@ public class TaskFragment extends Fragment
     SwipeRefreshLayout refreshLayout;
 
     private TaskListAdapter mAdapter;
-    private TaskPresenter taskPresenter;
+    private TaskViewModel viewModel;
 
     private ArrayList<Task> tasks;
 
@@ -50,30 +50,34 @@ public class TaskFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_task, container, false);
         ButterKnife.bind(this, v);
 
-        setupMVP();
+        viewModel = ViewModelProviders.of(this).get(TaskViewModel.class);
         setupView();
 
         return v;
     }
 
-    @Override
-    public void displayTasks(ArrayList<Task> taskList) {
-        hideProgress();
-        tasks = taskList;
+    private void getTaskList() {
+        Log.d(TAG, "getTaskList: ");
+        showProgress();
+        viewModel.getTaskList().observe(this, taskListWrapper -> {
+            hideProgress();
+            tasks = new ArrayList<>(taskListWrapper.getObject());
+            displayTasks(tasks);
+        });
+    }
+
+    private void displayTasks(ArrayList<Task> taskList) {
+        Log.d(TAG, "displayTasks: ");
         mAdapter.setTaskList(taskList);
     }
 
-    @Override
     public void displayError(String s) {
-        hideProgress();
+        Log.d(TAG, "displayError: ");
         Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
     }
 
-    private void setupMVP() {
-        taskPresenter = new TaskPresenter(this);
-    }
-
     private void setupView() {
+        Log.d(TAG, "setupView: ");
         refreshLayout.setOnRefreshListener(this);
 
         recyclerView.setHasFixedSize(true);
@@ -85,11 +89,6 @@ public class TaskFragment extends Fragment
         int space = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 74,
                 getResources().getDisplayMetrics());
         recyclerView.addItemDecoration(new TaskListAdapter.TaskListItemDecorator(space));
-    }
-
-    private void getTaskList() {
-        showProgress();
-        taskPresenter.getTasks();
     }
 
     @Override
@@ -118,13 +117,13 @@ public class TaskFragment extends Fragment
         getTaskList();
     }
 
-    @Override
-    public void showProgress() {
+    private void showProgress() {
+        Log.d(TAG, "showProgress: ");
         refreshLayout.setRefreshing(true);
     }
 
-    @Override
-    public void hideProgress() {
+    private void hideProgress() {
+        Log.d(TAG, "hideProgress: ");
         refreshLayout.setRefreshing(false);
     }
 

@@ -3,6 +3,7 @@ package com.devian.detected.main.profile;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -44,13 +46,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ProfileFragment extends Fragment
-        implements SwipeRefreshLayout.OnRefreshListener {
+        implements SwipeRefreshLayout.OnRefreshListener, EditPopupFragment.OnProfileChanged {
 
     private static final String TAG = "ProfileFragment";
 
     private FirebaseAuth mAuth;
 
     private ProfileViewModel viewModel;
+    private FragmentActivity mContext;
 
     @BindView(R.id.profile_tvName)
     TextView tvName;
@@ -83,6 +86,12 @@ public class ProfileFragment extends Fragment
     private RankRow selfRank;
     private ArrayList<RankRow> top10;
     private String currentEvent;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = (FragmentActivity) context;
+    }
 
     @Nullable
     @Override
@@ -217,13 +226,6 @@ public class ProfileFragment extends Fragment
         tvEvent.setText(spannable);
     }
 
-    private void displayChangedNickname(User user) {
-        Log.d(TAG, "displayChangedNickname");
-        hideProgress();
-        this.currentUser = user;
-        tvName.setText(currentUser.getDisplayName());
-    }
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -291,7 +293,8 @@ public class ProfileFragment extends Fragment
     @SuppressLint("InflateParams")
     private void popup_change() {
         EditPopupFragment popup = new EditPopupFragment(currentUser);
-        popup.show(getFragmentManager(), "editPopup");
+        popup.setOnProfileChangedListener(this);
+        popup.show(mContext.getSupportFragmentManager(), "editPopup");
     }
 
     private void init_fab(View v) {
@@ -376,5 +379,12 @@ public class ProfileFragment extends Fragment
     public void displayError(int errorCode) {
         Log.d(TAG, "displayError");
         hideProgress();
+    }
+
+    @Override
+    public void onDisplayNameChanged(String displayName) {
+        Log.d(TAG, "onDisplayNameChanged: ");
+        currentUser.setDisplayName(displayName);
+        tvName.setText(currentUser.getDisplayName());
     }
 }
