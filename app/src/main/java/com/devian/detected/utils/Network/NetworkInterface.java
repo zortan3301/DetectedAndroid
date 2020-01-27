@@ -18,8 +18,8 @@ public interface NetworkInterface {
     @GET("/getUserInfo")
     Call<ServerResponse> getUserInfo(@HeaderMap Map<String, String> headers);
 
-    @GET("/getStats")
-    Call<ServerResponse> getStats(@HeaderMap Map<String, String> headers);
+    @GET("/getUserStats")
+    Call<ServerResponse> getUserStats(@HeaderMap Map<String, String> headers);
 
     @GET("/getMapTasks")
     Observable<ServerResponse> getMapTasks();
@@ -33,8 +33,8 @@ public interface NetworkInterface {
     @GET("/getRankTop10")
     Call<ServerResponse> getRankTop10();
 
-    @GET("/getPersonalRank")
-    Call<ServerResponse> getPersonalRank(@HeaderMap Map<String, String> headers);
+    @GET("/getSelfRank")
+    Call<ServerResponse> getSelfRank(@HeaderMap Map<String, String> headers);
 
     @GET("/getEvent")
     Call<ServerResponse> getEvent();

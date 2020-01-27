@@ -17,44 +17,31 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.devian.detected.MainActivity;
 import com.devian.detected.R;
 import com.devian.detected.utils.LevelManager;
-import com.devian.detected.utils.network.GsonSerializer;
-import com.devian.detected.utils.network.NetworkManager;
-import com.devian.detected.utils.network.ServerResponse;
 import com.devian.detected.utils.domain.RankRow;
 import com.devian.detected.utils.domain.User;
 import com.devian.detected.utils.domain.UserStats;
-import com.devian.detected.utils.security.AES256;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ProfileFragment extends Fragment
         implements SwipeRefreshLayout.OnRefreshListener {
@@ -63,11 +50,10 @@ public class ProfileFragment extends Fragment
 
     private FirebaseAuth mAuth;
 
-    private Gson gson = GsonSerializer.getInstance().getGson();
+    private ProfileViewModel viewModel;
 
     @BindView(R.id.profile_tvName)
     TextView tvName;
-
     @BindView(R.id.profile_tvPoints)
     TextView tvPoints;
     @BindView(R.id.profile_tvLevel)
@@ -84,7 +70,6 @@ public class ProfileFragment extends Fragment
     TextView tvRating1;
     @BindView(R.id.profile_tvRating2)
     TextView tvRating2;
-
     @BindView(R.id.profile_refreshLayout)
     SwipeRefreshLayout refreshLayout;
 
@@ -99,9 +84,6 @@ public class ProfileFragment extends Fragment
     private ArrayList<RankRow> top10;
     private String currentEvent;
 
-    private Call<ServerResponse> callUpdateUserInfo, callUpdateStatistics, callUpdateTop10,
-            callUpdateSelfRank, callUpdateEvent, callChangeNickname;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -111,28 +93,155 @@ public class ProfileFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this, v);
 
+        viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
         refreshLayout.setOnRefreshListener(this);
         mAuth = FirebaseAuth.getInstance();
-
         init_fab(v);
-
-        checkSavedBundle(savedInstanceState);
 
         return v;
     }
 
-    private void checkSavedBundle(Bundle inState) {
-        Log.d(TAG, "checkSavedBundle");
-        if (inState != null) {
-            currentUser = (User) inState.getSerializable("currentUser");
-            userStats = (UserStats) inState.getSerializable("userStats");
-            currentEvent = (String) inState.getSerializable("currentEvent");
-            selfRank = inState.getParcelable("selfRank");
-            top10 = inState.getParcelableArrayList("top10");
-        } else {
-            init();
+    private void updateInformation() {
+        getUserInfo();
+        getUserStats();
+        getSelfRank();
+        getRankTop10();
+        getEvent();
+    }
+
+    private void getUserInfo() {
+        Log.d(TAG, "getUserInfo: ");
+        showProgress();
+        viewModel.getUserInfo(mAuth.getUid()).observe(this, userDataWrapper -> {
+            hideProgress();
+            currentUser = userDataWrapper.getObject();
+            displayUserInfo(currentUser);
+        });
+    }
+
+    private void getUserStats() {
+        Log.d(TAG, "getUserStats: ");
+        showProgress();
+        viewModel.getUserStats(mAuth.getUid()).observe(this, userStatsDataWrapper -> {
+            hideProgress();
+            userStats = userStatsDataWrapper.getObject();
+            displayUserStats(userStats);
+        });
+    }
+
+    private void getSelfRank() {
+        Log.d(TAG, "getSelfRank: ");
+        showProgress();
+        viewModel.getSelfRank(mAuth.getUid()).observe(this, selfRankDataWrapper -> {
+            hideProgress();
+            selfRank = selfRankDataWrapper.getObject();
+            displaySelfRank(selfRank);
+        });
+    }
+
+    private void getRankTop10() {
+        Log.d(TAG, "getRankTop10: ");
+        showProgress();
+        viewModel.getTop10().observe(this, top10DataWrapper -> {
+            hideProgress();
+            top10 = new ArrayList<>(top10DataWrapper.getObject());
+            displayTop10(top10);
+        });
+    }
+
+    private void getEvent() {
+        Log.d(TAG, "getEvent: ");
+        showProgress();
+        viewModel.getEvent().observe(this, eventDataWrapper -> {
+            hideProgress();
+            currentEvent = eventDataWrapper.getObject();
+            displayEvent(currentEvent);
+        });
+    }
+
+    private void displayUserInfo(User user) {
+        Log.d(TAG, "displayUserInfo");
+        tvName.setText(user.getDisplayName());
+    }
+
+    private void displayUserStats(UserStats stats) {
+        Log.d(TAG, "displayUserStats");
+        tvPoints.setText(String.valueOf(stats.getPoints()));
+        tvLevel.setText(String.valueOf(stats.getLevel()));
+        tvScannedTags.setText(String.valueOf(stats.getTags()));
+        progressLevel.setProgress(LevelManager.getPercentsCompleted(stats.getPoints()));
+    }
+
+    private void displaySelfRank(RankRow selfRank) {
+        Log.d(TAG, "displaySelfRank");
+        tvRating.setText(String.valueOf(selfRank.getRank()));
+    }
+
+    private void displayTop10(ArrayList<RankRow> top10) {
+        Log.d(TAG, "displayTop10");
+        StringBuilder
+                rating1 = new StringBuilder(),
+                rating2 = new StringBuilder();
+        for (int i = 0; i < top10.size(); i++) {
+            rating1.append(i + 1);
+            rating1.append(". ");
+            rating1.append(top10.get(i).getNickname());
+            rating2.append(top10.get(i).getPoints());
+            if (i != top10.size() - 1) {
+                rating1.append("\n");
+                rating2.append("\n");
+            }
         }
-        updateUI();
+        SpannableStringBuilder spannable1 = new SpannableStringBuilder(rating1);
+        spannable1.setSpan(
+                new ForegroundColorSpan(Color.RED),
+                3, top10.get(0).getNickname().length() + 3,
+                Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+        SpannableStringBuilder spannable2 = new SpannableStringBuilder(rating2);
+        spannable2.setSpan(
+                new ForegroundColorSpan(Color.RED),
+                0, String.valueOf(top10.get(0).getPoints()).length(),
+                Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
+        tvRating1.setText(spannable1);
+        tvRating2.setText(spannable2);
+    }
+
+    private void displayEvent(String event) {
+        Log.d(TAG, "displayEvent");
+        String text = getString(R.string.current_event) + event;
+        SpannableStringBuilder spannable = new SpannableStringBuilder(text);
+        spannable.setSpan(
+                new ForegroundColorSpan(Color.BLUE),
+                0, 1,
+                Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        tvEvent.setText(spannable);
+    }
+
+    private void displayChangedNickname(User user) {
+        Log.d(TAG, "displayChangedNickname");
+        hideProgress();
+        this.currentUser = user;
+        tvName.setText(currentUser.getDisplayName());
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated");
+        if (savedInstanceState != null) {
+            currentUser = (User) savedInstanceState.getSerializable("currentUser");
+            userStats = (UserStats) savedInstanceState.getSerializable("userStats");
+            currentEvent = (String) savedInstanceState.getSerializable("currentEvent");
+            selfRank = savedInstanceState.getParcelable("selfRank");
+            top10 = savedInstanceState.getParcelableArrayList("top10");
+            displayUserInfo(currentUser);
+            displayUserStats(userStats);
+            displayEvent(currentEvent);
+            displaySelfRank(selfRank);
+            displayTop10(top10);
+        } else {
+            updateInformation();
+        }
     }
 
     @Override
@@ -144,246 +253,6 @@ public class ProfileFragment extends Fragment
         outState.putSerializable("currentEvent", currentEvent);
         outState.putParcelable("selfRank", selfRank);
         outState.putParcelableArrayList("top10", top10);
-    }
-
-    private void init() {
-        Log.d(TAG, "init");
-        updateUserInfo();
-        updateStatistics();
-        updateRankings();
-        updateEvent();
-    }
-
-    private void updateUI() {
-        Log.d(TAG, "updateUI");
-        if (currentUser != null) {
-            tvName.setText(currentUser.getDisplayName());
-        }
-        if (userStats != null) {
-            tvPoints.setText(String.valueOf(userStats.getPoints()));
-            tvLevel.setText(String.valueOf(userStats.getLevel()));
-            tvScannedTags.setText(String.valueOf(userStats.getTags()));
-            progressLevel.setProgress(LevelManager.getPercentsCompleted(userStats.getPoints()));
-        }
-        if (top10 != null) {
-            StringBuilder
-                    rating1 = new StringBuilder(),
-                    rating2 = new StringBuilder();
-            for (int i = 0; i < top10.size(); i++) {
-                rating1.append(i + 1);
-                rating1.append(". ");
-                rating1.append(top10.get(i).getNickname());
-                rating2.append(top10.get(i).getPoints());
-                if (i != top10.size() - 1) {
-                    rating1.append("\n");
-                    rating2.append("\n");
-                }
-            }
-            SpannableStringBuilder spannable1 = new SpannableStringBuilder(rating1);
-            spannable1.setSpan(
-                    new ForegroundColorSpan(Color.RED),
-                    3, top10.get(0).getNickname().length() + 3,
-                    Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
-            SpannableStringBuilder spannable2 = new SpannableStringBuilder(rating2);
-            spannable2.setSpan(
-                    new ForegroundColorSpan(Color.RED),
-                    0, String.valueOf(top10.get(0).getPoints()).length(),
-                    Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
-            tvRating1.setText(spannable1);
-            tvRating2.setText(spannable2);
-        }
-        if (selfRank != null) {
-            String rank = String.valueOf(selfRank.getRank());
-            tvRating.setText(rank);
-        }
-        if (currentEvent != null) {
-            String text = getString(R.string.current_event) + currentEvent;
-            SpannableStringBuilder spannable = new SpannableStringBuilder(text);
-            spannable.setSpan(
-                    new ForegroundColorSpan(Color.BLUE),
-                    0, 1,
-                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-            tvEvent.setText(spannable);
-        }
-        refreshLayout.setRefreshing(false);
-    }
-
-    private void updateUserInfo() {
-        Log.d(TAG, "updateUserInfo");
-        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(mAuth.getUid());
-        callUpdateUserInfo = NetworkManager.getInstance().getApi().getUserInfo(headers);
-        callUpdateUserInfo.enqueue(new Callback<ServerResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<ServerResponse> call,
-                                   @NonNull Response<ServerResponse> response) {
-                if (response.body() == null) {
-                    Log.e(TAG, "updateUserInfo onResponse: response body is null");
-                    return;
-                }
-                try {
-                    if (response.body().getType() == ServerResponse.TYPE_AUTH_SUCCESS) {
-                        currentUser = gson.fromJson(
-                                NetworkManager.getInstance().proceedResponse(response.body()),
-                                User.class);
-                        Log.d(TAG, "updateUserInfo onResponse: current user = " +
-                                response.body().getData());
-                        updateUI();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ServerResponse> call,
-                                  @NonNull Throwable t) {
-                if (call.isCanceled())
-                    Log.d(TAG, "callUpdateUserInfo is cancelled");
-                else
-                    t.printStackTrace();
-            }
-        });
-    }
-
-    private void updateStatistics() {
-        Log.d(TAG, "updateStatistics");
-        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(mAuth.getUid());
-        callUpdateStatistics = NetworkManager.getInstance().getApi().getStats(headers);
-        callUpdateStatistics.enqueue(new Callback<ServerResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<ServerResponse> call,
-                                   @NonNull Response<ServerResponse> response) {
-                Log.d(TAG, "updateStatistics onResponse: " + gson.toJson(response.body()));
-                if (response.body() == null)
-                    return;
-                try {
-                    if (response.body().getType() == ServerResponse.TYPE_STATS_EXISTS) {
-                        userStats = gson.fromJson(
-                                NetworkManager.getInstance().proceedResponse(response.body()),
-                                UserStats.class);
-                        updateUI();
-                    } else {
-                        Log.e(TAG, "onResponse: user stats does not exist on the server");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ServerResponse> call,
-                                  @NonNull Throwable t) {
-                if (call.isCanceled())
-                    Log.d(TAG, "callUpdateStatistics is cancelled");
-                else
-                    t.printStackTrace();
-            }
-        });
-    }
-
-    private void updateRankings() {
-        Log.d(TAG, "updateRankings");
-        // Get top 10 users
-        callUpdateTop10 = NetworkManager.getInstance().getApi().getRankTop10();
-        callUpdateTop10.enqueue(new Callback<ServerResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<ServerResponse> call,
-                                   @NonNull Response<ServerResponse> response) {
-                if (response.body() == null) {
-                    Log.e(TAG, "updateRankings (top 10) onResponse: response body is null");
-                    return;
-                }
-                try {
-                    if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
-                        top10 = gson.fromJson(
-                                NetworkManager.getInstance().proceedResponse(response.body()),
-                                new TypeToken<ArrayList<RankRow>>() {
-                                }.getType());
-                        updateUI();
-                    } else {
-                        Log.e(TAG, "onResponse (top10): type != TYPE_RANK_SUCCESS");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ServerResponse> call,
-                                  @NonNull Throwable t) {
-                if (call.isCanceled())
-                    Log.d(TAG, "callUpdateTop10 is cancelled");
-                else
-                    t.printStackTrace();
-            }
-        });
-
-        // Get personal rank
-        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(mAuth.getUid());
-        callUpdateSelfRank = NetworkManager.getInstance().getApi().getPersonalRank(headers);
-        callUpdateSelfRank.enqueue(new Callback<ServerResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<ServerResponse> call,
-                                   @NonNull Response<ServerResponse> response) {
-                if (response.body() == null) {
-                    Log.e(TAG, "updateRankings (personal rank) onResponse: response body is null");
-                    return;
-                }
-                try {
-                    if (response.body().getType() == ServerResponse.TYPE_RANK_SUCCESS) {
-                        selfRank = gson.fromJson(
-                                NetworkManager.getInstance().proceedResponse(response.body()),
-                                RankRow.class);
-                        updateUI();
-                    } else
-                        Log.e(TAG, "onResponse (personal rank): type != TYPE_RANK_SUCCESS");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ServerResponse> call,
-                                  @NonNull Throwable t) {
-                if (call.isCanceled())
-                    Log.d(TAG, "callUpdateSelfRank is cancelled");
-                else
-                    t.printStackTrace();
-            }
-        });
-    }
-
-    private void updateEvent() {
-        Log.d(TAG, "updateEvent: ");
-
-        callUpdateEvent = NetworkManager.getInstance().getApi().getEvent();
-        callUpdateEvent.enqueue(new Callback<ServerResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<ServerResponse> call,
-                                   @NonNull Response<ServerResponse> response) {
-                if (response.body() == null) {
-                    Log.e(TAG, "updateEvent onResponse: response body is null");
-                    return;
-                }
-                try {
-                    if (response.body().getType() == ServerResponse.TYPE_TASK_SUCCESS) {
-                        currentEvent = NetworkManager.getInstance().proceedResponse(response.body());
-                        updateUI();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ServerResponse> call,
-                                  @NonNull Throwable t) {
-                if (call.isCanceled())
-                    Log.d(TAG, "callUpdateEvent is cancelled");
-                else
-                    t.printStackTrace();
-            }
-        });
     }
 
     private void logout() {
@@ -421,76 +290,8 @@ public class ProfileFragment extends Fragment
 
     @SuppressLint("InflateParams")
     private void popup_change() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
-        View mView = getLayoutInflater().inflate(R.layout.popup_change, null);
-        Button btnOK = mView.findViewById(R.id.changeNickname_btnOk);
-        Button btnCancel = mView.findViewById(R.id.changeNickname_btnCancel);
-        EditText etNickname = mView.findViewById(R.id.changeNickname_etNickname);
-        ImageView imgError = mView.findViewById(R.id.changeNickname_imgError);
-        TextView tvWarning = mView.findViewById(R.id.changeNickname_tvWarning);
-
-        mBuilder.setView(mView);
-        final AlertDialog dialog = mBuilder.create();
-        dialog.show();
-        btnOK.setOnClickListener(v -> {
-            String newNickname = etNickname.getText().toString().toLowerCase();
-            if (newNickname.length() < 6 || newNickname.length() > 16) {
-                imgError.setVisibility(View.VISIBLE);
-                tvWarning.setVisibility(View.VISIBLE);
-                tvWarning.setText(getResources().getString(R.string.nickname_warning));
-            } else {
-                Log.d(TAG, "changeNickname");
-                currentUser.setDisplayName(newNickname);
-                Map<String, String> headers =
-                        NetworkManager.getInstance().proceedHeader(gson.toJson(currentUser));
-
-                callChangeNickname = NetworkManager.getInstance().getApi().changeNickname(headers);
-                callChangeNickname.enqueue(new Callback<ServerResponse>() {
-                    @Override
-                    public void onResponse(@NonNull Call<ServerResponse> call,
-                                           @NonNull Response<ServerResponse> response) {
-                        if (response.body() == null) {
-                            Log.e(TAG, "changeNickname onResponse: response body is null");
-                            return;
-                        }
-                        try {
-                            if (response.body().getType() == ServerResponse.TYPE_CHANGE_NICKNAME_SUCCESS) {
-                                dialog.dismiss();
-                            } else if (response.body().getType() == ServerResponse.TYPE_CHANGE_NICKNAME_EXISTS) {
-                                imgError.setVisibility(View.VISIBLE);
-                                Toast.makeText(
-                                        getContext(),
-                                        getResources().getString(R.string.nickname_exists),
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Toast.makeText(
-                                    getContext(),
-                                    getResources().getString(R.string.try_later),
-                                    Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<ServerResponse> call,
-                                          @NonNull Throwable t) {
-                        if (call.isCanceled())
-                            Log.d(TAG, "callChangeNickname is cancelled");
-                        else
-                            t.printStackTrace();
-                        Toast.makeText(
-                                getContext(),
-                                getResources().getString(R.string.try_later),
-                                Toast.LENGTH_LONG).show();
-                        dialog.dismiss();
-                    }
-                });
-                updateUI();
-            }
-        });
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        EditPopupFragment popup = new EditPopupFragment(currentUser);
+        popup.show(getFragmentManager(), "editPopup");
     }
 
     private void init_fab(View v) {
@@ -548,25 +349,7 @@ public class ProfileFragment extends Fragment
     public void onRefresh() {
         Log.d(TAG, "onRefresh");
         refreshLayout.setRefreshing(true);
-        init();
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy");
-        super.onDestroy();
-        if (callUpdateUserInfo != null)
-            callUpdateUserInfo.cancel();
-        if (callUpdateStatistics != null)
-            callUpdateStatistics.cancel();
-        if (callUpdateTop10 != null)
-            callUpdateTop10.cancel();
-        if (callUpdateSelfRank != null)
-            callUpdateSelfRank.cancel();
-        if (callUpdateEvent != null)
-            callUpdateEvent.cancel();
-        if (callChangeNickname != null)
-            callChangeNickname.cancel();
+        updateInformation();
     }
 
     private Activity getActivityNonNull() {
@@ -575,5 +358,23 @@ public class ProfileFragment extends Fragment
         } else {
             throw new RuntimeException("null returned from getActivity()");
         }
+    }
+
+    private void showProgress() {
+        refreshLayout.setRefreshing(true);
+    }
+
+    private void hideProgress() {
+        refreshLayout.setRefreshing(false);
+    }
+
+    public void displayError(Throwable t) {
+        Log.d(TAG, "displayError");
+        hideProgress();
+    }
+
+    public void displayError(int errorCode) {
+        Log.d(TAG, "displayError");
+        hideProgress();
     }
 }
