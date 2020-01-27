@@ -22,7 +22,7 @@ public interface NetworkInterface {
     Call<ServerResponse> getUserStats(@HeaderMap Map<String, String> headers);
 
     @GET("/getMapTasks")
-    Observable<ServerResponse> getMapTasks();
+    Call<ServerResponse> getMapTasks();
 
     @GET("/getTextTasks")
     Call<ServerResponse> getTextTasks();

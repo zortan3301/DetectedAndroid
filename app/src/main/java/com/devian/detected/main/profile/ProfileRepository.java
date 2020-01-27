@@ -62,7 +62,7 @@ class ProfileRepository {
 
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
-                Log.d(TAG, "onFailure: ");
+                Log.e(TAG, "onFailure: ", t);
             }
         });
         return mldUser;
@@ -96,7 +96,7 @@ class ProfileRepository {
 
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
-                Log.d(TAG, "onFailure: ");
+                Log.e(TAG, "onFailure: ", t);
             }
         });
         return mldUserStats;
@@ -130,7 +130,7 @@ class ProfileRepository {
 
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
-                Log.d(TAG, "onFailure: ");
+                Log.e(TAG, "onFailure: ", t);
             }
         });
         return mldSelfRank;
@@ -163,7 +163,7 @@ class ProfileRepository {
 
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
-                Log.d(TAG, "onFailure: ");
+                Log.e(TAG, "onFailure: ", t);
             }
         });
         return mldTop10;
@@ -194,7 +194,7 @@ class ProfileRepository {
 
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
-                Log.d(TAG, "onFailure: ");
+                Log.e(TAG, "onFailure: ", t);
             }
         });
         return mldEvent;
@@ -209,18 +209,19 @@ class ProfileRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
-                if (response.body() == null) {
-                    Log.e(TAG, "response.body() == null");
+                ServerResponse serverResponse = response.body();
+                if (serverResponse == null) {
+                    Log.e(TAG, "serverResponse == null");
                     return;
                 }
-                if (response.body().getType() == ServerResponse.TYPE_CHANGE_NICKNAME_SUCCESS) {
+                if (serverResponse.getType() == ServerResponse.TYPE_CHANGE_NICKNAME_SUCCESS) {
                     User user = gson.fromJson(
-                            NetworkManager.getInstance().proceedResponse(response.body().getData()),
+                            NetworkManager.getInstance().proceedResponse(serverResponse.getData()),
                             User.class);
                     DataWrapper<User> userDataWrapper = new DataWrapper<>(user);
                     mldUser.setValue(userDataWrapper);
                 }
-                if (response.body().getType() == ServerResponse.TYPE_CHANGE_NICKNAME_EXISTS) {
+                if (serverResponse.getType() == ServerResponse.TYPE_CHANGE_NICKNAME_EXISTS) {
                     DataWrapper<User> userDataWrapper = new DataWrapper<>(ServerResponse.TYPE_CHANGE_NICKNAME_EXISTS);
                     mldUser.setValue(userDataWrapper);
                 }

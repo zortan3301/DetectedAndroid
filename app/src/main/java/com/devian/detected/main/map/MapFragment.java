@@ -17,10 +17,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
 import com.devian.detected.utils.domain.Task;
-import com.devian.detected.utils.network.GsonSerializer;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -45,17 +45,16 @@ import butterknife.ButterKnife;
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
 
 public class MapFragment extends Fragment implements
-        OnMapReadyCallback, View.OnClickListener, MapContract.View {
+        OnMapReadyCallback, View.OnClickListener {
 
     private static final String TAG = "MapFragment";
 
     private Context mContext;
     private View mView;
-    private MapPresenter mapPresenter;
+    private MapViewModel viewModel;
 
     private static String MAP_STYLE;
     private MapView mapView;
-    private MapboxMap mapboxMap;
     private SymbolManager symbolManager = null;
     private Bundle savedBundle;
 
@@ -81,6 +80,7 @@ public class MapFragment extends Fragment implements
         Mapbox.getInstance(mContext, getResources().getString(R.string.mapbox_access_token));
         mView = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, mView);
+        viewModel = ViewModelProviders.of(this).get(MapViewModel.class);
 
         MAP_STYLE = getResources().getString(R.string.map_style);
         mapView = mView.findViewById(R.id.mapView);
@@ -91,23 +91,22 @@ public class MapFragment extends Fragment implements
         fab_refresh.setOnClickListener(this);
         fab_rotate = AnimationUtils.loadAnimation(getContext(), R.anim.fab_full_rotate);
 
-        setupMVP();
 
         return mView;
     }
 
-    private void setupMVP() {
-        mapPresenter = new MapPresenter(this);
-    }
-
     private void getMarkers() {
+        Log.d(TAG, "getMarkers: ");
         showProgress();
-        mapPresenter.getMarkers();
+        viewModel.getMarkers().observe(this, markersDataWrapper -> {
+            hideProgress();
+            markers = new ArrayList<>(markersDataWrapper.getObject());
+            displayMarkers(markers);
+        });
     }
 
-    @Override
-    public void displayMarkers(ArrayList<Task> markers) {
-        hideProgress();
+    private void displayMarkers(ArrayList<Task> markers) {
+        Log.d(TAG, "displayMarkers: ");
         if (symbolManager == null)
             return;
         symbolManager.deleteAll();
@@ -117,7 +116,6 @@ public class MapFragment extends Fragment implements
                     .withIconImage("marker")
                     .withIconSize(0.6f));
         }
-        this.markers = markers;
     }
 
     private void checkSavedBundle(Bundle inState) {
@@ -187,23 +185,18 @@ public class MapFragment extends Fragment implements
 
         mapboxMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(position), 5000);
-
-        this.mapboxMap = mapboxMap;
     }
 
-    @Override
     public void displayError(Throwable t) {
         hideProgress();
         Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    public void showProgress() {
+    private void showProgress() {
         fab_refresh.startAnimation(fab_rotate);
     }
 
-    @Override
-    public void hideProgress() {
+    private void hideProgress() {
         fab_refresh.clearAnimation();
     }
 
