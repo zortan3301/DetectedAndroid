@@ -28,11 +28,12 @@ public class ScanActivity extends AppCompatActivity implements ZXingScannerView.
     
     private static final String TAG = "ScanActivity";
     
-    private ZXingScannerView scannerView;
     private Animation fab_clock, fab_anticlock;
     
     @BindView(R.id.fab_flashlight)
     FloatingActionButton fab_flash;
+    @BindView(R.id.scanner_view)
+    ZXingScannerView scannerView;
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class ScanActivity extends AppCompatActivity implements ZXingScannerView.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scanner_view);
         ButterKnife.bind(this);
-        scannerView = findViewById(R.id.scanner_view);
+        
         List<BarcodeFormat> formats = new ArrayList<>();
         formats.add(BarcodeFormat.QR_CODE);
         scannerView.setFormats(formats);

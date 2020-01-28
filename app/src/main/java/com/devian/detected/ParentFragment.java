@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.devian.detected.main.ScanActivity;
 import com.devian.detected.main.task_list.TaskFragment;
 import com.devian.detected.main.TaskInfoFragment;
+import com.devian.detected.utils.network.GsonSerializer;
 import com.devian.detected.utils.network.NetworkManager;
 import com.devian.detected.utils.network.ServerResponse;
 import com.devian.detected.utils.domain.Task;
@@ -41,23 +42,21 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainFragment extends AppCompatActivity
+public class ParentFragment extends AppCompatActivity
         implements
         View.OnClickListener,
         TaskFragment.OnTaskItemSelectedListener {
     
-    private static final String TAG = "MainFragment";
+    private static final String TAG = "ParentFragment";
+    private static final int CAMERA_REQUEST_CODE = 100;
+    
+    private Gson gson = GsonSerializer.getInstance().getGson();
     
     private FirebaseUser firebaseUser;
     
-    private Gson gson = new Gson();
-    
-    private CustomViewPager viewPager;
-    
-    @BindView(R.id.fab_qr)
-    FloatingActionButton fab_qr;
-    
-    private static final int CAMERA_REQUEST_CODE = 100;
+    @BindView(R.id.fab_qr) FloatingActionButton fab_qr;
+    @BindView(R.id.tab_layout) TabLayout tabLayout;
+    @BindView(R.id.pager) CustomViewPager viewPager;
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,8 +68,7 @@ public class MainFragment extends AppCompatActivity
     
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
-    
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        
         tabLayout.setupWithViewPager(viewPager);
     
         PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
