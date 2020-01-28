@@ -23,8 +23,13 @@ public class MapViewModel extends AndroidViewModel {
         repository = new MapRepository();
     }
 
-    LiveData<DataWrapper<List<Task>>> getMarkers() {
-        Log.d(TAG, "getMarkers: ");
+    LiveData<DataWrapper<List<Task>>> bindMarkers() {
+        Log.d(TAG, "bindMarkers: ");
         return repository.getMldMarkers();
+    }
+
+    void updateMarkers() {
+        Log.d(TAG, "updateMarkers: ");
+        repository.updateMldMarkers();
     }
 }

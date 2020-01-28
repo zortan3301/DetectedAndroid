@@ -6,7 +6,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,28 +51,29 @@ public class TaskFragment extends Fragment
 
         viewModel = ViewModelProviders.of(this).get(TaskViewModel.class);
         setupView();
+        bindView();
 
         return v;
     }
 
-    private void getTaskList() {
-        Log.d(TAG, "getTaskList: ");
-        showProgress();
-        viewModel.getTaskList().observe(this, taskListWrapper -> {
+    private void bindView() {
+        Log.d(TAG, "bind: ");
+        viewModel.bindTaskList().observe(this, taskListWrapper -> {
             hideProgress();
             tasks = new ArrayList<>(taskListWrapper.getObject());
-            displayTasks(tasks);
+            displayTaskList(tasks);
         });
     }
 
-    private void displayTasks(ArrayList<Task> taskList) {
-        Log.d(TAG, "displayTasks: ");
-        mAdapter.setTaskList(taskList);
+    private void updateTaskList() {
+        Log.d(TAG, "updateTaskList: ");
+        showProgress();
+        viewModel.updateTaskList();
     }
 
-    public void displayError(String s) {
-        Log.d(TAG, "displayError: ");
-        Toast.makeText(getContext(), s, Toast.LENGTH_LONG).show();
+    private void displayTaskList(ArrayList<Task> taskList) {
+        Log.d(TAG, "displayTaskList: ");
+        mAdapter.setTaskList(taskList);
     }
 
     private void setupView() {
@@ -97,9 +97,9 @@ public class TaskFragment extends Fragment
         Log.d(TAG, "onActivityCreated");
         if (savedInstanceState != null) {
             tasks = savedInstanceState.getParcelableArrayList("tasks");
-            displayTasks(tasks);
+            displayTaskList(tasks);
         } else {
-            getTaskList();
+            updateTaskList();
         }
     }
 
@@ -114,7 +114,7 @@ public class TaskFragment extends Fragment
     @Override
     public void onRefresh() {
         Log.d(TAG, "onRefresh");
-        getTaskList();
+        updateTaskList();
     }
 
     private void showProgress() {

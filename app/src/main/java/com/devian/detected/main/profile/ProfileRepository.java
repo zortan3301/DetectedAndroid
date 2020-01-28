@@ -34,8 +34,33 @@ class ProfileRepository {
     private MutableLiveData<DataWrapper<List<RankRow>>> mldTop10 = new MutableLiveData<>();
     private MutableLiveData<DataWrapper<String>> mldEvent = new MutableLiveData<>();
 
-    MutableLiveData<DataWrapper<User>> getMldUser(String uid) {
+    MutableLiveData<DataWrapper<User>> getMldUser() {
         Log.d(TAG, "getMldUser: ");
+        return mldUser;
+    }
+
+    MutableLiveData<DataWrapper<UserStats>> getMldUserStats() {
+        Log.d(TAG, "getMldUserStats: ");
+        return mldUserStats;
+    }
+
+    MutableLiveData<DataWrapper<RankRow>> getMldSelfRank() {
+        Log.d(TAG, "getMldSelfRank: ");
+        return mldSelfRank;
+    }
+
+    MutableLiveData<DataWrapper<List<RankRow>>> getMldTop10() {
+        Log.d(TAG, "getMldTop10: ");
+        return mldTop10;
+    }
+
+    MutableLiveData<DataWrapper<String>> getMldEvent() {
+        Log.d(TAG, "getMldEvent: ");
+        return mldEvent;
+    }
+
+    void updateMldUser(String uid) {
+        Log.d(TAG, "updateMldUser: ");
         Map<String, String> headers = NetworkManager.getInstance().proceedHeader(uid);
         Call<ServerResponse> call = NetworkManager.getInstance().getApi().getUserInfo(headers);
         call.enqueue(new Callback<ServerResponse>() {
@@ -65,11 +90,10 @@ class ProfileRepository {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
-        return mldUser;
     }
 
-    MutableLiveData<DataWrapper<UserStats>> getMldUserStats(String uid) {
-        Log.d(TAG, "getMldUserStats: ");
+    void updateMldUserStats(String uid) {
+        Log.d(TAG, "updateMldUserStats: ");
         Map<String, String> headers = NetworkManager.getInstance().proceedHeader(uid);
         Call<ServerResponse> call = NetworkManager.getInstance().getApi().getUserStats(headers);
         call.enqueue(new Callback<ServerResponse>() {
@@ -99,11 +123,10 @@ class ProfileRepository {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
-        return mldUserStats;
     }
 
-    MutableLiveData<DataWrapper<RankRow>> getMldSelfRank(String uid) {
-        Log.d(TAG, "getMldSelfRank: ");
+    void updateMldSelfRank(String uid) {
+        Log.d(TAG, "updateMldSelfRank: ");
         Map<String, String> headers = NetworkManager.getInstance().proceedHeader(uid);
         Call<ServerResponse> call = NetworkManager.getInstance().getApi().getSelfRank(headers);
         call.enqueue(new Callback<ServerResponse>() {
@@ -133,11 +156,10 @@ class ProfileRepository {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
-        return mldSelfRank;
     }
 
-    MutableLiveData<DataWrapper<List<RankRow>>> getMldTop10() {
-        Log.d(TAG, "getMldTop10: ");
+    void updateMldTop10() {
+        Log.d(TAG, "updateMldTop10: ");
         Call<ServerResponse> call = NetworkManager.getInstance().getApi().getRankTop10();
         call.enqueue(new Callback<ServerResponse>() {
             @Override
@@ -166,11 +188,10 @@ class ProfileRepository {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
-        return mldTop10;
     }
 
-    MutableLiveData<DataWrapper<String>> getMldEvent() {
-        Log.d(TAG, "getMldEvent: ");
+    void updateMldEvent() {
+        Log.d(TAG, "updateMldEvent: ");
         Call<ServerResponse> call = NetworkManager.getInstance().getApi().getEvent();
         call.enqueue(new Callback<ServerResponse>() {
             @Override
@@ -197,10 +218,9 @@ class ProfileRepository {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
-        return mldEvent;
     }
 
-    MutableLiveData<DataWrapper<User>> changeDisplayName(User user) {
+    void changeDisplayName(User user) {
         Log.d(TAG, "changeDisplayName: ");
         Map<String, String> headers = NetworkManager.getInstance().proceedHeader(gson.toJson(user));
         Call<ServerResponse> call = NetworkManager.getInstance().getApi().changeNickname(headers);
@@ -232,6 +252,5 @@ class ProfileRepository {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
-        return mldUser;
     }
 }

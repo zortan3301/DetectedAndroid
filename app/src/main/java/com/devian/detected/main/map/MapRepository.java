@@ -29,6 +29,11 @@ class MapRepository {
 
     MutableLiveData<DataWrapper<List<Task>>> getMldMarkers() {
         Log.d(TAG, "getMldMarkers: ");
+        return mldMarkers;
+    }
+
+    void updateMldMarkers() {
+        Log.d(TAG, "updateMldMarkers: ");
         Call<ServerResponse> call = NetworkManager.getInstance().getApi().getMapTasks();
         call.enqueue(new Callback<ServerResponse>() {
             @Override
@@ -57,7 +62,6 @@ class MapRepository {
                 Log.e(TAG, "onFailure: ", t);
             }
         });
-        return mldMarkers;
     }
 
 }

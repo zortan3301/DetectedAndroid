@@ -27,33 +27,58 @@ public class ProfileViewModel extends AndroidViewModel {
         repository = new ProfileRepository();
     }
 
-    LiveData<DataWrapper<User>> getUserInfo(String uid) {
-        Log.d(TAG, "getUserInfo: ");
-        return repository.getMldUser(uid);
+    LiveData<DataWrapper<User>> bindUserInfo() {
+        Log.d(TAG, "bindUserInfo: ");
+        return repository.getMldUser();
     }
 
-    LiveData<DataWrapper<UserStats>> getUserStats(String uid) {
-        Log.d(TAG, "getUserStats: ");
-        return repository.getMldUserStats(uid);
+    LiveData<DataWrapper<UserStats>> bindUserStats() {
+        Log.d(TAG, "bindUserStats: ");
+        return repository.getMldUserStats();
     }
 
-    LiveData<DataWrapper<RankRow>> getSelfRank(String uid) {
-        Log.d(TAG, "getSelfRank: ");
-        return repository.getMldSelfRank(uid);
+    LiveData<DataWrapper<RankRow>> bindSelfRank() {
+        Log.d(TAG, "bindSelfRank: ");
+        return repository.getMldSelfRank();
     }
 
-    LiveData<DataWrapper<List<RankRow>>> getTop10() {
-        Log.d(TAG, "getTop10: ");
+    LiveData<DataWrapper<List<RankRow>>> bindTop10() {
+        Log.d(TAG, "bindTop10: ");
         return repository.getMldTop10();
     }
 
-    LiveData<DataWrapper<String>> getEvent() {
-        Log.d(TAG, "getEvent: ");
+    LiveData<DataWrapper<String>> bindEvent() {
+        Log.d(TAG, "bindEvent: ");
         return repository.getMldEvent();
     }
 
-    LiveData<DataWrapper<User>> changeNickname(User user) {
+    void updateUserInfo(String uid) {
+        Log.d(TAG, "updateUserInfo: ");
+        repository.updateMldUser(uid);
+    }
+
+    void updateUserStats(String uid) {
+        Log.d(TAG, "updateUserStats: ");
+        repository.updateMldUserStats(uid);
+    }
+
+    void updateSelfRank(String uid) {
+        Log.d(TAG, "updateSelfRank: ");
+        repository.updateMldSelfRank(uid);
+    }
+
+    void updateTop10() {
+        Log.d(TAG, "updateTop10: ");
+        repository.updateMldTop10();
+    }
+
+    void updateEvent() {
+        Log.d(TAG, "updateEvent: ");
+        repository.updateMldEvent();
+    }
+
+    void changeNickname(User user) {
         Log.d(TAG, "changeNickname: ");
-        return repository.changeDisplayName(user);
+        repository.changeDisplayName(user);
     }
 }

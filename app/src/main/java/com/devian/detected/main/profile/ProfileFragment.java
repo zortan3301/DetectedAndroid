@@ -1,7 +1,6 @@
 package com.devian.detected.main.profile;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -46,14 +45,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ProfileFragment extends Fragment
-        implements SwipeRefreshLayout.OnRefreshListener, EditPopupFragment.OnProfileChanged {
+        implements SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = "ProfileFragment";
 
     private FirebaseAuth mAuth;
 
     private ProfileViewModel viewModel;
-    private FragmentActivity mContext;
 
     @BindView(R.id.profile_tvName)
     TextView tvName;
@@ -90,7 +88,6 @@ public class ProfileFragment extends Fragment
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mContext = (FragmentActivity) context;
     }
 
     @Nullable
@@ -102,75 +99,57 @@ public class ProfileFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this, v);
 
-        viewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
+        viewModel = ViewModelProviders.of(getActivityNonNull()).get(ProfileViewModel.class);
         refreshLayout.setOnRefreshListener(this);
         mAuth = FirebaseAuth.getInstance();
         init_fab(v);
+        bindView();
 
         return v;
     }
 
-    private void updateInformation() {
-        getUserInfo();
-        getUserStats();
-        getSelfRank();
-        getRankTop10();
-        getEvent();
-    }
-
-    private void getUserInfo() {
-        Log.d(TAG, "getUserInfo: ");
-        showProgress();
-        viewModel.getUserInfo(mAuth.getUid()).observe(this, userDataWrapper -> {
+    private void bindView() {
+        viewModel.bindUserInfo().observe(this, userDataWrapper -> {
             hideProgress();
             currentUser = userDataWrapper.getObject();
             displayUserInfo(currentUser);
         });
-    }
-
-    private void getUserStats() {
-        Log.d(TAG, "getUserStats: ");
-        showProgress();
-        viewModel.getUserStats(mAuth.getUid()).observe(this, userStatsDataWrapper -> {
+        viewModel.bindUserStats().observe(this, userStatsDataWrapper -> {
             hideProgress();
             userStats = userStatsDataWrapper.getObject();
             displayUserStats(userStats);
         });
-    }
-
-    private void getSelfRank() {
-        Log.d(TAG, "getSelfRank: ");
-        showProgress();
-        viewModel.getSelfRank(mAuth.getUid()).observe(this, selfRankDataWrapper -> {
+        viewModel.bindSelfRank().observe(this, selfRankDataWrapper -> {
             hideProgress();
             selfRank = selfRankDataWrapper.getObject();
             displaySelfRank(selfRank);
         });
-    }
-
-    private void getRankTop10() {
-        Log.d(TAG, "getRankTop10: ");
-        showProgress();
-        viewModel.getTop10().observe(this, top10DataWrapper -> {
+        viewModel.bindTop10().observe(this, top10DataWrapper -> {
             hideProgress();
             top10 = new ArrayList<>(top10DataWrapper.getObject());
             displayTop10(top10);
         });
-    }
-
-    private void getEvent() {
-        Log.d(TAG, "getEvent: ");
-        showProgress();
-        viewModel.getEvent().observe(this, eventDataWrapper -> {
+        viewModel.bindEvent().observe(this, eventDataWrapper -> {
             hideProgress();
             currentEvent = eventDataWrapper.getObject();
             displayEvent(currentEvent);
         });
     }
 
+    private void updateInformation() {
+        Log.d(TAG, "updateInformation: ");
+        showProgress();
+        viewModel.updateUserInfo(mAuth.getUid());
+        viewModel.updateUserStats(mAuth.getUid());
+        viewModel.updateSelfRank(mAuth.getUid());
+        viewModel.updateTop10();
+        viewModel.updateEvent();
+    }
+
     private void displayUserInfo(User user) {
         Log.d(TAG, "displayUserInfo");
-        tvName.setText(user.getDisplayName());
+        if (user != null)
+            tvName.setText(user.getDisplayName());
     }
 
     private void displayUserStats(UserStats stats) {
@@ -292,9 +271,14 @@ public class ProfileFragment extends Fragment
 
     @SuppressLint("InflateParams")
     private void popup_change() {
-        EditPopupFragment popup = new EditPopupFragment(currentUser);
-        popup.setOnProfileChangedListener(this);
-        popup.show(mContext.getSupportFragmentManager(), "editPopup");
+        EditPopup popup = new EditPopup(getActivityNonNull(), currentUser);
+        viewModel.bindUserInfo().observe(this, popup::proceedResponse);
+        popup.getBtnOK().setOnClickListener(v -> {
+            if (popup.isInputCorrect()) {
+                viewModel.changeNickname(popup.getInput());
+            }
+        });
+        popup.show();
     }
 
     private void init_fab(View v) {
@@ -355,7 +339,7 @@ public class ProfileFragment extends Fragment
         updateInformation();
     }
 
-    private Activity getActivityNonNull() {
+    private FragmentActivity getActivityNonNull() {
         if (super.getActivity() != null) {
             return super.getActivity();
         } else {
@@ -379,12 +363,5 @@ public class ProfileFragment extends Fragment
     public void displayError(int errorCode) {
         Log.d(TAG, "displayError");
         hideProgress();
-    }
-
-    @Override
-    public void onDisplayNameChanged(String displayName) {
-        Log.d(TAG, "onDisplayNameChanged: ");
-        currentUser.setDisplayName(displayName);
-        tvName.setText(currentUser.getDisplayName());
     }
 }

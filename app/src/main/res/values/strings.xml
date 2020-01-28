@@ -52,6 +52,7 @@
     <string name="new_nickname">новый никнейм</string>
     <string name="nickname_is_incorrect">nickname is incorrect</string>
     <string name="nickname_warning">Минимальная длина никнейма 6 символов</string>
+    <string name="button_cancel">button cancel</string>
 
     <!-- Popup result -->
     <string name="result_success">Вы успешно активировали метку</string>
@@ -61,6 +62,4 @@
     <string name="reward">Награда: %s</string>
 
     <!-- Other -->
-
-
 </resources>

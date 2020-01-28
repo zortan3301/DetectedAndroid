@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -91,18 +90,24 @@ public class MapFragment extends Fragment implements
         fab_refresh.setOnClickListener(this);
         fab_rotate = AnimationUtils.loadAnimation(getContext(), R.anim.fab_full_rotate);
 
+        bindView();
 
         return mView;
     }
 
-    private void getMarkers() {
-        Log.d(TAG, "getMarkers: ");
-        showProgress();
-        viewModel.getMarkers().observe(this, markersDataWrapper -> {
+    private void bindView() {
+        Log.d(TAG, "bindView: ");
+        viewModel.bindMarkers().observe(this, markersDataWrapper -> {
             hideProgress();
             markers = new ArrayList<>(markersDataWrapper.getObject());
             displayMarkers(markers);
         });
+    }
+
+    private void updateMarkers() {
+        Log.d(TAG, "updateMarkers: ");
+        showProgress();
+        viewModel.updateMarkers();
     }
 
     private void displayMarkers(ArrayList<Task> markers) {
@@ -124,7 +129,7 @@ public class MapFragment extends Fragment implements
             markers = inState.getParcelableArrayList("markers");
             displayMarkers(markers);
         } else {
-            getMarkers();
+            updateMarkers();
         }
     }
 
@@ -139,7 +144,7 @@ public class MapFragment extends Fragment implements
     public void onClick(View view) {
         if (view.getId() == R.id.fab_map_refresh) {
             fab_refresh.startAnimation(fab_rotate);
-            getMarkers();
+            updateMarkers();
         }
     }
 
@@ -185,11 +190,6 @@ public class MapFragment extends Fragment implements
 
         mapboxMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(position), 5000);
-    }
-
-    public void displayError(Throwable t) {
-        hideProgress();
-        Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_LONG).show();
     }
 
     private void showProgress() {

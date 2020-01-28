@@ -28,6 +28,11 @@ class TaskRepository {
 
     MutableLiveData<DataWrapper<List<Task>>> getMldTaskList() {
         Log.d(TAG, "getMldTaskList: ");
+        return mldTaskList;
+    }
+
+    void updateTaskList() {
+        Log.d(TAG, "updateTaskList: ");
         Call<ServerResponse> call = NetworkManager.getInstance().getApi().getTextTasks();
         call.enqueue(new Callback<ServerResponse>() {
             @Override
@@ -56,6 +61,5 @@ class TaskRepository {
                 Log.d(TAG, "onFailure: ");
             }
         });
-        return mldTaskList;
     }
 }

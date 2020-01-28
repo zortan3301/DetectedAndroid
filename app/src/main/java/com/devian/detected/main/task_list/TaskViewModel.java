@@ -24,8 +24,13 @@ public class TaskViewModel extends AndroidViewModel {
         repository = new TaskRepository();
     }
 
-    LiveData<DataWrapper<List<Task>>> getTaskList() {
-        Log.d(TAG, "getTaskList: ");
+    LiveData<DataWrapper<List<Task>>> bindTaskList() {
+        Log.d(TAG, "bindTaskList: ");
         return repository.getMldTaskList();
+    }
+
+    void updateTaskList() {
+        Log.d(TAG, "updateTaskList: ");
+        repository.updateTaskList();
     }
 }
