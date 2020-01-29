@@ -1,4 +1,4 @@
-package com.devian.detected.utils.domain;
+package com.devian.detected.model.domain;
 
 import android.os.Parcel;
 import android.os.Parcelable;

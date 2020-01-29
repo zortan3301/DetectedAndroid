@@ -24,8 +24,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.devian.detected.R;
-import com.devian.detected.utils.domain.Task;
-import com.devian.detected.utils.ui.PermissionsPopup;
+import com.devian.detected.model.domain.tasks.GeoTextTask;
+import com.devian.detected.utils.ui.DefaultPopup;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,7 +42,7 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     
     private FirebaseAuth mAuth;
     
-    private Task task;
+    private GeoTextTask task;
     
     @BindView(R.id.taskinfo_image)
     PhotoView imageView;
@@ -55,7 +55,7 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     @BindView(R.id.taskinfo_btnDownload)
     ImageView btnDownload;
     
-    public static TaskInfoFragment newInstance(Task task) {
+    public static TaskInfoFragment newInstance(GeoTextTask task) {
         Log.d(TAG, "newInstance");
         Bundle args = new Bundle();
         args.putParcelable("task", task);
@@ -120,7 +120,7 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
             if (split[0] == null)
                 return defaultString;
             String nickname = split[0];
-            String command = nickname + "@detected:~$> cat task_" + task.getId() + ".txt\n\n" + task.getDescription();
+            String command = nickname + "@detected:~$> cat task" + ".txt\n\n" + task.getDescription();
             int prefix = nickname.length() + 9;
             SpannableStringBuilder spannable = new SpannableStringBuilder(command);
             spannable.setSpan(
@@ -147,22 +147,22 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
         if (view.getId() == R.id.taskinfo_btnDownload) {
             if (getActivityNonNull().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
-                PermissionsPopup permissionsPopup =
-                        new PermissionsPopup(
+                DefaultPopup popupPermissions =
+                        new DefaultPopup(
                                 getResources().getString(R.string.storage_permission),
                                 getActivityNonNull());
-                permissionsPopup.getAllowOption().setOnClickListener(v -> {
+                popupPermissions.getPositiveOption().setOnClickListener(v -> {
                     requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
-                    permissionsPopup.dismiss();
+                    popupPermissions.dismiss();
                 });
-                permissionsPopup.getCancelOption().setOnClickListener(v -> {
+                popupPermissions.getNegativeOption().setOnClickListener(v -> {
                     Toast.makeText(getActivityNonNull(),
                             getResources().getString(R.string.storage_permission_denied),
                             Toast.LENGTH_LONG).show();
-                    permissionsPopup.dismiss();
+                    popupPermissions.dismiss();
                 });
-                permissionsPopup.show();
+                popupPermissions.show();
             } else {
                 saveImage();
             }

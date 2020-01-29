@@ -1,4 +1,4 @@
-package com.devian.detected.utils.domain;
+package com.devian.detected.model.domain;
 
 import java.io.Serializable;
 import java.util.Date;

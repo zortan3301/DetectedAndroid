@@ -19,7 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
-import com.devian.detected.utils.domain.Task;
+import com.devian.detected.model.domain.tasks.GeoTask;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -61,7 +61,7 @@ public class MapFragment extends Fragment implements
     FloatingActionButton fab_refresh;
     private Animation fab_rotate;
 
-    private ArrayList<Task> markers;
+    private ArrayList<GeoTask> markers;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -110,12 +110,12 @@ public class MapFragment extends Fragment implements
         viewModel.updateMarkers();
     }
 
-    private void displayMarkers(ArrayList<Task> markers) {
+    private void displayMarkers(ArrayList<GeoTask> markers) {
         Log.d(TAG, "displayMarkers: ");
         if (symbolManager == null)
             return;
         symbolManager.deleteAll();
-        for (Task t : markers) {
+        for (GeoTask t : markers) {
             symbolManager.create(new SymbolOptions()
                     .withLatLng(new LatLng(t.getLatitude(), t.getLongitude()))
                     .withIconImage("marker")

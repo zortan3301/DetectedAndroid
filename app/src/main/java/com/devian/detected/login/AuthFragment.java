@@ -14,9 +14,9 @@ import androidx.fragment.app.Fragment;
 
 import com.devian.detected.ParentFragment;
 import com.devian.detected.R;
-import com.devian.detected.utils.network.NetworkManager;
-import com.devian.detected.utils.network.ServerResponse;
-import com.devian.detected.utils.domain.User;
+import com.devian.detected.modules.network.NetworkModule;
+import com.devian.detected.modules.network.domain.ServerResponse;
+import com.devian.detected.model.domain.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -151,13 +151,13 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
                 firebaseUser.getUid(),
                 firebaseUser.getDisplayName(),
                 firebaseUser.getEmail());
-        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(gson.toJson(user));
-        NetworkManager.getInstance().getApi().auth(headers).enqueue(new Callback<ServerResponse>() {
+        Map<String, String> headers = NetworkModule.getInstance().proceedHeader(gson.toJson(user));
+        NetworkModule.getInstance().getApi().auth(headers).enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: " +
-                        gson.toJson(NetworkManager.getInstance().proceedResponse(response.body())));
+                        gson.toJson(NetworkModule.getInstance().proceedResponse(response.body())));
             }
     
             @Override

@@ -7,10 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.devian.detected.utils.domain.DataWrapper;
-import com.devian.detected.utils.domain.RankRow;
-import com.devian.detected.utils.domain.User;
-import com.devian.detected.utils.domain.UserStats;
+import com.devian.detected.model.domain.DataWrapper;
+import com.devian.detected.model.domain.RankRow;
+import com.devian.detected.model.domain.User;
+import com.devian.detected.model.domain.UserStats;
+import com.devian.detected.model.repo.ProfileRepository;
 
 import java.util.List;
 

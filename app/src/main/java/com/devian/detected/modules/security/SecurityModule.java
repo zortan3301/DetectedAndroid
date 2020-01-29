@@ -1,4 +1,4 @@
-package com.devian.detected.utils.security;
+package com.devian.detected.modules.security;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -9,7 +9,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class AES256 {
+public class SecurityModule {
     
     private static final String key = "qMg88AeRKteP4H2NTzU9s3tTWafmcBZGs3CTE7rRUqJDBVQqFqrQ4aYLmx7YZfNN";
     

@@ -11,17 +11,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.devian.detected.R;
-import com.devian.detected.utils.domain.Task;
+import com.devian.detected.model.domain.tasks.GeoTextTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHolder> {
 
-    private List<Task> taskList;
+    private List<GeoTextTask> taskList;
     private OnTaskItemClickListener listener;
 
-    TaskListAdapter(List<Task> taskList, OnTaskItemClickListener listener) {
+    TaskListAdapter(List<GeoTextTask> taskList, OnTaskItemClickListener listener) {
         this.taskList = taskList;
         this.listener = listener;
     }
@@ -59,7 +59,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         return taskList.size();
     }
 
-    void setTaskList(List<Task> taskList) {
+    void setTaskList(List<GeoTextTask> taskList) {
         this.taskList = taskList;
         notifyDataSetChanged();
     }
@@ -78,7 +78,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
             ivCover = view.findViewById(R.id.task_imageView);
         }
 
-        void bind(final Task task, final OnTaskItemClickListener clickListener) {
+        void bind(final GeoTextTask task, final OnTaskItemClickListener clickListener) {
             view.setOnClickListener(view -> clickListener.OnItemClicked(task));
         }
     }
@@ -103,6 +103,6 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
     }
 
     interface OnTaskItemClickListener {
-        void OnItemClicked(Task task);
+        void OnItemClicked(GeoTextTask task);
     }
 }

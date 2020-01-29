@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat;
 
 import com.devian.detected.R;
 
-public class PopupResult {
+public class ResultPopup {
     
     public static final int RESULT_SUCCESS = 1;
     public static final int RESULT_FAILURE = -1;
@@ -22,7 +22,7 @@ public class PopupResult {
     private AlertDialog dialog;
     
     @SuppressLint("InflateParams")
-    public PopupResult(int resultCode, int reward, Activity context) {
+    public ResultPopup(int resultCode, int reward, Activity context) {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
         View view = context.getLayoutInflater().inflate(R.layout.popup_result, null);
         

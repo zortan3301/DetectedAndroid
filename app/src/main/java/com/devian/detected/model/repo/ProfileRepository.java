@@ -1,17 +1,17 @@
-package com.devian.detected.main.profile;
+package com.devian.detected.model.repo;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.devian.detected.utils.domain.DataWrapper;
-import com.devian.detected.utils.domain.RankRow;
-import com.devian.detected.utils.domain.User;
-import com.devian.detected.utils.domain.UserStats;
-import com.devian.detected.utils.network.GsonSerializer;
-import com.devian.detected.utils.network.NetworkManager;
-import com.devian.detected.utils.network.ServerResponse;
+import com.devian.detected.model.domain.DataWrapper;
+import com.devian.detected.model.domain.RankRow;
+import com.devian.detected.model.domain.User;
+import com.devian.detected.model.domain.UserStats;
+import com.devian.detected.modules.network.GsonSerializer;
+import com.devian.detected.modules.network.NetworkModule;
+import com.devian.detected.modules.network.domain.ServerResponse;
 import com.google.gson.Gson;
 
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 @SuppressWarnings("unused")
-class ProfileRepository {
+public class ProfileRepository {
     private static final String TAG = "ProfileRepository";
 
     private Gson gson = GsonSerializer.getInstance().getGson();
@@ -33,36 +33,36 @@ class ProfileRepository {
     private MutableLiveData<DataWrapper<RankRow>> mldSelfRank = new MutableLiveData<>();
     private MutableLiveData<DataWrapper<List<RankRow>>> mldTop10 = new MutableLiveData<>();
     private MutableLiveData<DataWrapper<String>> mldEvent = new MutableLiveData<>();
-
-    MutableLiveData<DataWrapper<User>> getMldUser() {
+    
+    public MutableLiveData<DataWrapper<User>> getMldUser() {
         Log.d(TAG, "getMldUser: ");
         return mldUser;
     }
-
-    MutableLiveData<DataWrapper<UserStats>> getMldUserStats() {
+    
+    public MutableLiveData<DataWrapper<UserStats>> getMldUserStats() {
         Log.d(TAG, "getMldUserStats: ");
         return mldUserStats;
     }
-
-    MutableLiveData<DataWrapper<RankRow>> getMldSelfRank() {
+    
+    public MutableLiveData<DataWrapper<RankRow>> getMldSelfRank() {
         Log.d(TAG, "getMldSelfRank: ");
         return mldSelfRank;
     }
-
-    MutableLiveData<DataWrapper<List<RankRow>>> getMldTop10() {
+    
+    public MutableLiveData<DataWrapper<List<RankRow>>> getMldTop10() {
         Log.d(TAG, "getMldTop10: ");
         return mldTop10;
     }
-
-    MutableLiveData<DataWrapper<String>> getMldEvent() {
+    
+    public MutableLiveData<DataWrapper<String>> getMldEvent() {
         Log.d(TAG, "getMldEvent: ");
         return mldEvent;
     }
-
-    void updateMldUser(String uid) {
+    
+    public void updateMldUser(String uid) {
         Log.d(TAG, "updateMldUser: ");
-        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(uid);
-        Call<ServerResponse> call = NetworkManager.getInstance().getApi().getUserInfo(headers);
+        Map<String, String> headers = NetworkModule.getInstance().proceedHeader(uid);
+        Call<ServerResponse> call = NetworkModule.getInstance().getApi().getUserInfo(headers);
         call.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -75,7 +75,7 @@ class ProfileRepository {
                 }
                 if (serverResponse.getType() == ServerResponse.TYPE_AUTH_SUCCESS) {
                     User user = gson.fromJson(
-                            NetworkManager.getInstance().proceedResponse(serverResponse),
+                            NetworkModule.getInstance().proceedResponse(serverResponse),
                             User.class);
                     DataWrapper<User> userDataWrapper = new DataWrapper<>(user);
                     mldUser.setValue(userDataWrapper);
@@ -91,11 +91,11 @@ class ProfileRepository {
             }
         });
     }
-
-    void updateMldUserStats(String uid) {
+    
+    public void updateMldUserStats(String uid) {
         Log.d(TAG, "updateMldUserStats: ");
-        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(uid);
-        Call<ServerResponse> call = NetworkManager.getInstance().getApi().getUserStats(headers);
+        Map<String, String> headers = NetworkModule.getInstance().proceedHeader(uid);
+        Call<ServerResponse> call = NetworkModule.getInstance().getApi().getUserStats(headers);
         call.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -108,7 +108,7 @@ class ProfileRepository {
                 }
                 if (serverResponse.getType() == ServerResponse.TYPE_STATS_EXISTS) {
                     UserStats userStats = gson.fromJson(
-                            NetworkManager.getInstance().proceedResponse(serverResponse),
+                            NetworkModule.getInstance().proceedResponse(serverResponse),
                             UserStats.class);
                     DataWrapper<UserStats> userStatsDataWrapper = new DataWrapper<>(userStats);
                     mldUserStats.setValue(userStatsDataWrapper);
@@ -124,11 +124,11 @@ class ProfileRepository {
             }
         });
     }
-
-    void updateMldSelfRank(String uid) {
+    
+    public void updateMldSelfRank(String uid) {
         Log.d(TAG, "updateMldSelfRank: ");
-        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(uid);
-        Call<ServerResponse> call = NetworkManager.getInstance().getApi().getSelfRank(headers);
+        Map<String, String> headers = NetworkModule.getInstance().proceedHeader(uid);
+        Call<ServerResponse> call = NetworkModule.getInstance().getApi().getSelfRank(headers);
         call.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -141,7 +141,7 @@ class ProfileRepository {
                 }
                 if (serverResponse.getType() == ServerResponse.TYPE_RANK_SUCCESS) {
                     RankRow selfRank = gson.fromJson(
-                            NetworkManager.getInstance().proceedResponse(serverResponse),
+                            NetworkModule.getInstance().proceedResponse(serverResponse),
                             RankRow.class);
                     DataWrapper<RankRow> rankRowDataWrapper = new DataWrapper<>(selfRank);
                     mldSelfRank.setValue(rankRowDataWrapper);
@@ -157,10 +157,10 @@ class ProfileRepository {
             }
         });
     }
-
-    void updateMldTop10() {
+    
+    public void updateMldTop10() {
         Log.d(TAG, "updateMldTop10: ");
-        Call<ServerResponse> call = NetworkManager.getInstance().getApi().getRankTop10();
+        Call<ServerResponse> call = NetworkModule.getInstance().getApi().getRankTop10();
         call.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -173,7 +173,7 @@ class ProfileRepository {
                 }
                 if (serverResponse.getType() == ServerResponse.TYPE_RANK_SUCCESS) {
                     List<RankRow> top10 = Arrays.asList(gson.fromJson(
-                            NetworkManager.getInstance().proceedResponse(serverResponse),
+                            NetworkModule.getInstance().proceedResponse(serverResponse),
                             RankRow[].class));
                     DataWrapper<List<RankRow>> top10DataWrapper = new DataWrapper<>(top10);
                     mldTop10.setValue(top10DataWrapper);
@@ -189,10 +189,10 @@ class ProfileRepository {
             }
         });
     }
-
-    void updateMldEvent() {
+    
+    public void updateMldEvent() {
         Log.d(TAG, "updateMldEvent: ");
-        Call<ServerResponse> call = NetworkManager.getInstance().getApi().getEvent();
+        Call<ServerResponse> call = NetworkModule.getInstance().getApi().getEvent();
         call.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -204,7 +204,7 @@ class ProfileRepository {
                     return;
                 }
                 if (serverResponse.getType() == ServerResponse.TYPE_TASK_SUCCESS) {
-                    String event = NetworkManager.getInstance().proceedResponse(serverResponse);
+                    String event = NetworkModule.getInstance().proceedResponse(serverResponse);
                     DataWrapper<String> eventDataWrapper = new DataWrapper<>(event);
                     mldEvent.setValue(eventDataWrapper);
                 } else {
@@ -219,11 +219,11 @@ class ProfileRepository {
             }
         });
     }
-
-    void changeDisplayName(User user) {
+    
+    public void changeDisplayName(User user) {
         Log.d(TAG, "changeDisplayName: ");
-        Map<String, String> headers = NetworkManager.getInstance().proceedHeader(gson.toJson(user));
-        Call<ServerResponse> call = NetworkManager.getInstance().getApi().changeNickname(headers);
+        Map<String, String> headers = NetworkModule.getInstance().proceedHeader(gson.toJson(user));
+        Call<ServerResponse> call = NetworkModule.getInstance().getApi().changeNickname(headers);
         call.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
@@ -236,7 +236,7 @@ class ProfileRepository {
                 }
                 if (serverResponse.getType() == ServerResponse.TYPE_CHANGE_NICKNAME_SUCCESS) {
                     User user = gson.fromJson(
-                            NetworkManager.getInstance().proceedResponse(serverResponse.getData()),
+                            NetworkModule.getInstance().proceedResponse(serverResponse.getData()),
                             User.class);
                     DataWrapper<User> userDataWrapper = new DataWrapper<>(user);
                     mldUser.setValue(userDataWrapper);

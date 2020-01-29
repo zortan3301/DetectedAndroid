@@ -1,7 +1,6 @@
 package com.devian.detected.main.profile;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -16,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -29,10 +27,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.devian.detected.MainActivity;
 import com.devian.detected.R;
+import com.devian.detected.main.profile.popups.EditPopup;
 import com.devian.detected.utils.LevelManager;
-import com.devian.detected.utils.domain.RankRow;
-import com.devian.detected.utils.domain.User;
-import com.devian.detected.utils.domain.UserStats;
+import com.devian.detected.model.domain.RankRow;
+import com.devian.detected.model.domain.User;
+import com.devian.detected.model.domain.UserStats;
+import com.devian.detected.utils.ui.DefaultPopup;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -155,18 +155,23 @@ public class ProfileFragment extends Fragment
     private void displayUserStats(UserStats stats) {
         Log.d(TAG, "displayUserStats");
         tvPoints.setText(String.valueOf(stats.getPoints()));
-        tvLevel.setText(String.valueOf(stats.getLevel()));
+        tvLevel.setText(String.valueOf(LevelManager.getLevelByPoints(stats.getPoints())));
         tvScannedTags.setText(String.valueOf(stats.getTags()));
         progressLevel.setProgress(LevelManager.getPercentsCompleted(stats.getPoints()));
     }
 
     private void displaySelfRank(RankRow selfRank) {
         Log.d(TAG, "displaySelfRank");
+        if (selfRank == null)
+            return;
         tvRating.setText(String.valueOf(selfRank.getRank()));
     }
 
     private void displayTop10(ArrayList<RankRow> top10) {
         Log.d(TAG, "displayTop10");
+        if (top10.isEmpty()) {
+            return;
+        }
         StringBuilder
                 rating1 = new StringBuilder(),
                 rating2 = new StringBuilder();
@@ -254,19 +259,15 @@ public class ProfileFragment extends Fragment
 
     @SuppressLint("InflateParams")
     private void popup_logout() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getContext());
-        View mView = getLayoutInflater().inflate(R.layout.popup_logout, null);
-        Button btnYes = mView.findViewById(R.id.popup_logout_btnYes);
-        Button btnNo = mView.findViewById(R.id.popup_logout_btnNo);
-
-        mBuilder.setView(mView);
-        final AlertDialog dialog = mBuilder.create();
-        btnYes.setOnClickListener(v -> {
+        DefaultPopup popup = new DefaultPopup(
+                getResources().getString(R.string.popup_logout_info),
+                getActivityNonNull());
+        popup.setIcon(R.drawable.ic_exit_yellow);
+        popup.getPositiveOption().setOnClickListener(v -> {
             logout();
-            dialog.dismiss();
+            popup.dismiss();
         });
-        btnNo.setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
+        popup.show();
     }
 
     @SuppressLint("InflateParams")

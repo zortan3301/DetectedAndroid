@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.devian.detected.login.AuthFragment;
 import com.devian.detected.utils.LocalStorage;
-import com.devian.detected.utils.network.NetworkManager;
-import com.devian.detected.utils.network.ServerResponse;
+import com.devian.detected.modules.network.NetworkModule;
+import com.devian.detected.modules.network.domain.ServerResponse;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        NetworkManager.getInstance();
+        NetworkModule.getInstance();
         LocalStorage.getInstance(this);
     
         ButterKnife.bind(this);
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         final TextView textView = findViewById(R.id.main_text);
         textView.setText("Загрузка ...");
 
-        callTestConn = NetworkManager.getInstance().getApi().testConnection();
+        callTestConn = NetworkModule.getInstance().getApi().testConnection();
         callTestConn.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,

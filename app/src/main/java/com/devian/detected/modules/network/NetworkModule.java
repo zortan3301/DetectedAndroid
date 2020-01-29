@@ -1,6 +1,7 @@
-package com.devian.detected.utils.network;
+package com.devian.detected.modules.network;
 
-import com.devian.detected.utils.security.AES256;
+import com.devian.detected.modules.network.domain.ServerResponse;
+import com.devian.detected.modules.security.SecurityModule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,19 +11,19 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class NetworkManager {
+public class NetworkModule {
 
     private static final boolean encryptionEnabled = false;
 
-    private static NetworkManager mInstance;
+    private static NetworkModule mInstance;
 
-    //private static final String BASE_URL = "http://10.7.0.209:8080";
-    private static final String BASE_URL = "http://192.168.1.51:8080"; // for OnePlus // 51-pc, 53-laptop
+    private static final String BASE_URL = "http://172.21.196.220:8080";
+    //private static final String BASE_URL = "http://192.168.1.51:8080"; // for OnePlus // 51-pc, 53-laptop
     //private static final String BASE_URL = "http://10.0.2.2:8080"; // for emulator
 
     private Retrofit mRetrofit;
 
-    private NetworkManager() {
+    private NetworkModule() {
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         OkHttpClient okHttpClient = builder.build();
@@ -35,9 +36,9 @@ public class NetworkManager {
                 .build();
     }
 
-    public static NetworkManager getInstance() {
+    public static NetworkModule getInstance() {
         if (mInstance == null) {
-            mInstance = new NetworkManager();
+            mInstance = new NetworkModule();
         }
         return mInstance;
     }
@@ -49,7 +50,7 @@ public class NetworkManager {
     public Map<String, String> proceedHeader(String data) {
         Map<String, String> headers = new HashMap<>();
         if (encryptionEnabled) {
-            headers.put("data", AES256.encrypt(data));
+            headers.put("data", SecurityModule.encrypt(data));
         } else {
             headers.put("data", data);
         }
@@ -58,7 +59,7 @@ public class NetworkManager {
 
     public String proceedResponse(ServerResponse response) {
         if (encryptionEnabled) {
-            return AES256.decrypt(response.getData());
+            return SecurityModule.decrypt(response.getData());
         } else {
             return response.getData();
         }
@@ -66,7 +67,7 @@ public class NetworkManager {
 
     public String proceedResponse(String data) {
         if (encryptionEnabled) {
-            return AES256.decrypt(data);
+            return SecurityModule.decrypt(data);
         } else {
             return data;
         }

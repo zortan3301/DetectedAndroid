@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,15 +19,17 @@ import androidx.fragment.app.FragmentTransaction;
 import com.devian.detected.main.ScanActivity;
 import com.devian.detected.main.task_list.TaskFragment;
 import com.devian.detected.main.TaskInfoFragment;
-import com.devian.detected.utils.network.GsonSerializer;
-import com.devian.detected.utils.network.NetworkManager;
-import com.devian.detected.utils.network.ServerResponse;
-import com.devian.detected.utils.domain.Task;
-import com.devian.detected.utils.security.AES256;
+import com.devian.detected.model.domain.tasks.GeoTask;
+import com.devian.detected.model.domain.tasks.GeoTextTask;
+import com.devian.detected.model.domain.tasks.Task;
+import com.devian.detected.modules.network.GsonSerializer;
+import com.devian.detected.modules.network.NetworkModule;
+import com.devian.detected.modules.network.domain.ServerResponse;
+import com.devian.detected.modules.security.SecurityModule;
 import com.devian.detected.utils.ui.CustomViewPager;
 import com.devian.detected.utils.ui.PagerAdapter;
-import com.devian.detected.utils.ui.PermissionsPopup;
-import com.devian.detected.utils.ui.PopupResult;
+import com.devian.detected.utils.ui.DefaultPopup;
+import com.devian.detected.utils.ui.ResultPopup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,7 +51,8 @@ public class ParentFragment extends AppCompatActivity
         TaskFragment.OnTaskItemSelectedListener {
     
     private static final String TAG = "ParentFragment";
-    private static final int CAMERA_REQUEST_CODE = 100;
+    private static final int CAMERA_PERMISSION_CODE = 100;
+    private static final int CAMERA_SCAN_CODE = 200;
     
     private Gson gson = GsonSerializer.getInstance().getGson();
     
@@ -84,24 +88,24 @@ public class ParentFragment extends AppCompatActivity
         if (view.getId() == R.id.fab_qr) {
             if (checkSelfPermission(Manifest.permission.CAMERA)
                     != PackageManager.PERMISSION_GRANTED) {
-                PermissionsPopup permissionsPopup =
-                        new PermissionsPopup(
+                DefaultPopup popupPermissions =
+                        new DefaultPopup(
                                 getResources().getString(R.string.camera_permission),
                                 this);
-                permissionsPopup.getAllowOption().setOnClickListener(v -> {
-                    requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_REQUEST_CODE);
-                    permissionsPopup.dismiss();
+                popupPermissions.getPositiveOption().setOnClickListener(v -> {
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+                    popupPermissions.dismiss();
                 });
-                permissionsPopup.getCancelOption().setOnClickListener(v -> {
+                popupPermissions.getNegativeOption().setOnClickListener(v -> {
                     showToast(
                             getResources().getString(R.string.camera_permission_denied),
                             Toast.LENGTH_LONG);
-                    permissionsPopup.dismiss();
+                    popupPermissions.dismiss();
                 });
-                permissionsPopup.show();
+                popupPermissions.show();
             } else {
                 Intent i = new Intent(this, ScanActivity.class);
-                startActivityForResult(i, 1);
+                startActivityForResult(i, CAMERA_SCAN_CODE);
             }
         }
     }
@@ -109,7 +113,7 @@ public class ParentFragment extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
+        if (requestCode == CAMERA_SCAN_CODE) {
             if(resultCode == Activity.RESULT_OK){
                 if (data != null) {
                     String result = data.getStringExtra("result");
@@ -125,7 +129,7 @@ public class ParentFragment extends AppCompatActivity
             @NonNull String[] permissions,
             @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CAMERA_REQUEST_CODE) {
+        if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Intent i = new Intent(this, ScanActivity.class);
                 startActivityForResult(i, 1);
@@ -137,40 +141,53 @@ public class ParentFragment extends AppCompatActivity
         }
     }
     
-    public void proceedTask(String tagId) {
+    public void proceedTask(String result) {
+        Uri uri = Uri.parse(result);
+        String tagType_param = uri.getQueryParameter("tag_type");
+        String tagId_param = uri.getQueryParameter("tag_id");
         
-        if (tagId == null) {
-            PopupResult popupResult = new PopupResult(
-                    PopupResult.RESULT_FAILURE, 0, this);
-            popupResult.show();
+        if (tagId_param == null || tagType_param == null) {
+            showPopup(ResultPopup.RESULT_FAILURE, 0);
             return;
+        }
+        
+        int tagType = Integer.parseInt(tagId_param);
+        
+        if (tagType != Task.GEO_TAG && tagType != Task.GEO_TEXT_TAG) {
+            showPopup(ResultPopup.RESULT_FAILURE, 0);
         }
     
         String executor = firebaseUser.getUid();
-        Task task = new Task(tagId, executor);
+        Task task;
+        if (tagType == Task.GEO_TAG) {
+            task = new GeoTask(tagId_param, executor);
+        } else {
+            task = new GeoTextTask(tagId_param, executor);
+        }
+
         String user_data = gson.toJson(task);
     
         Map<String, String> headers = new HashMap<>();
-        headers.put("data", AES256.encrypt(user_data));
+        headers.put("data", SecurityModule.encrypt(user_data));
 
-        NetworkManager.getInstance().getApi().scanTag(headers).enqueue(new Callback<ServerResponse>() {
+        NetworkModule.getInstance().getApi().scanTag(headers).enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 if (response.body() == null) {
-                    showPopup(PopupResult.RESULT_FAILURE, 0);
+                    showPopup(ResultPopup.RESULT_FAILURE, 0);
                     return;
                 }
                 switch (response.body().getType()) {
                     case ServerResponse.TYPE_TASK_ALREADY_COMPLETED:
-                        showPopup(PopupResult.RESULT_ACTIVATED, 0);
+                        showPopup(ResultPopup.RESULT_ACTIVATED, 0);
                         break;
                     case ServerResponse.TYPE_TASK_FAILURE:
-                        showPopup(PopupResult.RESULT_FAILURE, 0);
+                        showPopup(ResultPopup.RESULT_FAILURE, 0);
                         break;
                     case ServerResponse.TYPE_TASK_COMPLETED:
                         Task completedTask = gson.fromJson(response.body().getData(), Task.class);
-                        showPopup(PopupResult.RESULT_SUCCESS, completedTask.getReward());
+                        showPopup(ResultPopup.RESULT_SUCCESS, completedTask.getReward());
                 }
             }
     
@@ -178,6 +195,7 @@ public class ParentFragment extends AppCompatActivity
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
                 t.printStackTrace();
+                showPopup(ResultPopup.RESULT_FAILURE, 0);
             }
         });
     }
@@ -187,9 +205,9 @@ public class ParentFragment extends AppCompatActivity
     }
     
     public void showPopup(int resultCode, int reward) {
-        PopupResult popupResult = new PopupResult(
+        ResultPopup resultPopup = new ResultPopup(
                 resultCode, reward, this);
-        popupResult.show();
+        resultPopup.show();
     }
     
     @Override
@@ -211,7 +229,7 @@ public class ParentFragment extends AppCompatActivity
     }
     
     @Override
-    public void onTaskItemSelected(Task task) {
+    public void onTaskItemSelected(GeoTextTask task) {
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_main, TaskInfoFragment.newInstance(task), "taskinfo")
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

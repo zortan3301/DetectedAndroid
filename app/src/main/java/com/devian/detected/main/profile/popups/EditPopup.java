@@ -1,4 +1,4 @@
-package com.devian.detected.main.profile;
+package com.devian.detected.main.profile.popups;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -13,15 +13,18 @@ import android.widget.TextView;
 import androidx.fragment.app.FragmentActivity;
 
 import com.devian.detected.R;
-import com.devian.detected.utils.domain.DataWrapper;
-import com.devian.detected.utils.domain.User;
-import com.devian.detected.utils.network.ServerResponse;
+import com.devian.detected.model.domain.DataWrapper;
+import com.devian.detected.model.domain.User;
+import com.devian.detected.modules.network.domain.ServerResponse;
+
+import lombok.Getter;
 
 @SuppressLint("InflateParams")
-class EditPopup {
+public class EditPopup {
 
     private static final String TAG = "EditPopup";
 
+    @Getter
     private Button btnOK;
     private EditText etNickname;
     private ImageView ivError;
@@ -34,7 +37,7 @@ class EditPopup {
     private User currentUser;
 
 
-    EditPopup(FragmentActivity context, User user) {
+    public EditPopup(FragmentActivity context, User user) {
         currentUser = user;
         this.context = context;
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
@@ -53,7 +56,7 @@ class EditPopup {
         btnCancel.setOnClickListener(v -> dismiss());
     }
 
-    void show() {
+    public void show() {
         dialog.show();
     }
 
@@ -61,11 +64,7 @@ class EditPopup {
         dialog.dismiss();
     }
 
-    Button getBtnOK() {
-        return btnOK;
-    }
-
-    void proceedResponse(DataWrapper<User> userDataWrapper) {
+    public void proceedResponse(DataWrapper<User> userDataWrapper) {
         hideProgress();
         if (userDataWrapper.isError())
             displayError(userDataWrapper.getCode());
@@ -73,7 +72,7 @@ class EditPopup {
             dismiss();
     }
 
-    boolean isInputCorrect() {
+    public boolean isInputCorrect() {
         String newNickname = getInput().getDisplayName();
         if (newNickname.length() < 6 || newNickname.length() > 16) {
             displayError(TYPE_INCORRECT_NEW_NICKNAME);
@@ -83,7 +82,7 @@ class EditPopup {
         return true;
     }
 
-    User getInput() {
+    public User getInput() {
         currentUser.setDisplayName(etNickname.getText().toString().toLowerCase());
         return currentUser;
     }

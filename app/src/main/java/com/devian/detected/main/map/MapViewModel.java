@@ -7,8 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.devian.detected.utils.domain.DataWrapper;
-import com.devian.detected.utils.domain.Task;
+import com.devian.detected.model.domain.DataWrapper;
+import com.devian.detected.model.domain.tasks.GeoTask;
+import com.devian.detected.model.repo.TaskRepository;
 
 import java.util.List;
 
@@ -16,20 +17,20 @@ public class MapViewModel extends AndroidViewModel {
 
     private static final String TAG = "MapViewModel";
 
-    private MapRepository repository;
+    private TaskRepository repository;
 
     public MapViewModel(@NonNull Application application) {
         super(application);
-        repository = new MapRepository();
+        repository = new TaskRepository();
     }
 
-    LiveData<DataWrapper<List<Task>>> bindMarkers() {
+    LiveData<DataWrapper<List<GeoTask>>> bindMarkers() {
         Log.d(TAG, "bindMarkers: ");
-        return repository.getMldMarkers();
+        return repository.getMldGeoTaskList();
     }
 
     void updateMarkers() {
         Log.d(TAG, "updateMarkers: ");
-        repository.updateMldMarkers();
+        repository.updateMldGeoTaskList();
     }
 }

@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.devian.detected.R;
-import com.devian.detected.utils.domain.Task;
+import com.devian.detected.model.domain.tasks.GeoTextTask;
 
 import java.util.ArrayList;
 
@@ -39,7 +39,7 @@ public class TaskFragment extends Fragment
     private TaskListAdapter mAdapter;
     private TaskViewModel viewModel;
 
-    private ArrayList<Task> tasks;
+    private ArrayList<GeoTextTask> tasks;
 
     @Nullable
     @Override
@@ -71,7 +71,7 @@ public class TaskFragment extends Fragment
         viewModel.updateTaskList();
     }
 
-    private void displayTaskList(ArrayList<Task> taskList) {
+    private void displayTaskList(ArrayList<GeoTextTask> taskList) {
         Log.d(TAG, "displayTaskList: ");
         mAdapter.setTaskList(taskList);
     }
@@ -128,7 +128,7 @@ public class TaskFragment extends Fragment
     }
 
     @Override
-    public void OnItemClicked(Task task) {
+    public void OnItemClicked(GeoTextTask task) {
         Log.d(TAG, "OnItemClicked: " + task.getTitle());
         callback.onTaskItemSelected(task);
     }
@@ -137,8 +137,8 @@ public class TaskFragment extends Fragment
         Log.d(TAG, "setOnTaskItemSelectedListener");
         this.callback = callback;
     }
-
+    
     public interface OnTaskItemSelectedListener {
-        void onTaskItemSelected(Task task);
+        void onTaskItemSelected(GeoTextTask task);
     }
 }

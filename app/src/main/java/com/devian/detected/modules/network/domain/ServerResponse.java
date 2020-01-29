@@ -1,18 +1,13 @@
-package com.devian.detected.utils.network;
+package com.devian.detected.modules.network.domain;
 
+import lombok.Getter;
+
+@Getter
 @SuppressWarnings("unused")
 public class ServerResponse {
 
     private int type;
     private String data;
-
-    public int getType() {
-        return type;
-    }
-
-    public String getData() {
-        return data;
-    }
 
     public static final int TYPE_DEFAULT = 0;
 

@@ -7,8 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.devian.detected.utils.domain.DataWrapper;
-import com.devian.detected.utils.domain.Task;
+import com.devian.detected.model.domain.DataWrapper;
+import com.devian.detected.model.domain.tasks.GeoTextTask;
+import com.devian.detected.model.repo.TaskRepository;
 
 import java.util.List;
 
@@ -24,13 +25,13 @@ public class TaskViewModel extends AndroidViewModel {
         repository = new TaskRepository();
     }
 
-    LiveData<DataWrapper<List<Task>>> bindTaskList() {
+    LiveData<DataWrapper<List<GeoTextTask>>> bindTaskList() {
         Log.d(TAG, "bindTaskList: ");
-        return repository.getMldTaskList();
+        return repository.getMldGeoTextTasks();
     }
 
     void updateTaskList() {
         Log.d(TAG, "updateTaskList: ");
-        repository.updateTaskList();
+        repository.updateMldGeoTextTaskList();
     }
 }
