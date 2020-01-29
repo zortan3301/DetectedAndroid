@@ -1,4 +1,4 @@
-package com.devian.detected.main.task_list;
+package com.devian.detected.view.tasks_tab;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -6,10 +6,12 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,8 +19,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
+import com.devian.detected.view.TaskViewModel;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,6 +40,8 @@ public class TaskFragment extends Fragment
     RecyclerView recyclerView;
     @BindView(R.id.task_refreshLayout)
     SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.task_tvEmpty)
+    TextView tvEmpty;
 
     private TaskListAdapter mAdapter;
     private TaskViewModel viewModel;
@@ -49,7 +56,7 @@ public class TaskFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_task, container, false);
         ButterKnife.bind(this, v);
 
-        viewModel = ViewModelProviders.of(this).get(TaskViewModel.class);
+        viewModel = ViewModelProviders.of(getActivityNonNull()).get(TaskViewModel.class);
         setupView();
         bindView();
 
@@ -60,7 +67,13 @@ public class TaskFragment extends Fragment
         Log.d(TAG, "bind: ");
         viewModel.bindTaskList().observe(this, taskListWrapper -> {
             hideProgress();
-            tasks = new ArrayList<>(taskListWrapper.getObject());
+            List<GeoTextTask> geoTextTaskList = taskListWrapper.getObject();
+            if (geoTextTaskList.isEmpty()) {
+                tvEmpty.setVisibility(View.VISIBLE);
+            } else {
+                tvEmpty.setVisibility(View.INVISIBLE);
+            }
+            tasks = new ArrayList<>(geoTextTaskList);
             displayTaskList(tasks);
         });
     }
@@ -114,7 +127,24 @@ public class TaskFragment extends Fragment
     @Override
     public void onRefresh() {
         Log.d(TAG, "onRefresh");
-        updateTaskList();
+        if (isRefreshAvailable()) {
+            showProgress();
+            updateTaskList();
+        } else {
+            hideProgress();
+        }
+    }
+
+    private Date lastRefresh = new Date();
+
+    private boolean isRefreshAvailable() {
+        Date currTime = new Date();
+        if (currTime.getTime() - lastRefresh.getTime() >= 15000) {
+            lastRefresh = currTime;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void showProgress() {
@@ -125,6 +155,14 @@ public class TaskFragment extends Fragment
     private void hideProgress() {
         Log.d(TAG, "hideProgress: ");
         refreshLayout.setRefreshing(false);
+    }
+
+    private FragmentActivity getActivityNonNull() {
+        if (super.getActivity() != null) {
+            return super.getActivity();
+        } else {
+            throw new RuntimeException("null returned from getActivity()");
+        }
     }
 
     @Override

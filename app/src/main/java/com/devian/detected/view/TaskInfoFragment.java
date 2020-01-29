@@ -1,4 +1,4 @@
-package com.devian.detected.main;
+package com.devian.detected.view;
 
 import android.Manifest;
 import android.app.Activity;
@@ -25,7 +25,7 @@ import androidx.fragment.app.Fragment;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
-import com.devian.detected.utils.ui.DefaultPopup;
+import com.devian.detected.utils.ui.popups.DefaultPopup;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -151,6 +151,7 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
                         new DefaultPopup(
                                 getResources().getString(R.string.storage_permission),
                                 getActivityNonNull());
+                popupPermissions.setButtonsText(getResources().getString(R.string.allow), getString(R.string.restrict));
                 popupPermissions.getPositiveOption().setOnClickListener(v -> {
                     requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             WRITE_EXTERNAL_STORAGE_REQUEST_CODE);

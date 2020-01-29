@@ -11,7 +11,7 @@ import com.devian.detected.model.domain.User;
 import com.devian.detected.model.domain.UserStats;
 import com.devian.detected.modules.network.GsonSerializer;
 import com.devian.detected.modules.network.NetworkModule;
-import com.devian.detected.modules.network.domain.ServerResponse;
+import com.devian.detected.model.domain.network.ServerResponse;
 import com.google.gson.Gson;
 
 import java.util.Arrays;

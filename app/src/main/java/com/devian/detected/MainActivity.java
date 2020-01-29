@@ -9,10 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.devian.detected.login.AuthFragment;
+import com.devian.detected.view.login.AuthFragment;
 import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.modules.network.NetworkModule;
-import com.devian.detected.modules.network.domain.ServerResponse;
+import com.devian.detected.model.domain.network.ServerResponse;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

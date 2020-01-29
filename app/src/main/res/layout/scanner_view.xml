@@ -12,7 +12,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:backgroundTint="@color/black"
-        android:tint="@color/yellow"
+        android:tint="@color/light_green"
         android:src="@drawable/ic_flashlight"
         android:clickable="true"
         app:borderWidth="1dp"

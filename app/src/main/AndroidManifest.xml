@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ParentFragment" />
-        <activity android:name=".main.ScanActivity" />
+        <activity android:name=".view.ScanActivity" />
     </application>
 
 </manifest>

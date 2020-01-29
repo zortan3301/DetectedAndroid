@@ -6,8 +6,8 @@
     android:background="@drawable/black_shape_with_yellow_stroke"
     android:orientation="vertical"
     android:padding="16dp"
-    android:paddingStart="48dp"
-    android:paddingEnd="48dp">
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
 
 
     <ImageView
@@ -62,20 +62,14 @@
         app:layout_constraintStart_toStartOf="@+id/popupResult_tvInfo"
         app:layout_constraintTop_toBottomOf="@+id/popupResult_tvInfo" />
 
-    <Button
+    <ImageView
         android:id="@+id/popupResult_btnOk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/black_shape_with_yellow_stroke"
-        android:clickable="true"
-        android:fontFamily="@font/consola"
+        android:contentDescription="@string/button_cancel"
         android:foreground="@drawable/selectable_item_background"
-        android:text="@string/ok"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/popupResult_tvReward"
-        app:layout_constraintStart_toStartOf="@+id/popupResult_tvReward"
-        app:layout_constraintTop_toBottomOf="@+id/popupResult_tvReward" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close_yellow" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,9 +5,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.devian.detected.main.map.MapFragment;
-import com.devian.detected.main.profile.ProfileFragment;
-import com.devian.detected.main.task_list.TaskFragment;
+import com.devian.detected.view.map_tab.MapFragment;
+import com.devian.detected.view.profile_tab.ProfileFragment;
+import com.devian.detected.view.tasks_tab.TaskFragment;
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
     

@@ -7,6 +7,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
     <string name="allow">Разрешить</string>
+    <string name="restrict">Запретить</string>
     <string name="dollar_more"><![CDATA[$>]]></string>
     <string name="try_later">Попробуйте позже</string>
     <string name="google_signin">Войти</string>
@@ -62,4 +63,5 @@
     <string name="reward">Награда: %s</string>
 
     <!-- Other -->
+
 </resources>

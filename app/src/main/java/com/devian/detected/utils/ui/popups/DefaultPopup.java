@@ -1,4 +1,4 @@
-package com.devian.detected.utils.ui;
+package com.devian.detected.utils.ui.popups;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -47,5 +47,10 @@ public class DefaultPopup {
     
     public void setIcon(int resId) {
         icon.setImageResource(resId);
+    }
+
+    public void setButtonsText(String positiveText, String negativeText) {
+        positiveOption.setText(positiveText);
+        negativeOption.setText(negativeText);
     }
 }

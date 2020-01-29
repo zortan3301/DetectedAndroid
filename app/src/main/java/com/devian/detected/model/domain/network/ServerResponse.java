@@ -1,4 +1,4 @@
-package com.devian.detected.modules.network.domain;
+package com.devian.detected.model.domain.network;
 
 import lombok.Getter;
 

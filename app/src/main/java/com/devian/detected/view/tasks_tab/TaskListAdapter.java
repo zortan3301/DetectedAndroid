@@ -1,4 +1,4 @@
-package com.devian.detected.main.task_list;
+package com.devian.detected.view.tasks_tab;
 
 import android.graphics.Rect;
 import android.view.LayoutInflater;

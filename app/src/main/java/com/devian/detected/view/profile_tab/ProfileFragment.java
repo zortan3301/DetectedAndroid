@@ -1,4 +1,4 @@
-package com.devian.detected.main.profile;
+package com.devian.detected.view.profile_tab;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -27,12 +27,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.devian.detected.MainActivity;
 import com.devian.detected.R;
-import com.devian.detected.main.profile.popups.EditPopup;
+import com.devian.detected.view.profile_tab.popups.EditPopup;
 import com.devian.detected.utils.LevelManager;
 import com.devian.detected.model.domain.RankRow;
 import com.devian.detected.model.domain.User;
 import com.devian.detected.model.domain.UserStats;
-import com.devian.detected.utils.ui.DefaultPopup;
+import com.devian.detected.utils.ui.popups.DefaultPopup;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -40,6 +40,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -154,6 +155,8 @@ public class ProfileFragment extends Fragment
 
     private void displayUserStats(UserStats stats) {
         Log.d(TAG, "displayUserStats");
+        if (stats == null)
+            return;
         tvPoints.setText(String.valueOf(stats.getPoints()));
         tvLevel.setText(String.valueOf(LevelManager.getLevelByPoints(stats.getPoints())));
         tvScannedTags.setText(String.valueOf(stats.getTags()));
@@ -263,6 +266,7 @@ public class ProfileFragment extends Fragment
                 getResources().getString(R.string.popup_logout_info),
                 getActivityNonNull());
         popup.setIcon(R.drawable.ic_exit_yellow);
+        popup.setButtonsText(getResources().getString(R.string.yes), getResources().getString(R.string.no));
         popup.getPositiveOption().setOnClickListener(v -> {
             logout();
             popup.dismiss();
@@ -282,7 +286,7 @@ public class ProfileFragment extends Fragment
         popup.show();
     }
 
-    private void init_fab(View v) {
+    private void init_fab(@NonNull View v) {
         Log.d(TAG, "init_fab");
 
         fab_settings = v.findViewById(R.id.fab_settings);
@@ -336,8 +340,24 @@ public class ProfileFragment extends Fragment
     @Override
     public void onRefresh() {
         Log.d(TAG, "onRefresh");
-        refreshLayout.setRefreshing(true);
-        updateInformation();
+        if (isRefreshAvailable()) {
+            showProgress();
+            updateInformation();
+        } else {
+            hideProgress();
+        }
+    }
+
+    private Date lastRefresh = new Date();
+
+    private boolean isRefreshAvailable() {
+        Date currTime = new Date();
+        if (currTime.getTime() - lastRefresh.getTime() >= 15000) {
+            lastRefresh = currTime;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private FragmentActivity getActivityNonNull() {

@@ -1,4 +1,4 @@
-package com.devian.detected.utils.ui;
+package com.devian.detected.utils.ui.popups;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.devian.detected.R;
@@ -30,7 +31,7 @@ public class ResultPopup {
         View line = view.findViewById(R.id.popupResult_line);
         TextView tvInfo = view.findViewById(R.id.popupResult_tvInfo);
         TextView tvReward = view.findViewById(R.id.popupResult_tvReward);
-        Button btnOk = view.findViewById(R.id.popupResult_btnOk);
+        ImageView btnOk = view.findViewById(R.id.popupResult_btnOk);
         
         btnOk.setOnClickListener(v -> dismiss());
         
@@ -63,7 +64,7 @@ public class ResultPopup {
     public void show() {
         dialog.show();
     }
-    
+
     private void dismiss() {
         dialog.dismiss();
     }

@@ -1,4 +1,4 @@
-package com.devian.detected.main;
+package com.devian.detected.view;
 
 import android.app.Activity;
 import android.content.Intent;

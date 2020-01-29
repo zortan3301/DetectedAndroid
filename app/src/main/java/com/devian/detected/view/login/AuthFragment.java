@@ -1,4 +1,4 @@
-package com.devian.detected.login;
+package com.devian.detected.view.login;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.devian.detected.ParentFragment;
 import com.devian.detected.R;
 import com.devian.detected.modules.network.NetworkModule;
-import com.devian.detected.modules.network.domain.ServerResponse;
+import com.devian.detected.model.domain.network.ServerResponse;
 import com.devian.detected.model.domain.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;

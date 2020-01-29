@@ -7,19 +7,22 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/task_tvEmpty"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:autoSizeTextType="uniform"
         android:fontFamily="@font/consola"
         android:maxLines="2"
         android:text="@string/tasks_unavailable"
         android:textAlignment="center"
-        android:textColor="@color/white"
+        android:textColor="@color/light_green"
         android:textSize="18sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/task_refreshLayout"
         app:layout_constraintEnd_toEndOf="@+id/task_refreshLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

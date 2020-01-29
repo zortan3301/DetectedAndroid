@@ -1,4 +1,4 @@
-package com.devian.detected.main.profile.popups;
+package com.devian.detected.view.profile_tab.popups;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -15,7 +15,7 @@ import androidx.fragment.app.FragmentActivity;
 import com.devian.detected.R;
 import com.devian.detected.model.domain.DataWrapper;
 import com.devian.detected.model.domain.User;
-import com.devian.detected.modules.network.domain.ServerResponse;
+import com.devian.detected.model.domain.network.ServerResponse;
 
 import lombok.Getter;
 

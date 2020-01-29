@@ -1,6 +1,6 @@
 package com.devian.detected.modules.network;
 
-import com.devian.detected.modules.network.domain.ServerResponse;
+import com.devian.detected.model.domain.network.ServerResponse;
 
 import java.util.Map;
 
@@ -27,9 +27,6 @@ public interface NetworkInterface {
 
     @GET("/getTextTasks")
     Call<ServerResponse> getTextTasks();
-
-    @POST("/scanTag")
-    Call<ServerResponse> scanTag(@HeaderMap Map<String, String> headers);
     
     @POST("/scanGeoTag")
     Call<ServerResponse> scanGeoTag(@HeaderMap Map<String, String> headers);

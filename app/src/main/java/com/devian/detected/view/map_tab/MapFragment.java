@@ -1,4 +1,4 @@
-package com.devian.detected.main.map;
+package com.devian.detected.view.map_tab;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -16,10 +16,12 @@ import android.view.animation.AnimationUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTask;
+import com.devian.detected.view.TaskViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -37,6 +39,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,7 +53,7 @@ public class MapFragment extends Fragment implements
 
     private Context mContext;
     private View mView;
-    private MapViewModel viewModel;
+    private TaskViewModel viewModel;
 
     private static String MAP_STYLE;
     private MapView mapView;
@@ -79,7 +82,7 @@ public class MapFragment extends Fragment implements
         Mapbox.getInstance(mContext, getResources().getString(R.string.mapbox_access_token));
         mView = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, mView);
-        viewModel = ViewModelProviders.of(this).get(MapViewModel.class);
+        viewModel = ViewModelProviders.of(getActivityNonNull()).get(TaskViewModel.class);
 
         MAP_STYLE = getResources().getString(R.string.map_style);
         mapView = mView.findViewById(R.id.mapView);
@@ -141,14 +144,6 @@ public class MapFragment extends Fragment implements
     }
 
     @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.fab_map_refresh) {
-            fab_refresh.startAnimation(fab_rotate);
-            updateMarkers();
-        }
-    }
-
-    @Override
     public void onMapReady(@NonNull final MapboxMap mapboxMap) {
         Log.d(TAG, "onMapReady");
         mapboxMap.setStyle(new Style.Builder().fromUri(MAP_STYLE), style -> {
@@ -192,12 +187,43 @@ public class MapFragment extends Fragment implements
                 .newCameraPosition(position), 5000);
     }
 
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.fab_map_refresh) {
+            if (isRefreshAvailable()) {
+                showProgress();
+                updateMarkers();
+            } else
+                hideProgress();
+        }
+    }
+
+    private Date lastRefresh = new Date();
+
+    private boolean isRefreshAvailable() {
+        Date currTime = new Date();
+        if (currTime.getTime() - lastRefresh.getTime() >= 15000) {
+            lastRefresh = currTime;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void showProgress() {
         fab_refresh.startAnimation(fab_rotate);
     }
 
     private void hideProgress() {
         fab_refresh.clearAnimation();
+    }
+
+    private FragmentActivity getActivityNonNull() {
+        if (super.getActivity() != null) {
+            return super.getActivity();
+        } else {
+            throw new RuntimeException("null returned from getActivity()");
+        }
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.devian.detected.main.profile;
+package com.devian.detected.view.profile_tab;
 
 import android.app.Application;
 import android.util.Log;
@@ -81,5 +81,14 @@ public class ProfileViewModel extends AndroidViewModel {
     void changeNickname(User user) {
         Log.d(TAG, "changeNickname: ");
         repository.changeDisplayName(user);
+    }
+
+    public void updateInformation(String uid) {
+        Log.d(TAG, "updateInformation: ");
+        updateUserInfo(uid);
+        updateUserStats(uid);
+        updateSelfRank(uid);
+        updateTop10();
+        updateEvent();
     }
 }
