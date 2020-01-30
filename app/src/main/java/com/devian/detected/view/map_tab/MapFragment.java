@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTask;
-import com.devian.detected.view.TaskViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -53,7 +52,7 @@ public class MapFragment extends Fragment implements
 
     private Context mContext;
     private View mView;
-    private TaskViewModel viewModel;
+    private MapViewModel viewModel;
 
     private static String MAP_STYLE;
     private MapView mapView;
@@ -82,7 +81,7 @@ public class MapFragment extends Fragment implements
         Mapbox.getInstance(mContext, getResources().getString(R.string.mapbox_access_token));
         mView = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, mView);
-        viewModel = ViewModelProviders.of(getActivityNonNull()).get(TaskViewModel.class);
+        viewModel = ViewModelProviders.of(getActivityNonNull()).get(MapViewModel.class);
 
         MAP_STYLE = getResources().getString(R.string.map_style);
         mapView = mView.findViewById(R.id.mapView);

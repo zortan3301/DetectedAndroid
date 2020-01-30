@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,7 +24,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.devian.detected.MainActivity;
+import com.devian.detected.utils.LocalStorage;
+import com.devian.detected.view.LauncherActivity;
 import com.devian.detected.R;
 import com.devian.detected.view.profile_tab.popups.EditPopup;
 import com.devian.detected.utils.LevelManager;
@@ -40,6 +40,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -53,6 +54,7 @@ public class ProfileFragment extends Fragment
     private FirebaseAuth mAuth;
 
     private ProfileViewModel viewModel;
+    private LocalStorage localStorage;
 
     @BindView(R.id.profile_tvName)
     TextView tvName;
@@ -101,6 +103,7 @@ public class ProfileFragment extends Fragment
         ButterKnife.bind(this, v);
 
         viewModel = ViewModelProviders.of(getActivityNonNull()).get(ProfileViewModel.class);
+        localStorage = new LocalStorage(getActivityNonNull());
         refreshLayout.setOnRefreshListener(this);
         mAuth = FirebaseAuth.getInstance();
         init_fab(v);
@@ -112,27 +115,32 @@ public class ProfileFragment extends Fragment
     private void bindView() {
         viewModel.bindUserInfo().observe(this, userDataWrapper -> {
             hideProgress();
-            currentUser = userDataWrapper.getObject();
+            if (userDataWrapper.getObject() != null)
+                currentUser = userDataWrapper.getObject();
             displayUserInfo(currentUser);
         });
         viewModel.bindUserStats().observe(this, userStatsDataWrapper -> {
             hideProgress();
-            userStats = userStatsDataWrapper.getObject();
+            if (userStatsDataWrapper.getObject() != null)
+                userStats = userStatsDataWrapper.getObject();
             displayUserStats(userStats);
         });
         viewModel.bindSelfRank().observe(this, selfRankDataWrapper -> {
             hideProgress();
-            selfRank = selfRankDataWrapper.getObject();
+            if (selfRankDataWrapper.getObject() != null)
+                selfRank = selfRankDataWrapper.getObject();
             displaySelfRank(selfRank);
         });
         viewModel.bindTop10().observe(this, top10DataWrapper -> {
             hideProgress();
-            top10 = new ArrayList<>(top10DataWrapper.getObject());
+            if (top10DataWrapper.getObject() != null)
+                top10 = new ArrayList<>(top10DataWrapper.getObject());
             displayTop10(top10);
         });
         viewModel.bindEvent().observe(this, eventDataWrapper -> {
             hideProgress();
-            currentEvent = eventDataWrapper.getObject();
+            if (!eventDataWrapper.getObject().isEmpty())
+                currentEvent = eventDataWrapper.getObject();
             displayEvent(currentEvent);
         });
     }
@@ -207,20 +215,43 @@ public class ProfileFragment extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
-        if (savedInstanceState != null) {
-            currentUser = (User) savedInstanceState.getSerializable("currentUser");
-            userStats = (UserStats) savedInstanceState.getSerializable("userStats");
-            currentEvent = (String) savedInstanceState.getSerializable("currentEvent");
-            selfRank = savedInstanceState.getParcelable("selfRank");
-            top10 = savedInstanceState.getParcelableArrayList("top10");
-            displayUserInfo(currentUser);
-            displayUserStats(userStats);
-            displayEvent(currentEvent);
-            displaySelfRank(selfRank);
-            displayTop10(top10);
-        } else {
+        if (savedInstanceState != null)
+            proceedInstanceState(savedInstanceState);
+        else {
+            proceedLocalStorage();
             updateInformation();
         }
+        displayUserInfo(currentUser);
+        displayUserStats(userStats);
+        displayEvent(currentEvent);
+        displaySelfRank(selfRank);
+        displayTop10(top10);
+    }
+
+    private void proceedInstanceState(@NonNull Bundle savedInstanceState) {
+        Log.d(TAG, "proceedInstanceState: ");
+        User tmpUserInfo = (User) savedInstanceState.getSerializable("currentUser");
+        if (tmpUserInfo == null)
+            return;
+        currentUser = tmpUserInfo;
+        userStats = (UserStats) savedInstanceState.getSerializable("userStats");
+        currentEvent = (String) savedInstanceState.getSerializable("currentEvent");
+        selfRank = savedInstanceState.getParcelable("selfRank");
+        top10 = savedInstanceState.getParcelableArrayList("top10");
+    }
+
+    private void proceedLocalStorage() {
+        Log.d(TAG, "proceedLocalStorage: ");
+        User tmpUserInfo = localStorage.getData("user_info", User.class);
+        if (tmpUserInfo == null)
+            return;
+        currentUser = tmpUserInfo;
+        userStats = localStorage.getData("user_stats", UserStats.class);
+        selfRank = localStorage.getData("self_rank", RankRow.class);
+        currentEvent = localStorage.getData("event", String.class);
+        RankRow[] tmp_top10 = localStorage.getData("top10", RankRow[].class);
+        if (tmp_top10 != null)
+            top10 = new ArrayList<>(Arrays.asList(localStorage.getData("top10", RankRow[].class)));
     }
 
     @Override
@@ -245,7 +276,7 @@ public class ProfileFragment extends Fragment
         GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivityNonNull(), gso);
         mGoogleSignInClient.signOut().addOnCompleteListener(getActivityNonNull(),
                 task -> {
-                    Intent intent = new Intent(getActivityNonNull(), MainActivity.class);
+                    Intent intent = new Intent(getActivityNonNull(), LauncherActivity.class);
                     startActivity(intent);
                 });
     }
@@ -348,6 +379,17 @@ public class ProfileFragment extends Fragment
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+        localStorage.putData("user_info", currentUser);
+        localStorage.putData("user_stats", userStats);
+        localStorage.putData("self_rank", selfRank);
+        localStorage.putData("top10", top10);
+        localStorage.putData("event", currentEvent);
     }
 
     private FragmentActivity getActivityNonNull() {

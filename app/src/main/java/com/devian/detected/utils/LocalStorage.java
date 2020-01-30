@@ -4,35 +4,32 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.devian.detected.modules.network.GsonSerializer;
+import com.google.gson.Gson;
+
+@SuppressWarnings("unused")
 public class LocalStorage {
-    
-    private static LocalStorage mInstance;
+
     private static final String APP_PREFERENCES = "APP_PREFERENCES";
     private static SharedPreferences mSharedPreferences;
-    
-    private LocalStorage(Activity activity) {
+    private Gson gson = GsonSerializer.getInstance().getGson();
+
+    public LocalStorage(Activity activity) {
         mSharedPreferences =
                 activity.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
     }
-    
-    public static LocalStorage getInstance(Activity activity) {
-        if (mInstance == null) {
-            mInstance = new LocalStorage(activity);
-        }
-        return mInstance;
-    }
-    
-    public String getString(String key) {
+
+    public <T> T getData(String key, Class<T> classname) {
         if (mSharedPreferences.contains(key)) {
-            return mSharedPreferences.getString(key, "");
+            return gson.fromJson(mSharedPreferences.getString(key, ""), classname);
         } else {
             return null;
         }
     }
-    
-    public LocalStorage putString(String key, String value) {
-        mSharedPreferences.edit().putString(key, value).apply();
+
+    public <T> LocalStorage putData(String key, T object) {
+        mSharedPreferences.edit().putString(key, gson.toJson(object)).apply();
         return this;
     }
-    
+
 }

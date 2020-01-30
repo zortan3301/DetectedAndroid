@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.devian.detected.ParentFragment;
+import com.devian.detected.view.MainActivity;
 import com.devian.detected.R;
 import com.devian.detected.modules.network.NetworkModule;
 import com.devian.detected.model.domain.network.ServerResponse;
@@ -141,7 +141,7 @@ public class AuthFragment extends Fragment implements View.OnClickListener {
     
     private void updateUI(FirebaseUser user) {
         if (user != null) {
-            Intent intent = new Intent(getActivity(), ParentFragment.class);
+            Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
         }
     }

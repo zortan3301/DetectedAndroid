@@ -1,4 +1,4 @@
-package com.devian.detected;
+package com.devian.detected.view;
 
 import android.Manifest;
 import android.app.Activity;
@@ -16,10 +16,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.devian.detected.R;
 import com.devian.detected.model.domain.network.ServerResponse;
 import com.devian.detected.model.domain.tasks.Task;
 import com.devian.detected.view.extra.ScanActivity;
-import com.devian.detected.view.TaskViewModel;
+import com.devian.detected.view.map_tab.MapViewModel;
+import com.devian.detected.view.tasks_tab.TaskViewModel;
 import com.devian.detected.view.profile_tab.ProfileViewModel;
 import com.devian.detected.view.tasks_tab.TaskFragment;
 import com.devian.detected.view.tasks_tab.TaskInfoFragment;
@@ -36,17 +38,20 @@ import com.google.firebase.auth.FirebaseUser;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ParentFragment extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements
         View.OnClickListener,
         TaskFragment.OnTaskItemSelectedListener {
-    
-    private static final String TAG = "ParentFragment";
+
+    private static final String TAG = "MainActivity";
     private static final int CAMERA_PERMISSION_CODE = 100;
     private static final int CAMERA_SCAN_CODE = 200;
     
     private FirebaseUser firebaseUser;
+
+    private MainViewModel mainViewModel;
     private TaskViewModel taskViewModel;
+    private MapViewModel mapViewModel;
     private ProfileViewModel profileViewModel;
 
     @BindView(R.id.fab_qr) FloatingActionButton fab_qr;
@@ -57,11 +62,13 @@ public class ParentFragment extends AppCompatActivity
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_main);
+        setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
         taskViewModel = ViewModelProviders.of(this).get(TaskViewModel.class);
         profileViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mapViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
@@ -81,7 +88,7 @@ public class ParentFragment extends AppCompatActivity
 
     public void bindView() {
         Log.d(TAG, "bindView: ");
-        taskViewModel.bindCompletedTask().observe(this, taskDataWrapper -> {
+        mainViewModel.bindCompletedTask().observe(this, taskDataWrapper -> {
             if (taskDataWrapper.isError()) {
                 if (taskDataWrapper.getCode() == ServerResponse.TYPE_TASK_ALREADY_COMPLETED) {
                     showPopup(ResultPopup.RESULT_ACTIVATED, 0);
@@ -92,7 +99,8 @@ public class ParentFragment extends AppCompatActivity
             } else {
                 Task completedTask = taskDataWrapper.getObject();
                 showPopup(ResultPopup.RESULT_SUCCESS, completedTask.getReward());
-                taskViewModel.updateTasks();
+                taskViewModel.updateTaskList();
+                mapViewModel.updateMarkers();
                 profileViewModel.updateInformation(firebaseUser.getUid());
             }
         });
@@ -108,7 +116,7 @@ public class ParentFragment extends AppCompatActivity
 
     public void proceedTask(String result) {
         Log.d(TAG, "proceedTask: " + result);
-        taskViewModel.proceedTag(result, firebaseUser.getUid());
+        mainViewModel.proceedTag(result, firebaseUser.getUid());
     }
 
     private void checkCameraPermission() {

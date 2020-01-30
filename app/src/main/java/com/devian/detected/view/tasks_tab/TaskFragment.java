@@ -19,7 +19,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
-import com.devian.detected.view.TaskViewModel;
 
 import java.util.ArrayList;
 import java.util.Date;
