@@ -1,7 +1,6 @@
-package com.devian.detected.view;
+package com.devian.detected.view.tasks_tab;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -22,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
@@ -54,6 +54,8 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
     TextView tvDescription;
     @BindView(R.id.taskinfo_btnDownload)
     ImageView btnDownload;
+    @BindView(R.id.taskinfo_btnBack)
+    ImageView btnBack;
     
     public static TaskInfoFragment newInstance(GeoTextTask task) {
         Log.d(TAG, "newInstance");
@@ -63,50 +65,131 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
         fragment.setArguments(args);
         return fragment;
     }
-    
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: ");
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null)
+            task = getArguments().getParcelable("task");
+        else
+            task = new GeoTextTask();
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-        if (savedInstanceState != null) {
-            task = savedInstanceState.getParcelable("task");
-        }
-        if (getArguments() != null) {
-            task = getArguments().getParcelable("task");
-        }
         View v = inflater.inflate(R.layout.fragment_taskinfo, container, false);
         ButterKnife.bind(this, v);
         mAuth = FirebaseAuth.getInstance();
-        
-        tvTitle.setText(task.getTitle());
-        tvReward.setText(String.valueOf(task.getReward()));
-        tvDescription.setText(getLinuxLikeCommand());
-        
-        imageView.setZoomable(true);
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        Picasso.get()
-                .load(task.getImgUrl())
-                .into(imageView);
-    
-        btnDownload.setOnClickListener(this);
-        
         return v;
     }
-    
+
     @Override
-    public void onResume() {
-        Log.d(TAG, "onResume");
-        super.onResume();
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            task = savedInstanceState.getParcelable("task");
+        }
+        setupView();
     }
-    
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         Log.d(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelable("task", task);
     }
+
+    private void setupView() {
+        tvTitle.setText(task.getTitle());
+        tvReward.setText(String.valueOf(task.getReward()));
+        tvDescription.setText(getLinuxLikeCommand());
+
+        imageView.setZoomable(true);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Picasso.get()
+                .load(task.getImgUrl())
+                .into(imageView);
+
+        btnDownload.setOnClickListener(this);
+        btnBack.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        Log.d(TAG, "onClick: ");
+        switch (view.getId()) {
+            case R.id.taskinfo_btnDownload:
+                onSaveButtonClick();
+                break;
+            case R.id.taskinfo_btnBack:
+                onBackButtonClick();
+        }
+    }
+
+    private void onBackButtonClick() {
+        Log.d(TAG, "onBackButtonClick: ");
+        getActivityNonNull().getSupportFragmentManager().popBackStack();
+    }
+
+    private void onSaveButtonClick() {
+        Log.d(TAG, "onSaveButtonClick: ");
+        if (getActivityNonNull().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            DefaultPopup popupPermissions =
+                    new DefaultPopup(
+                            getResources().getString(R.string.storage_permission),
+                            getActivityNonNull());
+            popupPermissions.setButtonsText(getResources().getString(R.string.allow), getString(R.string.restrict));
+            popupPermissions.getPositiveOption().setOnClickListener(v -> {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
+                popupPermissions.dismiss();
+            });
+            popupPermissions.getNegativeOption().setOnClickListener(v -> {
+                Toast.makeText(getActivityNonNull(),
+                        getResources().getString(R.string.storage_permission_denied),
+                        Toast.LENGTH_LONG).show();
+                popupPermissions.dismiss();
+            });
+            popupPermissions.show();
+        } else {
+            saveImage();
+        }
+    }
     
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == WRITE_EXTERNAL_STORAGE_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                saveImage();
+            } else {
+                Toast.makeText(getActivityNonNull(),
+                        getResources().getString(R.string.storage_permission_denied),
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    
+    private void saveImage() {
+        Log.d(TAG, "saveImage: ");
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        MediaStore.Images.Media.insertImage(
+                getActivityNonNull().getContentResolver(),
+                bitmap,
+                task.getTitle(),
+                task.getDescription()
+        );
+        Toast.makeText(getActivityNonNull(),
+                getResources().getString(R.string.image_saved),
+                Toast.LENGTH_SHORT).show();
+    }
+
     private SpannableStringBuilder getLinuxLikeCommand() {
+        Log.d(TAG, "getLinuxLikeCommand: ");
         Log.d(TAG, "getLinuxLikeCommand");
         SpannableStringBuilder defaultString = new SpannableStringBuilder(task.getDescription());
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -141,63 +224,8 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
             return defaultString;
         }
     }
-    
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.taskinfo_btnDownload) {
-            if (getActivityNonNull().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                DefaultPopup popupPermissions =
-                        new DefaultPopup(
-                                getResources().getString(R.string.storage_permission),
-                                getActivityNonNull());
-                popupPermissions.setButtonsText(getResources().getString(R.string.allow), getString(R.string.restrict));
-                popupPermissions.getPositiveOption().setOnClickListener(v -> {
-                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
-                    popupPermissions.dismiss();
-                });
-                popupPermissions.getNegativeOption().setOnClickListener(v -> {
-                    Toast.makeText(getActivityNonNull(),
-                            getResources().getString(R.string.storage_permission_denied),
-                            Toast.LENGTH_LONG).show();
-                    popupPermissions.dismiss();
-                });
-                popupPermissions.show();
-            } else {
-                saveImage();
-            }
-        }
-    }
-    
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == WRITE_EXTERNAL_STORAGE_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                saveImage();
-            } else {
-                Toast.makeText(getActivityNonNull(),
-                        getResources().getString(R.string.storage_permission_denied),
-                        Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-    
-    private void saveImage() {
-        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        MediaStore.Images.Media.insertImage(
-                getActivityNonNull().getContentResolver(),
-                bitmap,
-                task.getTitle(),
-                task.getDescription()
-        );
-        Toast.makeText(getActivityNonNull(),
-                getResources().getString(R.string.image_saved),
-                Toast.LENGTH_SHORT).show();
-    }
-    
-    private Activity getActivityNonNull() {
+
+    private FragmentActivity getActivityNonNull() {
         if (super.getActivity() != null) {
             return super.getActivity();
         } else {

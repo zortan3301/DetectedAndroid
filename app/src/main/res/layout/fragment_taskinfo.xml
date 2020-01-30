@@ -96,6 +96,19 @@
             app:srcCompat="@drawable/ic_download"
             android:contentDescription="@string/save_image_on_device" />
 
+        <ImageView
+            android:id="@+id/taskinfo_btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:foreground="@drawable/selectable_item_background"
+            android:contentDescription="@string/button_cancel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_back_yellow" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

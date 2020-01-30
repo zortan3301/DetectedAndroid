@@ -18,11 +18,11 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.model.domain.network.ServerResponse;
 import com.devian.detected.model.domain.tasks.Task;
-import com.devian.detected.view.ScanActivity;
+import com.devian.detected.view.extra.ScanActivity;
 import com.devian.detected.view.TaskViewModel;
 import com.devian.detected.view.profile_tab.ProfileViewModel;
 import com.devian.detected.view.tasks_tab.TaskFragment;
-import com.devian.detected.view.TaskInfoFragment;
+import com.devian.detected.view.tasks_tab.TaskInfoFragment;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
 import com.devian.detected.utils.ui.CustomViewPager;
 import com.devian.detected.utils.ui.PagerAdapter;

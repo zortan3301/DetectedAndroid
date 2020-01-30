@@ -17,7 +17,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:usesCleartextTraffic="true"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        android:allowBackup="true">
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -26,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ParentFragment" />
-        <activity android:name=".view.ScanActivity" />
+        <activity android:name=".view.extra.ScanActivity" />
     </application>
 
 </manifest>

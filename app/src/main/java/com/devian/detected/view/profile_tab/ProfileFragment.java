@@ -188,18 +188,8 @@ public class ProfileFragment extends Fragment
                 rating2.append("\n");
             }
         }
-        SpannableStringBuilder spannable1 = new SpannableStringBuilder(rating1);
-        spannable1.setSpan(
-                new ForegroundColorSpan(Color.RED),
-                3, top10.get(0).getNickname().length() + 3,
-                Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
-        SpannableStringBuilder spannable2 = new SpannableStringBuilder(rating2);
-        spannable2.setSpan(
-                new ForegroundColorSpan(Color.RED),
-                0, String.valueOf(top10.get(0).getPoints()).length(),
-                Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
-        tvRating1.setText(spannable1);
-        tvRating2.setText(spannable2);
+        tvRating1.setText(rating1);
+        tvRating2.setText(rating2);
     }
 
     private void displayEvent(String event) {
@@ -374,15 +364,5 @@ public class ProfileFragment extends Fragment
 
     private void hideProgress() {
         refreshLayout.setRefreshing(false);
-    }
-
-    public void displayError(Throwable t) {
-        Log.d(TAG, "displayError");
-        hideProgress();
-    }
-
-    public void displayError(int errorCode) {
-        Log.d(TAG, "displayError");
-        hideProgress();
     }
 }
