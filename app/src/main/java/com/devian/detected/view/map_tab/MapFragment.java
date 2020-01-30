@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTask;
+import com.devian.detected.utils.LocalStorage;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -38,6 +39,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -53,11 +55,11 @@ public class MapFragment extends Fragment implements
     private Context mContext;
     private View mView;
     private MapViewModel viewModel;
+    private LocalStorage localStorage;
 
     private static String MAP_STYLE;
     private MapView mapView;
     private SymbolManager symbolManager = null;
-    private Bundle savedBundle;
 
     @BindView(R.id.fab_map_refresh)
     FloatingActionButton fab_refresh;
@@ -82,13 +84,13 @@ public class MapFragment extends Fragment implements
         mView = inflater.inflate(R.layout.fragment_map, container, false);
         ButterKnife.bind(this, mView);
         viewModel = ViewModelProviders.of(getActivityNonNull()).get(MapViewModel.class);
+        localStorage = new LocalStorage(getActivityNonNull());
 
         MAP_STYLE = getResources().getString(R.string.map_style);
         mapView = mView.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
-        savedBundle = savedInstanceState;
         fab_refresh.setOnClickListener(this);
         fab_rotate = AnimationUtils.loadAnimation(getContext(), R.anim.fab_full_rotate);
 
@@ -101,7 +103,8 @@ public class MapFragment extends Fragment implements
         Log.d(TAG, "bindView: ");
         viewModel.bindMarkers().observe(this, markersDataWrapper -> {
             hideProgress();
-            markers = new ArrayList<>(markersDataWrapper.getObject());
+            if (markersDataWrapper.getObject() != null)
+                markers = new ArrayList<>(markersDataWrapper.getObject());
             displayMarkers(markers);
         });
     }
@@ -114,7 +117,7 @@ public class MapFragment extends Fragment implements
 
     private void displayMarkers(ArrayList<GeoTask> markers) {
         Log.d(TAG, "displayMarkers: ");
-        if (symbolManager == null)
+        if (symbolManager == null || markers == null)
             return;
         symbolManager.deleteAll();
         for (GeoTask t : markers) {
@@ -124,22 +127,31 @@ public class MapFragment extends Fragment implements
                     .withIconSize(0.6f));
         }
     }
-
-    private void checkSavedBundle(Bundle inState) {
-        Log.d(TAG, "checkSavedBundle");
-        if (inState != null) {
-            markers = inState.getParcelableArrayList("markers");
-            displayMarkers(markers);
+    
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated: ");
+        if (savedInstanceState != null) {
+            ArrayList<GeoTask> tmp = savedInstanceState.getParcelableArrayList("markers");
+            if (tmp != null)
+                markers = savedInstanceState.getParcelableArrayList("markers");
         } else {
+            GeoTask[] tmp = localStorage.getData("markers", GeoTask[].class);
+            if (tmp != null) {
+                markers = new ArrayList<>(Arrays.asList(tmp));
+            }
             updateMarkers();
         }
+        displayMarkers(markers);
     }
-
+    
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("markers", markers);
+        if (markers != null)
+            outState.putParcelableArrayList("markers", markers);
     }
 
     @Override
@@ -171,7 +183,7 @@ public class MapFragment extends Fragment implements
                             }
                         }).show();
             });
-            checkSavedBundle(savedBundle);
+            displayMarkers(markers);
         });
 
         mapboxMap.getUiSettings().setZoomGesturesEnabled(true);
@@ -188,6 +200,7 @@ public class MapFragment extends Fragment implements
 
     @Override
     public void onClick(View view) {
+        Log.d(TAG, "onClick: ");
         if (view.getId() == R.id.fab_map_refresh) {
             if (isRefreshAvailable()) {
                 showProgress();
@@ -210,14 +223,17 @@ public class MapFragment extends Fragment implements
     }
 
     private void showProgress() {
+        Log.d(TAG, "showProgress: ");
         fab_refresh.startAnimation(fab_rotate);
     }
 
     private void hideProgress() {
+        Log.d(TAG, "hideProgress: ");
         fab_refresh.clearAnimation();
     }
-
+    
     private FragmentActivity getActivityNonNull() {
+        Log.d(TAG, "getActivityNonNull: ");
         if (super.getActivity() != null) {
             return super.getActivity();
         } else {
@@ -251,6 +267,8 @@ public class MapFragment extends Fragment implements
         Log.d(TAG, "onStop");
         super.onStop();
         mapView.onStop();
+        if (markers != null)
+            localStorage.putData("markers", markers);
     }
 
     @Override

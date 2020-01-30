@@ -180,7 +180,7 @@ public class ProfileFragment extends Fragment
 
     private void displayTop10(ArrayList<RankRow> top10) {
         Log.d(TAG, "displayTop10");
-        if (top10.isEmpty()) {
+        if (top10 == null || top10.isEmpty()) {
             return;
         }
         StringBuilder

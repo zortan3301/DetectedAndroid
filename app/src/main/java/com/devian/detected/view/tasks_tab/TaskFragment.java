@@ -19,8 +19,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
+import com.devian.detected.utils.LocalStorage;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -44,6 +46,7 @@ public class TaskFragment extends Fragment
 
     private TaskListAdapter mAdapter;
     private TaskViewModel viewModel;
+    private LocalStorage localStorage;
 
     private ArrayList<GeoTextTask> tasks;
 
@@ -55,6 +58,7 @@ public class TaskFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_task, container, false);
         ButterKnife.bind(this, v);
 
+        localStorage = new LocalStorage(getActivityNonNull());
         viewModel = ViewModelProviders.of(getActivityNonNull()).get(TaskViewModel.class);
         setupView();
         bindView();
@@ -67,15 +71,17 @@ public class TaskFragment extends Fragment
         viewModel.bindTaskList().observe(this, taskListWrapper -> {
             hideProgress();
             List<GeoTextTask> geoTextTaskList = taskListWrapper.getObject();
-            if (geoTextTaskList.isEmpty()) {
+            if (geoTextTaskList == null || geoTextTaskList.isEmpty()) {
                 tvEmpty.setVisibility(View.VISIBLE);
             } else {
                 tvEmpty.setVisibility(View.INVISIBLE);
+                tasks = new ArrayList<>(geoTextTaskList);
+                displayTaskList(tasks);
             }
-            tasks = new ArrayList<>(geoTextTaskList);
-            displayTaskList(tasks);
         });
     }
+    
+    
 
     private void updateTaskList() {
         Log.d(TAG, "updateTaskList: ");
@@ -85,6 +91,8 @@ public class TaskFragment extends Fragment
 
     private void displayTaskList(ArrayList<GeoTextTask> taskList) {
         Log.d(TAG, "displayTaskList: ");
+        if (taskList == null || taskList.isEmpty())
+            return;
         mAdapter.setTaskList(taskList);
     }
 
@@ -108,18 +116,26 @@ public class TaskFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated");
         if (savedInstanceState != null) {
-            tasks = savedInstanceState.getParcelableArrayList("tasks");
-            displayTaskList(tasks);
+            ArrayList<GeoTextTask> tmp = savedInstanceState.getParcelableArrayList("tasks");
+            if (tmp != null) {
+                tasks = tmp;
+            }
         } else {
+            GeoTextTask[] tmp = localStorage.getData("tasks", GeoTextTask[].class);
+            if (tmp != null) {
+                tasks = new ArrayList<>(Arrays.asList(tmp));
+            }
             updateTaskList();
         }
+        displayTaskList(tasks);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         Log.d(TAG, "onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("tasks", tasks);
+        if (tasks != null)
+            outState.putParcelableArrayList("tasks", tasks);
     }
 
 
@@ -155,7 +171,16 @@ public class TaskFragment extends Fragment
         Log.d(TAG, "hideProgress: ");
         refreshLayout.setRefreshing(false);
     }
-
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+        if (tasks != null) {
+            localStorage.putData("tasks", tasks);
+        }
+    }
+    
     private FragmentActivity getActivityNonNull() {
         if (super.getActivity() != null) {
             return super.getActivity();
