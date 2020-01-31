@@ -24,6 +24,8 @@ public class ServerResponse {
     public static final int TYPE_RANK_SUCCESS = 40;
 
     public static final int TYPE_CHANGE_NICKNAME_SUCCESS = 50;
+    
+    public static final int TYPE_AUTH_FAILURE = -10;
 
     public static final int TYPE_STATS_DOES_NOT_EXIST = -20;
 

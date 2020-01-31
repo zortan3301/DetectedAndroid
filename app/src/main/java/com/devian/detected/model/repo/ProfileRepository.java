@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Getter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,36 +29,16 @@ public class ProfileRepository {
 
     private Gson gson = GsonSerializer.getInstance().getGson();
 
+    @Getter
     private MutableLiveData<DataWrapper<User>> mldUser = new MutableLiveData<>();
+    @Getter
     private MutableLiveData<DataWrapper<UserStats>> mldUserStats = new MutableLiveData<>();
+    @Getter
     private MutableLiveData<DataWrapper<RankRow>> mldSelfRank = new MutableLiveData<>();
+    @Getter
     private MutableLiveData<DataWrapper<List<RankRow>>> mldTop10 = new MutableLiveData<>();
+    @Getter
     private MutableLiveData<DataWrapper<String>> mldEvent = new MutableLiveData<>();
-    
-    public MutableLiveData<DataWrapper<User>> getMldUser() {
-        Log.d(TAG, "getMldUser: ");
-        return mldUser;
-    }
-    
-    public MutableLiveData<DataWrapper<UserStats>> getMldUserStats() {
-        Log.d(TAG, "getMldUserStats: ");
-        return mldUserStats;
-    }
-    
-    public MutableLiveData<DataWrapper<RankRow>> getMldSelfRank() {
-        Log.d(TAG, "getMldSelfRank: ");
-        return mldSelfRank;
-    }
-    
-    public MutableLiveData<DataWrapper<List<RankRow>>> getMldTop10() {
-        Log.d(TAG, "getMldTop10: ");
-        return mldTop10;
-    }
-    
-    public MutableLiveData<DataWrapper<String>> getMldEvent() {
-        Log.d(TAG, "getMldEvent: ");
-        return mldEvent;
-    }
     
     public void updateMldUser(String uid) {
         Log.d(TAG, "updateMldUser: ");
@@ -88,6 +69,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                updateMldUser(uid);
             }
         });
     }
@@ -121,6 +103,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                updateMldUserStats(uid);
             }
         });
     }
@@ -154,6 +137,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                updateMldSelfRank(uid);
             }
         });
     }
@@ -186,6 +170,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                updateMldTop10();
             }
         });
     }
@@ -216,6 +201,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                updateMldEvent();
             }
         });
     }

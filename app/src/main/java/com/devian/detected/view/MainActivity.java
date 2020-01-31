@@ -19,8 +19,10 @@ import androidx.lifecycle.ViewModelProviders;
 import com.devian.detected.R;
 import com.devian.detected.model.domain.network.ServerResponse;
 import com.devian.detected.model.domain.tasks.Task;
+import com.devian.detected.view.auth.AuthActivity;
 import com.devian.detected.view.extra.ScanActivity;
 import com.devian.detected.view.map_tab.MapViewModel;
+import com.devian.detected.view.profile_tab.ProfileFragment;
 import com.devian.detected.view.tasks_tab.TaskViewModel;
 import com.devian.detected.view.profile_tab.ProfileViewModel;
 import com.devian.detected.view.tasks_tab.TaskFragment;
@@ -30,6 +32,9 @@ import com.devian.detected.utils.ui.CustomViewPager;
 import com.devian.detected.utils.ui.PagerAdapter;
 import com.devian.detected.utils.ui.popups.DefaultPopup;
 import com.devian.detected.utils.ui.popups.ResultPopup;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,19 +46,21 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity
         implements
         View.OnClickListener,
-        TaskFragment.OnTaskItemSelectedListener {
+        TaskFragment.OnTaskItemSelectedListener,
+        ProfileFragment.OnLogoutListener {
 
     private static final String TAG = "MainActivity";
     private static final int CAMERA_PERMISSION_CODE = 100;
     private static final int CAMERA_SCAN_CODE = 200;
     
     private FirebaseUser firebaseUser;
+    private FirebaseAuth mAuth;
 
     private MainViewModel mainViewModel;
     private TaskViewModel taskViewModel;
     private MapViewModel mapViewModel;
     private ProfileViewModel profileViewModel;
-
+    
     @BindView(R.id.fab_qr) FloatingActionButton fab_qr;
     @BindView(R.id.tab_layout) TabLayout tabLayout;
     @BindView(R.id.pager) CustomViewPager viewPager;
@@ -70,17 +77,24 @@ public class MainActivity extends AppCompatActivity
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         mapViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
 
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
 
         setupView();
         bindView();
+        
+        checkAuth();
+    }
+    
+    private void checkAuth() {
+        if (firebaseUser == null)
+            startAuthActivity();
     }
 
     public void setupView() {
         Log.d(TAG, "setupView: ");
         tabLayout.setupWithViewPager(viewPager);
-        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        PagerAdapter pagerAdapter = new PagerAdapter(this, this);
         viewPager = findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
         fab_qr.setOnClickListener(this);
@@ -202,6 +216,25 @@ public class MainActivity extends AppCompatActivity
                 .setCustomAnimations(R.animator.slide_in_left, R.animator.slide_in_right)
                 .addToBackStack(TaskInfoFragment.class.getSimpleName())
                 .commit();
+    }
+    
+    @Override
+    public void onLogout() {
+        Log.d(TAG, "onLogout: ");
+        mAuth.signOut();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                task -> startAuthActivity());
+    }
+    
+    public void startAuthActivity() {
+        Intent authIntent = new Intent(this, AuthActivity.class);
+        startActivity(authIntent);
+        finish();
     }
 }
 

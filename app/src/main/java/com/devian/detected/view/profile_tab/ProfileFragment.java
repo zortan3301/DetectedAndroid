@@ -2,7 +2,6 @@ package com.devian.detected.view.profile_tab;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -24,18 +23,14 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.devian.detected.utils.LocalStorage;
-import com.devian.detected.view.LauncherActivity;
 import com.devian.detected.R;
-import com.devian.detected.view.profile_tab.popups.EditPopup;
-import com.devian.detected.utils.LevelManager;
 import com.devian.detected.model.domain.RankRow;
 import com.devian.detected.model.domain.User;
 import com.devian.detected.model.domain.UserStats;
+import com.devian.detected.utils.LevelManager;
+import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.ui.popups.DefaultPopup;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.devian.detected.view.profile_tab.popups.EditPopup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -55,6 +50,8 @@ public class ProfileFragment extends Fragment
 
     private ProfileViewModel viewModel;
     private LocalStorage localStorage;
+    
+    private OnLogoutListener callback;
 
     @BindView(R.id.profile_tvName)
     TextView tvName;
@@ -267,18 +264,7 @@ public class ProfileFragment extends Fragment
 
     private void logout() {
         Log.d(TAG, "logout");
-        mAuth.signOut();
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivityNonNull(), gso);
-        mGoogleSignInClient.signOut().addOnCompleteListener(getActivityNonNull(),
-                task -> {
-                    Intent intent = new Intent(getActivityNonNull(), LauncherActivity.class);
-                    startActivity(intent);
-                });
+        callback.onLogout();
     }
 
     @SuppressLint("InflateParams")
@@ -373,7 +359,7 @@ public class ProfileFragment extends Fragment
 
     private boolean isRefreshAvailable() {
         Date currTime = new Date();
-        if (currTime.getTime() - lastRefresh.getTime() >= 15000) {
+        if (currTime.getTime() - lastRefresh.getTime() >= getResources().getInteger(R.integer.refresh_delay)) {
             lastRefresh = currTime;
             return true;
         } else {
@@ -406,5 +392,13 @@ public class ProfileFragment extends Fragment
 
     private void hideProgress() {
         refreshLayout.setRefreshing(false);
+    }
+    
+    public void setOnLogoutListener(OnLogoutListener listener) {
+        callback = listener;
+    }
+    
+    public interface OnLogoutListener {
+        void onLogout();
     }
 }

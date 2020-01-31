@@ -8,19 +8,24 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.devian.detected.model.domain.DataWrapper;
+import com.devian.detected.model.domain.User;
 import com.devian.detected.model.domain.tasks.Task;
+import com.devian.detected.model.repo.MainRepository;
 import com.devian.detected.model.repo.TaskRepository;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainViewModel extends AndroidViewModel {
 
     private static final String TAG = "MainViewModel";
 
+    private MainRepository mainRepository;
     private TaskRepository taskRepository;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         Log.d(TAG, "MainViewModel: ");
         taskRepository = new TaskRepository();
+        mainRepository = new MainRepository();
     }
 
     LiveData<DataWrapper<Task>> bindCompletedTask() {
@@ -32,6 +37,14 @@ public class MainViewModel extends AndroidViewModel {
         Log.d(TAG, "proceedTask: ");
         taskRepository.scanTag(data, executor);
     }
+    
+    public LiveData<DataWrapper<User>> bindSignedUser() {
+        Log.d(TAG, "bindSignedUser: ");
+        return mainRepository.getMldSignedUser();
+    }
 
-
+    public void authUserOnServer(FirebaseUser user) {
+        Log.d(TAG, "authUserOnServer: ");
+        mainRepository.authUser(user);
+    }
 }

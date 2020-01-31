@@ -66,6 +66,7 @@ public class TaskRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                updateMldGeoTaskList();
             }
         });
     }
@@ -98,6 +99,7 @@ public class TaskRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.d(TAG, "onFailure: ");
+                updateMldGeoTextTaskList();
             }
         });
     }

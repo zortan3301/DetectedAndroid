@@ -76,19 +76,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_yellow" />
 
-    <ProgressBar
+    <com.wang.avi.AVLoadingIndicatorView
         android:id="@+id/changeNickname_progress"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:indeterminateDrawable="@drawable/progress"
-        android:visibility="visible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:indicatorName="BallPulseIndicator"
+        style="AVLoadingIndicatorView.Large"
         app:layout_constraintBottom_toBottomOf="@+id/changeNickname_btnOk"
         app:layout_constraintEnd_toEndOf="@+id/changeNickname_btnOk"
         app:layout_constraintStart_toStartOf="@+id/changeNickname_btnOk"
-        app:layout_constraintTop_toTopOf="@+id/changeNickname_btnOk" />
+        app:layout_constraintTop_toTopOf="@+id/changeNickname_btnOk"/>
 
     <Button
         android:id="@+id/changeNickname_btnOk"

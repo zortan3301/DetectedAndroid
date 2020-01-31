@@ -154,7 +154,7 @@ public class TaskFragment extends Fragment
 
     private boolean isRefreshAvailable() {
         Date currTime = new Date();
-        if (currTime.getTime() - lastRefresh.getTime() >= 15000) {
+        if (currTime.getTime() - lastRefresh.getTime() >= getResources().getInteger(R.integer.refresh_delay)) {
             lastRefresh = currTime;
             return true;
         } else {

@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
@@ -16,6 +15,7 @@ import com.devian.detected.R;
 import com.devian.detected.model.domain.DataWrapper;
 import com.devian.detected.model.domain.User;
 import com.devian.detected.model.domain.network.ServerResponse;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import lombok.Getter;
 
@@ -29,7 +29,7 @@ public class EditPopup {
     private EditText etNickname;
     private ImageView ivError;
     private TextView tvWarning;
-    private ProgressBar progressBar;
+    private AVLoadingIndicatorView progressBar;
 
     private AlertDialog dialog;
     private FragmentActivity context;
@@ -91,13 +91,13 @@ public class EditPopup {
         Log.d(TAG, "showProgress: ");
         hideError();
         btnOK.setVisibility(View.INVISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
+        progressBar.show();
     }
 
     private void hideProgress() {
         Log.d(TAG, "hideProgress: ");
         btnOK.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
+        progressBar.hide();
     }
 
     private void hideError() {
