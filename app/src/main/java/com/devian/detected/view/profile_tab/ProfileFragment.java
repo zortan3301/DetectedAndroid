@@ -30,6 +30,7 @@ import com.devian.detected.model.domain.UserStats;
 import com.devian.detected.utils.LevelManager;
 import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.ui.popups.DefaultPopup;
+import com.devian.detected.view.interfaces.OnLogoutListener;
 import com.devian.detected.view.profile_tab.popups.EditPopup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,7 +52,7 @@ public class ProfileFragment extends Fragment
     private ProfileViewModel viewModel;
     private LocalStorage localStorage;
     
-    private OnLogoutListener callback;
+    private OnLogoutListener logoutCallback;
 
     @BindView(R.id.profile_tvName)
     TextView tvName;
@@ -112,33 +113,38 @@ public class ProfileFragment extends Fragment
     private void bindView() {
         viewModel.bindUserInfo().observe(this, userDataWrapper -> {
             hideProgress();
-            if (userDataWrapper.getObject() != null)
+            if (userDataWrapper.getObject() != null) {
                 currentUser = userDataWrapper.getObject();
-            displayUserInfo(currentUser);
+                displayUserInfo(currentUser);
+            }
         });
         viewModel.bindUserStats().observe(this, userStatsDataWrapper -> {
             hideProgress();
-            if (userStatsDataWrapper.getObject() != null)
+            if (userStatsDataWrapper.getObject() != null) {
                 userStats = userStatsDataWrapper.getObject();
-            displayUserStats(userStats);
+                displayUserStats(userStats);
+            }
         });
         viewModel.bindSelfRank().observe(this, selfRankDataWrapper -> {
             hideProgress();
-            if (selfRankDataWrapper.getObject() != null)
+            if (selfRankDataWrapper.getObject() != null) {
                 selfRank = selfRankDataWrapper.getObject();
-            displaySelfRank(selfRank);
+                displaySelfRank(selfRank);
+            }
         });
         viewModel.bindTop10().observe(this, top10DataWrapper -> {
             hideProgress();
-            if (top10DataWrapper.getObject() != null)
+            if (top10DataWrapper.getObject() != null) {
                 top10 = new ArrayList<>(top10DataWrapper.getObject());
-            displayTop10(top10);
+                displayTop10(top10);
+            }
         });
         viewModel.bindEvent().observe(this, eventDataWrapper -> {
             hideProgress();
-            if (!eventDataWrapper.getObject().isEmpty())
+            if (!eventDataWrapper.getObject().isEmpty()) {
                 currentEvent = eventDataWrapper.getObject();
-            displayEvent(currentEvent);
+                displayEvent(currentEvent);
+            }
         });
     }
 
@@ -235,6 +241,7 @@ public class ProfileFragment extends Fragment
         currentEvent = (String) savedInstanceState.getSerializable("currentEvent");
         selfRank = savedInstanceState.getParcelable("selfRank");
         top10 = savedInstanceState.getParcelableArrayList("top10");
+        refreshLayout.setRefreshing(savedInstanceState.getBoolean("refresh"));
     }
 
     private void proceedLocalStorage() {
@@ -260,11 +267,12 @@ public class ProfileFragment extends Fragment
         outState.putSerializable("currentEvent", currentEvent);
         outState.putParcelable("selfRank", selfRank);
         outState.putParcelableArrayList("top10", top10);
+        outState.putBoolean("refresh", refreshLayout.isRefreshing());
     }
 
     private void logout() {
         Log.d(TAG, "logout");
-        callback.onLogout();
+        logoutCallback.onLogout();
     }
 
     @SuppressLint("InflateParams")
@@ -395,10 +403,6 @@ public class ProfileFragment extends Fragment
     }
     
     public void setOnLogoutListener(OnLogoutListener listener) {
-        callback = listener;
-    }
-    
-    public interface OnLogoutListener {
-        void onLogout();
+        logoutCallback = listener;
     }
 }

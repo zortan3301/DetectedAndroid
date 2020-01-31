@@ -12,26 +12,26 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.network.ServerResponse;
-import com.devian.detected.model.domain.tasks.Task;
-import com.devian.detected.view.auth.AuthActivity;
-import com.devian.detected.view.extra.ScanActivity;
-import com.devian.detected.view.map_tab.MapViewModel;
-import com.devian.detected.view.profile_tab.ProfileFragment;
-import com.devian.detected.view.tasks_tab.TaskViewModel;
-import com.devian.detected.view.profile_tab.ProfileViewModel;
-import com.devian.detected.view.tasks_tab.TaskFragment;
-import com.devian.detected.view.tasks_tab.TaskInfoFragment;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
+import com.devian.detected.model.domain.tasks.Task;
 import com.devian.detected.utils.ui.CustomViewPager;
 import com.devian.detected.utils.ui.PagerAdapter;
 import com.devian.detected.utils.ui.popups.DefaultPopup;
 import com.devian.detected.utils.ui.popups.ResultPopup;
+import com.devian.detected.view.auth.AuthActivity;
+import com.devian.detected.view.extra.ScanActivity;
+import com.devian.detected.view.interfaces.OnLogoutListener;
+import com.devian.detected.view.interfaces.OnTaskItemSelectedListener;
+import com.devian.detected.view.map_tab.MapViewModel;
+import com.devian.detected.view.profile_tab.ProfileViewModel;
+import com.devian.detected.view.tasks_tab.TaskInfoFragment;
+import com.devian.detected.view.tasks_tab.TaskViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -44,10 +44,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
-        implements
-        View.OnClickListener,
-        TaskFragment.OnTaskItemSelectedListener,
-        ProfileFragment.OnLogoutListener {
+        implements View.OnClickListener, OnTaskItemSelectedListener, OnLogoutListener{
 
     private static final String TAG = "MainActivity";
     private static final int CAMERA_PERMISSION_CODE = 100;
@@ -61,9 +58,14 @@ public class MainActivity extends AppCompatActivity
     private MapViewModel mapViewModel;
     private ProfileViewModel profileViewModel;
     
-    @BindView(R.id.fab_qr) FloatingActionButton fab_qr;
-    @BindView(R.id.tab_layout) TabLayout tabLayout;
-    @BindView(R.id.pager) CustomViewPager viewPager;
+    @BindView(R.id.fab_qr)
+    FloatingActionButton fab_qr;
+    @BindView(R.id.tab_layout)
+    TabLayout tabLayout;
+    @BindView(R.id.pager)
+    CustomViewPager viewPager;
+    @BindView(R.id.main_layoutError)
+    ConstraintLayout layoutError;
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity
     public void setupView() {
         Log.d(TAG, "setupView: ");
         tabLayout.setupWithViewPager(viewPager);
-        PagerAdapter pagerAdapter = new PagerAdapter(this, this);
+        PagerAdapter pagerAdapter = new PagerAdapter(this);
         viewPager = findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
         fab_qr.setOnClickListener(this);
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity
                 Task completedTask = taskDataWrapper.getObject();
                 showPopup(ResultPopup.RESULT_SUCCESS, completedTask.getReward());
                 taskViewModel.updateTaskList();
-                mapViewModel.updateMarkers();
+                mapViewModel.updateGeoTasks();
                 profileViewModel.updateInformation(firebaseUser.getUid());
             }
         });
@@ -197,14 +199,6 @@ public class MainActivity extends AppCompatActivity
         int count = getSupportFragmentManager().getBackStackEntryCount();
         if (count != 0) {
             getSupportFragmentManager().popBackStack();
-        }
-    }
-    
-    @Override
-    public void onAttachFragment(@NonNull Fragment fragment) {
-        if (fragment instanceof TaskFragment) {
-            TaskFragment taskFragment = (TaskFragment) fragment;
-            taskFragment.setOnTaskItemSelectedListener(this);
         }
     }
     

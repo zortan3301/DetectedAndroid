@@ -20,6 +20,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
 import com.devian.detected.utils.LocalStorage;
+import com.devian.detected.view.interfaces.OnTaskItemSelectedListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,7 @@ public class TaskFragment extends Fragment
 
     private static final String TAG = "TaskFragment";
 
-    private OnTaskItemSelectedListener callback;
+    private OnTaskItemSelectedListener taskItemSelectedCallback;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -120,6 +121,7 @@ public class TaskFragment extends Fragment
             if (tmp != null) {
                 tasks = tmp;
             }
+            refreshLayout.setRefreshing(savedInstanceState.getBoolean("refresh"));
         } else {
             GeoTextTask[] tmp = localStorage.getData("tasks", GeoTextTask[].class);
             if (tmp != null) {
@@ -136,6 +138,7 @@ public class TaskFragment extends Fragment
         super.onSaveInstanceState(outState);
         if (tasks != null)
             outState.putParcelableArrayList("tasks", tasks);
+        outState.putBoolean("refresh", refreshLayout.isRefreshing());
     }
 
 
@@ -192,15 +195,11 @@ public class TaskFragment extends Fragment
     @Override
     public void OnItemClicked(GeoTextTask task) {
         Log.d(TAG, "OnItemClicked: " + task.getTitle());
-        callback.onTaskItemSelected(task);
+        taskItemSelectedCallback.onTaskItemSelected(task);
     }
 
-    public void setOnTaskItemSelectedListener(OnTaskItemSelectedListener callback) {
+    public void setOnTaskItemSelectedListener(OnTaskItemSelectedListener listener) {
         Log.d(TAG, "setOnTaskItemSelectedListener");
-        this.callback = callback;
-    }
-    
-    public interface OnTaskItemSelectedListener {
-        void onTaskItemSelected(GeoTextTask task);
+        this.taskItemSelectedCallback = listener;
     }
 }

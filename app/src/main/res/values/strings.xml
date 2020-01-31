@@ -61,6 +61,7 @@
     <string name="result_activated">Данная метка уже была активирована</string>
     <string name="scan_result">scan result</string>
     <string name="reward">Награда: %s</string>
+    <string name="network_error">Нет соединения с сервером</string>
 
     <!-- Other -->
 

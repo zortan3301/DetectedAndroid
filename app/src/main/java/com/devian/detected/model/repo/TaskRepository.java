@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import lombok.Getter;
 import retrofit2.Call;
@@ -30,6 +31,11 @@ public class TaskRepository {
     private static final String TAG = "TaskRepository";
     
     private Gson gson = GsonSerializer.getInstance().getGson();
+    
+    @Getter
+    private MutableLiveData<UUID> mldNetworkError = new MutableLiveData<>();
+    @Getter
+    private MutableLiveData<UUID> mldNetworkSuccess = new MutableLiveData<>();
     
     @Getter
     private MutableLiveData<DataWrapper<List<GeoTask>>> mldGeoTaskList = new MutableLiveData<>();
@@ -46,6 +52,7 @@ public class TaskRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse:");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -66,6 +73,7 @@ public class TaskRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                mldNetworkError.setValue(UUID.randomUUID());
                 updateMldGeoTaskList();
             }
         });
@@ -79,6 +87,7 @@ public class TaskRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -99,6 +108,7 @@ public class TaskRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.d(TAG, "onFailure: ");
+                mldNetworkError.setValue(UUID.randomUUID());
                 updateMldGeoTextTaskList();
             }
         });
@@ -137,8 +147,9 @@ public class TaskRepository {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
-                ServerResponse serverResponse = response.body();
                 Log.d(TAG, "onResponse: ======== Response");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
+                ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
                     return;
@@ -161,6 +172,7 @@ public class TaskRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                mldNetworkError.setValue(UUID.randomUUID());
                 mldCompletedTask.setValue(new DataWrapper<>(ServerResponse.TYPE_TASK_FAILURE));
             }
         };

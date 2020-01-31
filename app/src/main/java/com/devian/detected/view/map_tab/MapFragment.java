@@ -1,10 +1,6 @@
 package com.devian.detected.view.map_tab;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,195 +17,144 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTask;
-import com.devian.detected.utils.LocalStorage;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.maps.Style;
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT;
-
-public class MapFragment extends Fragment implements
-        OnMapReadyCallback, View.OnClickListener {
-
+public class MapFragment extends Fragment
+        implements OnMapReadyCallback, View.OnClickListener, GoogleMap.OnMarkerClickListener {
+    
     private static final String TAG = "MapFragment";
-
-    private Context mContext;
-    private View mView;
+    
+    private GoogleMap mMap;
+    
     private MapViewModel viewModel;
-    private LocalStorage localStorage;
-
-    private static String MAP_STYLE;
-    private MapView mapView;
-    private SymbolManager symbolManager = null;
-
+    
+    @BindView(R.id.mapView)
+    MapView mapView;
     @BindView(R.id.fab_map_refresh)
     FloatingActionButton fab_refresh;
     private Animation fab_rotate;
-
-    private ArrayList<GeoTask> markers;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        Log.d(TAG, "onAttach");
-        super.onAttach(context);
-        mContext = context;
-    }
-
+    
+    private ArrayList<GeoTask> geoTasks;
+    
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
-        Mapbox.getInstance(mContext, getResources().getString(R.string.mapbox_access_token));
-        mView = inflater.inflate(R.layout.fragment_map, container, false);
-        ButterKnife.bind(this, mView);
-        viewModel = ViewModelProviders.of(getActivityNonNull()).get(MapViewModel.class);
-        localStorage = new LocalStorage(getActivityNonNull());
-
-        MAP_STYLE = getResources().getString(R.string.map_style);
-        mapView = mView.findViewById(R.id.mapView);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_map, container, false);
+        ButterKnife.bind(this, v);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-
-        fab_refresh.setOnClickListener(this);
-        fab_rotate = AnimationUtils.loadAnimation(getContext(), R.anim.fab_full_rotate);
-
+        
+        setupView();
         bindView();
-
-        return mView;
+        return v;
     }
-
+    
     private void bindView() {
         Log.d(TAG, "bindView: ");
-        viewModel.bindMarkers().observe(this, markersDataWrapper -> {
+        viewModel = ViewModelProviders.of(getActivityNonNull()).get(MapViewModel.class);
+        viewModel.bindGeoTasks().observe(this, markersDataWrapper -> {
             hideProgress();
             if (markersDataWrapper.getObject() != null)
-                markers = new ArrayList<>(markersDataWrapper.getObject());
-            displayMarkers(markers);
+                geoTasks = new ArrayList<>(markersDataWrapper.getObject());
+            displayGeoTasks(geoTasks);
         });
     }
-
-    private void updateMarkers() {
-        Log.d(TAG, "updateMarkers: ");
-        showProgress();
-        viewModel.updateMarkers();
-    }
-
-    private void displayMarkers(ArrayList<GeoTask> markers) {
-        Log.d(TAG, "displayMarkers: ");
-        if (symbolManager == null || markers == null)
-            return;
-        symbolManager.deleteAll();
-        for (GeoTask t : markers) {
-            symbolManager.create(new SymbolOptions()
-                    .withLatLng(new LatLng(t.getLatitude(), t.getLongitude()))
-                    .withIconImage("marker")
-                    .withIconSize(0.6f));
-        }
+    
+    private void setupView() {
+        fab_refresh.setOnClickListener(this);
+        fab_rotate = AnimationUtils.loadAnimation(getContext(), R.anim.fab_full_rotate);
     }
     
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated: ");
-        if (savedInstanceState != null) {
-            ArrayList<GeoTask> tmp = savedInstanceState.getParcelableArrayList("markers");
-            if (tmp != null)
-                markers = savedInstanceState.getParcelableArrayList("markers");
-        } else {
-            GeoTask[] tmp = localStorage.getData("markers", GeoTask[].class);
-            if (tmp != null) {
-                markers = new ArrayList<>(Arrays.asList(tmp));
-            }
-            updateMarkers();
-        }
-        displayMarkers(markers);
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "onMapReady: ");
+        mMap = googleMap;
+        setMapStyle();
+        setMapView();
+        updateGeoTasks();
     }
     
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-        if (markers != null)
-            outState.putParcelableArrayList("markers", markers);
-    }
-
-    @Override
-    public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-        Log.d(TAG, "onMapReady");
-        mapboxMap.setStyle(new Style.Builder().fromUri(MAP_STYLE), style -> {
-            Bitmap bitmapMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker);
-            style.addImage("marker", bitmapMarker);
-
-            symbolManager = new SymbolManager(mapView, mapboxMap, style);
-            symbolManager.setIconAllowOverlap(true);
-            symbolManager.setIconRotationAlignment(ICON_ROTATION_ALIGNMENT_VIEWPORT);
-            symbolManager.addClickListener(symbol -> {
-                DecimalFormat df = new DecimalFormat("#.######");
-                DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols();
-                formatSymbols.setDecimalSeparator('.');
-                df.setDecimalFormatSymbols(formatSymbols);
-                df.setRoundingMode(RoundingMode.CEILING);
-                String lat = df.format(symbol.getLatLng().getLatitude());
-                String lng = df.format(symbol.getLatLng().getLongitude());
-                final String snack_text = lat + ", " + lng;
-
-                Snackbar.make(mView, snack_text, Snackbar.LENGTH_LONG)
-                        .setAction("Копировать", view -> {
-                            ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-                            ClipData clip = ClipData.newPlainText("LatLng", snack_text);
-                            if (clipboard != null) {
-                                clipboard.setPrimaryClip(clip);
-                            }
-                        }).show();
-            });
-            displayMarkers(markers);
-        });
-
-        mapboxMap.getUiSettings().setZoomGesturesEnabled(true);
-        CameraPosition position = new CameraPosition.Builder()
-                .target(new LatLng(55.7, 37.6))
-                .zoom(10)
-                .bearing(360)
-                .tilt(45)
-                .build();
-
-        mapboxMap.animateCamera(CameraUpdateFactory
-                .newCameraPosition(position), 5000);
-    }
-
     @Override
     public void onClick(View view) {
         Log.d(TAG, "onClick: ");
         if (view.getId() == R.id.fab_map_refresh) {
             if (isRefreshAvailable()) {
                 showProgress();
-                updateMarkers();
+                updateGeoTasks();
             } else
                 hideProgress();
         }
     }
-
+    
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
+    }
+    
+    private void updateGeoTasks() {
+        Log.d(TAG, "updateGeoTasks: ");
+        showProgress();
+        viewModel.updateGeoTasks();
+    }
+    
+    private void displayGeoTasks(ArrayList<GeoTask> geoTasks) {
+        Log.d(TAG, "displayMarkers: ");
+        if (geoTasks == null || geoTasks.isEmpty()) {
+            return;
+        }
+        mMap.clear();
+        BitmapDescriptor markerIcon = BitmapDescriptorFactory.fromResource(R.drawable.marker);
+        for (GeoTask geoTask : geoTasks) {
+            mMap.addMarker(new MarkerOptions()
+                    .icon(markerIcon)
+                    .position(new LatLng(geoTask.getLatitude(), geoTask.getLongitude()))
+            );
+        }
+    }
+    
+    private void setMapView() {
+        Log.d(TAG, "setMapView: ");
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setMinZoomPreference(10.0f);
+        LatLngBounds MOSCOW_BOUNDS = new LatLngBounds(
+                new LatLng(55.575, 37.351),
+                new LatLng(55.912, 37.838)
+        );
+        mMap.setLatLngBoundsForCameraTarget(MOSCOW_BOUNDS);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MOSCOW_BOUNDS.getCenter(), 0));
+    }
+    
+    private void setMapStyle() {
+        Log.d(TAG, "setMapStyle: ");
+        try {
+            boolean success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            getActivityNonNull(), R.raw.map_style));
+            if (!success) {
+                Log.e(TAG, "setMapStyle: Style parsing failed");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
+    }
+    
     private Date lastRefresh = new Date();
 
     private boolean isRefreshAvailable() {
@@ -221,7 +166,7 @@ public class MapFragment extends Fragment implements
             return false;
         }
     }
-
+    
     private void showProgress() {
         Log.d(TAG, "showProgress: ");
         fab_refresh.startAnimation(fab_rotate);
@@ -240,40 +185,27 @@ public class MapFragment extends Fragment implements
             throw new RuntimeException("null returned from getActivity()");
         }
     }
-
-    @Override
-    public void onStart() {
-        Log.d(TAG, "onStart");
-        super.onStart();
-        mapView.onStart();
-    }
-
+    
     @Override
     public void onResume() {
-        Log.d(TAG, "onResume");
         super.onResume();
         mapView.onResume();
     }
-
+    
     @Override
     public void onPause() {
-        Log.d(TAG, "onPause");
         super.onPause();
-        mapView.onPause();
+        mapView.onResume();
     }
-
+    
     @Override
-    public void onStop() {
-        Log.d(TAG, "onStop");
-        super.onStop();
-        mapView.onStop();
-        if (markers != null)
-            localStorage.putData("markers", markers);
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
     }
-
+    
     @Override
     public void onLowMemory() {
-        Log.d(TAG, "onLowMemory");
         super.onLowMemory();
         mapView.onLowMemory();
     }

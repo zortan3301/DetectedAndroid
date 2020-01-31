@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import lombok.Getter;
 import retrofit2.Call;
@@ -28,6 +29,11 @@ public class ProfileRepository {
     private static final String TAG = "ProfileRepository";
 
     private Gson gson = GsonSerializer.getInstance().getGson();
+    
+    @Getter
+    private MutableLiveData<UUID> mldNetworkError = new MutableLiveData<>();
+    @Getter
+    private MutableLiveData<UUID> mldNetworkSuccess = new MutableLiveData<>();
 
     @Getter
     private MutableLiveData<DataWrapper<User>> mldUser = new MutableLiveData<>();
@@ -49,6 +55,7 @@ public class ProfileRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -69,6 +76,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                mldNetworkError.setValue(UUID.randomUUID());
                 updateMldUser(uid);
             }
         });
@@ -83,6 +91,7 @@ public class ProfileRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -103,6 +112,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                mldNetworkError.setValue(UUID.randomUUID());
                 updateMldUserStats(uid);
             }
         });
@@ -117,6 +127,7 @@ public class ProfileRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -137,6 +148,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                mldNetworkError.setValue(UUID.randomUUID());
                 updateMldSelfRank(uid);
             }
         });
@@ -150,6 +162,7 @@ public class ProfileRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -170,6 +183,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                mldNetworkError.setValue(UUID.randomUUID());
                 updateMldTop10();
             }
         });
@@ -183,6 +197,7 @@ public class ProfileRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -201,6 +216,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                mldNetworkError.setValue(UUID.randomUUID());
                 updateMldEvent();
             }
         });
@@ -215,6 +231,7 @@ public class ProfileRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -236,6 +253,7 @@ public class ProfileRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                mldNetworkError.setValue(UUID.randomUUID());
             }
         });
     }

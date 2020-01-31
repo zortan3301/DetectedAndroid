@@ -26,13 +26,13 @@ public class MapViewModel extends AndroidViewModel {
         repository = new TaskRepository();
     }
 
-    LiveData<DataWrapper<List<GeoTask>>> bindMarkers() {
-        Log.d(TAG, "bindMarkers: ");
+    LiveData<DataWrapper<List<GeoTask>>> bindGeoTasks() {
+        Log.d(TAG, "bindGeoTasks: ");
         return repository.getMldGeoTaskList();
     }
 
-    public void updateMarkers() {
-        Log.d(TAG, "updateMarkers: ");
+    public void updateGeoTasks() {
+        Log.d(TAG, "updateGeoTasks: ");
         repository.updateMldGeoTaskList();
     }
 

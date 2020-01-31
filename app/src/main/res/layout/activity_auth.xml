@@ -7,6 +7,44 @@
     android:background="@color/black"
     android:orientation="vertical">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/auth_layoutError"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/auth_ivError"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/network_error"
+            app:layout_constraintBottom_toBottomOf="@+id/auth_tvError"
+            app:layout_constraintEnd_toStartOf="@+id/auth_tvError"
+            app:layout_constraintTop_toTopOf="@+id/auth_tvError"
+            app:srcCompat="@drawable/ic_network_error" />
+
+        <TextView
+            android:id="@+id/auth_tvError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:fontFamily="@font/consola"
+            android:text="@string/network_error"
+            android:textColor="@color/red"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <Button
         android:id="@+id/auth_btnAuth"
         android:layout_width="wrap_content"

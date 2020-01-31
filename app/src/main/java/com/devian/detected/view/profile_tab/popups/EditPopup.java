@@ -41,7 +41,7 @@ public class EditPopup {
         currentUser = user;
         this.context = context;
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(context);
-        View mView = context.getLayoutInflater().inflate(R.layout.popup_change, null);
+        View mView = context.getLayoutInflater().inflate(R.layout.popup_edit, null);
 
         btnOK = mView.findViewById(R.id.changeNickname_btnOk);
         ImageView btnCancel = mView.findViewById(R.id.changeNickname_btnCancel);

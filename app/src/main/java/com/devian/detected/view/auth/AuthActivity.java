@@ -5,14 +5,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
-import com.devian.detected.model.domain.network.ServerResponse;
 import com.devian.detected.view.MainActivity;
 import com.devian.detected.view.MainViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -43,6 +42,8 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
     Button btnAuth;
     @BindView(R.id.auth_progress)
     AVLoadingIndicatorView progress;
+    @BindView(R.id.auth_layoutError)
+    ConstraintLayout layoutError;
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +74,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         viewModel.bindSignedUser().observe(this, userDataWrapper -> {
             hideProgress();
             if (userDataWrapper.isError()) {
-                showError(userDataWrapper.getCode());
+                showError();
             } else {
                 startMainActivity();
             }
@@ -83,6 +84,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.auth_btnAuth) {
+            showProgress();
             signIn();
         }
     }
@@ -90,25 +92,22 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        
+        Log.d(TAG, "onActivityResult: ");
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 if (account != null)
                     firebaseAuthWithGoogle(account);
-                else
-                    showError(ServerResponse.TYPE_AUTH_FAILURE);
             } catch (ApiException e) {
                 Log.w(TAG, "Google sign in failed", e);
-                showError(ServerResponse.TYPE_AUTH_FAILURE);
+                showError();
             }
         }
     }
     
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         Log.d(TAG, "FirebaseAuthWithGoogle:" + acct.getId());
-        showProgress();
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, task -> {
@@ -120,7 +119,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.e(TAG, "signInWithCredential:failure", task.getException());
-                        showError(ServerResponse.TYPE_AUTH_FAILURE);
+                        showError();
                     }
                 });
     }
@@ -136,9 +135,9 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         finish();
     }
     
-    private void showError(int code) {
-        Log.d(TAG, "showError: " + code);
-        Toast.makeText(this, "Нет соединения с сервером", Toast.LENGTH_SHORT).show();
+    private void showError() {
+        Log.d(TAG, "showError: ");
+        layoutError.setVisibility(View.VISIBLE);
     }
     
     private void showProgress() {

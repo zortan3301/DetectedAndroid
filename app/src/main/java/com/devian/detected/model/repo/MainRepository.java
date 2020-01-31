@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 
 import java.util.Map;
+import java.util.UUID;
 
 import lombok.Getter;
 import retrofit2.Call;
@@ -24,8 +25,13 @@ import retrofit2.Response;
 public class MainRepository {
 
     private static final String TAG = "MainRepository";
-
+    
     private Gson gson = GsonSerializer.getInstance().getGson();
+    
+    @Getter
+    private MutableLiveData<UUID> mldNetworkError = new MutableLiveData<>();
+    @Getter
+    private MutableLiveData<UUID> mldNetworkSuccess = new MutableLiveData<>();
     
     @Getter
     private MutableLiveData<DataWrapper<User>> mldSignedUser = new MutableLiveData<>();
@@ -44,6 +50,7 @@ public class MainRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
+                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -64,8 +71,10 @@ public class MainRepository {
             public void onFailure(@NonNull Call<ServerResponse> call,
                                   @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+                mldNetworkError.setValue(UUID.randomUUID());
                 DataWrapper<User> userDataWrapper = new DataWrapper<>(ServerResponse.TYPE_AUTH_FAILURE);
                 mldSignedUser.setValue(userDataWrapper);
+                authUser(user);
             }
         });
     }
