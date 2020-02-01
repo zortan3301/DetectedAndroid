@@ -20,6 +20,7 @@ import com.devian.detected.R;
 import com.devian.detected.model.domain.network.ServerResponse;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
 import com.devian.detected.model.domain.tasks.Task;
+import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.ui.CustomViewPager;
 import com.devian.detected.utils.ui.PagerAdapter;
 import com.devian.detected.utils.ui.popups.DefaultPopup;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     private TaskViewModel taskViewModel;
     private MapViewModel mapViewModel;
     private ProfileViewModel profileViewModel;
+    private LocalStorage localStorage;
     
     private ResultPopup resultPopup;
     
@@ -86,8 +88,10 @@ public class MainActivity extends AppCompatActivity
     }
     
     private void checkAuth() {
-        if (firebaseUser == null)
+        Boolean isLoggedIn = localStorage.getData("isLoggedIn", Boolean.class);
+        if (isLoggedIn == null || !isLoggedIn || firebaseUser == null) {
             startAuthActivity();
+        }
     }
 
     public void setupView() {
@@ -98,6 +102,7 @@ public class MainActivity extends AppCompatActivity
         viewPager.setAdapter(pagerAdapter);
         fab_qr.setOnClickListener(this);
         resultPopup = new ResultPopup(this);
+        localStorage = new LocalStorage(this);
     }
 
     public void bindView() {

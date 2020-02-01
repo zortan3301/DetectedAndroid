@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
+import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.view.MainActivity;
 import com.devian.detected.view.MainViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -37,6 +38,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private MainViewModel viewModel;
+    private LocalStorage localStorage;
     
     @BindView(R.id.auth_btnAuth)
     Button btnAuth;
@@ -52,7 +54,8 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
         
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-    
+        localStorage = new LocalStorage(this);
+        
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -74,8 +77,14 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         viewModel.bindSignedUser().observe(this, userDataWrapper -> {
             hideProgress();
             if (userDataWrapper.isError()) {
-                showError();
+                Boolean isLoggedIn = localStorage.getData("isLoggedIn", Boolean.class);
+                if (isLoggedIn == null || !isLoggedIn) {
+                    showError();
+                } else {
+                    startMainActivity();
+                }
             } else {
+                localStorage.putData("isLoggedIn", true);
                 startMainActivity();
             }
         });
