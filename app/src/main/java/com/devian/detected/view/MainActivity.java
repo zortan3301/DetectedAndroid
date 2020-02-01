@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity
     private MapViewModel mapViewModel;
     private ProfileViewModel profileViewModel;
     
+    private ResultPopup resultPopup;
+    
     @BindView(R.id.fab_qr)
     FloatingActionButton fab_qr;
     @BindView(R.id.tab_layout)
@@ -73,11 +75,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        taskViewModel = ViewModelProviders.of(this).get(TaskViewModel.class);
-        profileViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
-        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        mapViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
 
         mAuth = FirebaseAuth.getInstance();
         firebaseUser = mAuth.getCurrentUser();
@@ -100,21 +97,25 @@ public class MainActivity extends AppCompatActivity
         viewPager = findViewById(R.id.pager);
         viewPager.setAdapter(pagerAdapter);
         fab_qr.setOnClickListener(this);
+        resultPopup = new ResultPopup(this);
     }
 
     public void bindView() {
         Log.d(TAG, "bindView: ");
+        taskViewModel = ViewModelProviders.of(this).get(TaskViewModel.class);
+        profileViewModel = ViewModelProviders.of(this).get(ProfileViewModel.class);
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mapViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
+        
         mainViewModel.bindCompletedTask().observe(this, taskDataWrapper -> {
             if (taskDataWrapper.isError()) {
-                if (taskDataWrapper.getCode() == ServerResponse.TYPE_TASK_ALREADY_COMPLETED) {
-                    showPopup(ResultPopup.RESULT_ACTIVATED, 0);
-                }
-                if (taskDataWrapper.getCode() == ServerResponse.TYPE_TASK_FAILURE) {
-                    showPopup(ResultPopup.RESULT_FAILURE, 0);
-                }
+                if (taskDataWrapper.getCode() == ServerResponse.TYPE_TASK_ALREADY_COMPLETED)
+                    resultPopup.setResult(ResultPopup.RESULT_ACTIVATED, 0);
+                if (taskDataWrapper.getCode() == ServerResponse.TYPE_TASK_FAILURE)
+                    resultPopup.setResult(ResultPopup.RESULT_FAILURE, 0);
             } else {
                 Task completedTask = taskDataWrapper.getObject();
-                showPopup(ResultPopup.RESULT_SUCCESS, completedTask.getReward());
+                resultPopup.setResult(ResultPopup.RESULT_SUCCESS, completedTask.getReward());
                 taskViewModel.updateTaskList();
                 mapViewModel.updateGeoTasks();
                 profileViewModel.updateInformation(firebaseUser.getUid());
@@ -132,6 +133,7 @@ public class MainActivity extends AppCompatActivity
 
     public void proceedTask(String result) {
         Log.d(TAG, "proceedTask: " + result);
+        resultPopup.show();
         mainViewModel.proceedTag(result, firebaseUser.getUid());
     }
 
@@ -186,12 +188,6 @@ public class MainActivity extends AppCompatActivity
     
     public void showToast(String text, int duration) {
         Toast.makeText(this, text, duration).show();
-    }
-    
-    public void showPopup(int resultCode, int reward) {
-        ResultPopup resultPopup = new ResultPopup(
-                resultCode, reward, this);
-        resultPopup.show();
     }
     
     @Override

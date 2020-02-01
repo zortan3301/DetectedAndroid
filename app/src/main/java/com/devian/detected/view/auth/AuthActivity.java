@@ -140,8 +140,14 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         layoutError.setVisibility(View.VISIBLE);
     }
     
+    private void hideError() {
+        Log.d(TAG, "hideError: ");
+        layoutError.setVisibility(View.GONE);
+    }
+    
     private void showProgress() {
         Log.d(TAG, "showProgress: ");
+        hideError();
         progress.show();
         btnAuth.setVisibility(View.INVISIBLE);
     }

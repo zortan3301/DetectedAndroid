@@ -11,6 +11,7 @@
     <string name="dollar_more"><![CDATA[$>]]></string>
     <string name="try_later">Попробуйте позже</string>
     <string name="google_signin">Войти</string>
+    <string name="network_error">Нет соединения с сервером</string>
 
     <!-- Main Fragment (Activity) -->
     <string name="camera_permission">Для запуска сканера приложению необходим доступ к камере</string>
@@ -61,7 +62,7 @@
     <string name="result_activated">Данная метка уже была активирована</string>
     <string name="scan_result">scan result</string>
     <string name="reward">Награда: %s</string>
-    <string name="network_error">Нет соединения с сервером</string>
+    <string name="tag_progress">Подождите, метка обрабатывается</string>
 
     <!-- Other -->
 
