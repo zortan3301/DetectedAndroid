@@ -79,6 +79,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
             if (userDataWrapper.isError()) {
                 Boolean isLoggedIn = localStorage.getData("isLoggedIn", Boolean.class);
                 if (isLoggedIn == null || !isLoggedIn) {
+                    btnAuth.setVisibility(View.VISIBLE);
                     showError();
                 } else {
                     startMainActivity();
@@ -164,7 +165,6 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
     private void hideProgress() {
         Log.d(TAG, "hideProgress: ");
         progress.hide();
-        btnAuth.setVisibility(View.VISIBLE);
     }
     
     @Override

@@ -11,8 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -32,7 +30,7 @@ import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.ui.popups.DefaultPopup;
 import com.devian.detected.view.interfaces.OnLogoutListener;
 import com.devian.detected.view.profile_tab.popups.EditPopup;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
@@ -43,7 +41,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ProfileFragment extends Fragment
-        implements SwipeRefreshLayout.OnRefreshListener {
+        implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
 
     private static final String TAG = "ProfileFragment";
 
@@ -53,32 +51,6 @@ public class ProfileFragment extends Fragment
     private LocalStorage localStorage;
     
     private OnLogoutListener logoutCallback;
-
-    @BindView(R.id.profile_tvName)
-    TextView tvName;
-    @BindView(R.id.profile_tvPoints)
-    TextView tvPoints;
-    @BindView(R.id.profile_tvLevel)
-    TextView tvLevel;
-    @BindView(R.id.profile_tvScannedTags)
-    TextView tvScannedTags;
-    @BindView(R.id.profile_progressLevel)
-    ProgressBar progressLevel;
-    @BindView(R.id.profile_tvEvent)
-    TextView tvEvent;
-    @BindView(R.id.profile_tvRating)
-    TextView tvRating;
-    @BindView(R.id.profile_tvRating1)
-    TextView tvRating1;
-    @BindView(R.id.profile_tvRating2)
-    TextView tvRating2;
-    @BindView(R.id.profile_refreshLayout)
-    SwipeRefreshLayout refreshLayout;
-
-    private FloatingActionButton fab_settings, fab_exit, fab_edit;
-    private TextView tv_fab_exit, tv_fab_edit;
-    private Animation fab_open, fab_close, fab_clock, fab_anticlock;
-    private Boolean fab_settings_open = false;
 
     private User currentUser;
     private UserStats userStats;
@@ -99,15 +71,20 @@ public class ProfileFragment extends Fragment
         Log.d(TAG, "onCreateView");
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this, v);
-
-        viewModel = ViewModelProviders.of(getActivityNonNull()).get(ProfileViewModel.class);
-        localStorage = new LocalStorage(getActivityNonNull());
-        refreshLayout.setOnRefreshListener(this);
-        mAuth = FirebaseAuth.getInstance();
-        init_fab(v);
+    
+        setupView();
         bindView();
 
         return v;
+    }
+    
+    private void setupView() {
+        mAuth = FirebaseAuth.getInstance();
+        viewModel = ViewModelProviders.of(getActivityNonNull()).get(ProfileViewModel.class);
+        localStorage = new LocalStorage(getActivityNonNull());
+        refreshLayout.setOnRefreshListener(this);
+        fab_edit.setOnClickListener(this);
+        fab_exit.setOnClickListener(this);
     }
 
     private void bindView() {
@@ -300,58 +277,19 @@ public class ProfileFragment extends Fragment
         });
         popup.show();
     }
-
-    private void init_fab(@NonNull View v) {
-        Log.d(TAG, "init_fab");
-
-        fab_settings = v.findViewById(R.id.fab_settings);
-        fab_exit = v.findViewById(R.id.fab_exit);
-        fab_edit = v.findViewById(R.id.fab_edit);
-
-        fab_close = AnimationUtils.loadAnimation(getContext(), R.anim.fab_close);
-        fab_open = AnimationUtils.loadAnimation(getContext(), R.anim.fab_open);
-        fab_clock = AnimationUtils.loadAnimation(getContext(), R.anim.fab_rotate_clock);
-        fab_anticlock = AnimationUtils.loadAnimation(getContext(), R.anim.fab_rotate_anticlock);
-
-        tv_fab_exit = v.findViewById(R.id.profile_tv_fab_exit);
-        tv_fab_edit = v.findViewById(R.id.profile_tv_fab_edit);
-
-        fab_settings.setOnClickListener(view -> {
-            if (fab_settings_open) {
-                fab_exit.startAnimation(fab_close);
-                fab_edit.startAnimation(fab_close);
-                fab_settings.startAnimation(fab_anticlock);
-
-                fab_exit.setClickable(false);
-                fab_edit.setClickable(false);
-
-                tv_fab_exit.setVisibility(View.INVISIBLE);
-                tv_fab_edit.setVisibility(View.INVISIBLE);
-                tv_fab_exit.startAnimation(fab_close);
-                tv_fab_edit.startAnimation(fab_close);
-
-                fab_settings_open = false;
-            } else {
-                fab_exit.startAnimation(fab_open);
-                fab_edit.startAnimation(fab_open);
-                fab_settings.startAnimation(fab_clock);
-
-                fab_exit.setClickable(true);
-                fab_edit.setClickable(true);
-
-                tv_fab_exit.setVisibility(View.VISIBLE);
-                tv_fab_edit.setVisibility(View.VISIBLE);
-                tv_fab_exit.startAnimation(fab_open);
-                tv_fab_edit.startAnimation(fab_open);
-
-                fab_settings_open = true;
-            }
-        });
-
-        fab_exit.setOnClickListener(view -> popup_logout());
-        fab_edit.setOnClickListener(view -> popup_change());
+    
+    @Override
+    public void onClick(View view) {
+        Log.d(TAG, "onClick: ");
+        switch (view.getId()) {
+            case R.id.fab_edit:
+                popup_change();
+                break;
+            case R.id.fab_exit:
+                popup_logout();
+        }
     }
-
+    
     @Override
     public void onRefresh() {
         Log.d(TAG, "onRefresh");
@@ -405,4 +343,29 @@ public class ProfileFragment extends Fragment
     public void setOnLogoutListener(OnLogoutListener listener) {
         logoutCallback = listener;
     }
+    
+    @BindView(R.id.profile_tvName)
+    TextView tvName;
+    @BindView(R.id.profile_tvPoints)
+    TextView tvPoints;
+    @BindView(R.id.profile_tvLevel)
+    TextView tvLevel;
+    @BindView(R.id.profile_tvScannedTags)
+    TextView tvScannedTags;
+    @BindView(R.id.profile_progressLevel)
+    ProgressBar progressLevel;
+    @BindView(R.id.profile_tvEvent)
+    TextView tvEvent;
+    @BindView(R.id.profile_tvRating)
+    TextView tvRating;
+    @BindView(R.id.profile_tvRating1)
+    TextView tvRating1;
+    @BindView(R.id.profile_tvRating2)
+    TextView tvRating2;
+    @BindView(R.id.profile_refreshLayout)
+    SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.fab_exit)
+    FloatingActionButton fab_exit;
+    @BindView(R.id.fab_edit)
+    FloatingActionButton fab_edit;
 }

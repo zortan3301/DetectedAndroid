@@ -301,89 +301,45 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/fab_settings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/black"
-        android:clickable="true"
-        android:src="@drawable/ic_settings_yellow"
-        android:tint="@color/light_green"
-        app:borderWidth="1dp"
-        app:fabSize="normal"
+        app:menu_fab_size="normal"
+        app:menu_icon="@drawable/ic_settings_yellow"
+        app:menu_colorNormal="@color/black"
+        app:menu_showShadow="true"
+        app:menu_shadowColor="@color/fab_shadow"
+        app:menu_shadowRadius="4dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:pressedTranslationZ="12dp"
-        app:rippleColor="@color/lightBlue" />
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <TextView
-        android:id="@+id/profile_tv_fab_exit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="4dp"
-        android:background="@color/black"
-        android:fontFamily="@font/consola"
-        android:gravity="center_vertical|end"
-        android:text="@string/exit"
-        android:textAlignment="viewEnd"
-        android:textColor="@color/white"
-        android:textSize="22sp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/fab_exit"
-        app:layout_constraintEnd_toStartOf="@+id/fab_exit"
-        app:layout_constraintTop_toTopOf="@+id/fab_exit" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
+            app:fab_size="mini"
+            app:fab_colorNormal="@color/black"
+            app:fab_showShadow="true"
+            app:fab_shadowColor="@color/fab_shadow"
+            app:fab_shadowRadius="2dp"
+            app:fab_label="@string/edit" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_exit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:backgroundTint="@color/black"
-        android:clickable="true"
-        android:scaleType="center"
-        android:src="@drawable/ic_exit_white"
-        android:visibility="invisible"
-        app:borderWidth="1dp"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/fab_settings"
-        app:layout_constraintEnd_toEndOf="@+id/fab_settings"
-        app:layout_constraintStart_toStartOf="@+id/fab_settings"
-        app:rippleColor="@color/lightBlue" />
-
-    <TextView
-        android:id="@+id/profile_tv_fab_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:fontFamily="@font/consola"
-        android:gravity="center_vertical|end"
-        android:text="@string/edit"
-        android:textAlignment="viewEnd"
-        android:textColor="@color/white"
-        android:textSize="22sp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/fab_edit"
-        app:layout_constraintEnd_toStartOf="@+id/fab_edit"
-        app:layout_constraintTop_toTopOf="@+id/fab_edit" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/black"
-        android:clickable="true"
-        android:scaleType="center"
-        android:src="@drawable/ic_edit"
-        android:visibility="invisible"
-        app:borderWidth="1dp"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/fab_exit"
-        app:layout_constraintEnd_toEndOf="@+id/fab_exit"
-        app:layout_constraintStart_toStartOf="@+id/fab_exit"
-        app:rippleColor="@color/lightBlue" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_exit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_exit_white"
+            app:fab_size="mini"
+            app:fab_colorNormal="@color/black"
+            app:fab_showShadow="true"
+            app:fab_shadowColor="@color/fab_shadow"
+            app:fab_shadowRadius="2dp"
+            app:fab_label="@string/exit" />
+    </com.github.clans.fab.FloatingActionMenu>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
