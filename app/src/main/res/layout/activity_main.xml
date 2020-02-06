@@ -7,21 +7,6 @@
     android:id="@+id/fragment_main"
     android:background="@color/black">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_qr"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/black"
-        android:clickable="true"
-        android:tint="@color/light_green"
-        app:borderWidth="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/pager"
-        app:rippleColor="@color/lightBlue"
-        app:srcCompat="@drawable/ic_qr_code" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/main_layoutError"
         android:layout_width="0dp"
@@ -79,5 +64,20 @@
             app:tabTextColor="@color/lightBlue" />
 
     </com.devian.detected.utils.ui.CustomViewPager>
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_qr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_qr_code"
+        app:fab_colorNormal="@color/black"
+        app:fab_shadowColor="@color/fab_shadow"
+        app:fab_shadowRadius="4dp"
+        app:fab_showShadow="true"
+        app:fab_size="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/pager" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

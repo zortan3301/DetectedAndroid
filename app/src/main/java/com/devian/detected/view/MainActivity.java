@@ -33,10 +33,10 @@ import com.devian.detected.view.map_tab.MapViewModel;
 import com.devian.detected.view.profile_tab.ProfileViewModel;
 import com.devian.detected.view.tasks_tab.TaskInfoFragment;
 import com.devian.detected.view.tasks_tab.TaskViewModel;
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -62,14 +62,10 @@ public class MainActivity extends AppCompatActivity
     
     private ResultPopup resultPopup;
     
-    @BindView(R.id.fab_qr)
-    FloatingActionButton fab_qr;
-    @BindView(R.id.tab_layout)
-    TabLayout tabLayout;
-    @BindView(R.id.pager)
-    CustomViewPager viewPager;
-    @BindView(R.id.main_layoutError)
-    ConstraintLayout layoutError;
+    @BindView(R.id.fab_qr) FloatingActionButton fab_qr;
+    @BindView(R.id.tab_layout) TabLayout tabLayout;
+    @BindView(R.id.pager) CustomViewPager viewPager;
+    @BindView(R.id.main_layoutError) ConstraintLayout layoutError;
     
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
