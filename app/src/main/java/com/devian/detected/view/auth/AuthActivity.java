@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import androidx.annotation.Nullable;
@@ -40,31 +42,31 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
     private MainViewModel viewModel;
     private LocalStorage localStorage;
     
-    @BindView(R.id.auth_btnAuth)
-    Button btnAuth;
-    @BindView(R.id.auth_progress)
-    AVLoadingIndicatorView progress;
-    @BindView(R.id.auth_layoutError)
-    ConstraintLayout layoutError;
-    
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
         ButterKnife.bind(this);
         
+        setupView();
+        bindView();
+    }
+    
+    private void setupView() {
         viewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         localStorage = new LocalStorage(this);
-        
+    
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-    
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mAuth = FirebaseAuth.getInstance();
         
-        bindView();
+        slide_down = AnimationUtils.loadAnimation(getApplicationContext(),
+                R.anim.slide_down);
+        slide_up = AnimationUtils.loadAnimation(getApplicationContext(),
+                R.anim.slide_up);
     }
     
     private void bindView() {
@@ -79,7 +81,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
             if (userDataWrapper.isError()) {
                 Boolean isLoggedIn = localStorage.getData("isLoggedIn", Boolean.class);
                 if (isLoggedIn == null || !isLoggedIn) {
-                    btnAuth.setVisibility(View.VISIBLE);
+                    showAuthButton();
                     showError();
                 } else {
                     startMainActivity();
@@ -159,7 +161,7 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(TAG, "showProgress: ");
         hideError();
         progress.show();
-        btnAuth.setVisibility(View.INVISIBLE);
+        hideAuthButton();
     }
     
     private void hideProgress() {
@@ -167,8 +169,24 @@ public class AuthActivity extends AppCompatActivity implements View.OnClickListe
         progress.hide();
     }
     
+    private void showAuthButton() {
+        Log.d(TAG, "showAuthButton: ");
+        btnAuth.startAnimation(slide_up);
+    }
+    
+    private void hideAuthButton() {
+        Log.d(TAG, "hideAuthButton: ");
+        btnAuth.startAnimation(slide_down);
+    }
+    
     @Override
     public void onBackPressed() {
         Log.d(TAG, "onBackPressed: ");
     }
+    
+    @BindView(R.id.auth_btnAuth) Button btnAuth;
+    @BindView(R.id.auth_progress) AVLoadingIndicatorView progress;
+    @BindView(R.id.auth_layoutError) ConstraintLayout layoutError;
+    
+    Animation slide_down, slide_up;
 }
