@@ -4,21 +4,6 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_map_refresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/black"
-        android:clickable="true"
-        android:src="@drawable/ic_refresh"
-        android:tint="@color/light_green"
-        app:borderWidth="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:rippleColor="@color/lightBlue" />
-
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="0dp"
@@ -28,4 +13,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_map_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_refresh"
+        app:fab_colorNormal="@color/black"
+        app:fab_shadowColor="@color/fab_shadow"
+        app:fab_shadowRadius="4dp"
+        app:fab_showShadow="true"
+        app:fab_size="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.devian.detected.R;
 import com.devian.detected.model.domain.tasks.GeoTask;
+import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -28,7 +29,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,10 +45,8 @@ public class MapFragment extends Fragment
     
     private MapViewModel viewModel;
     
-    @BindView(R.id.mapView)
-    MapView mapView;
-    @BindView(R.id.fab_map_refresh)
-    FloatingActionButton fab_refresh;
+    @BindView(R.id.mapView) MapView mapView;
+    @BindView(R.id.fab_map_refresh) FloatingActionButton fab_refresh;
     private Animation fab_rotate;
     
     private ArrayList<GeoTask> geoTasks;
