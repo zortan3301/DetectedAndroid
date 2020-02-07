@@ -60,7 +60,7 @@
         android:text="@string/google_signin"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -71,7 +71,6 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
         android:autoSizeTextType="uniform"
         android:fontFamily="@font/hacked"
         android:gravity="center_horizontal|center_vertical"
@@ -79,12 +78,11 @@
         android:text="@string/app_name"
         android:textColor="@color/white"
         android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/auth_btnAuth"
+        app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.wang.avi.AVLoadingIndicatorView
         android:id="@+id/auth_progress"
@@ -97,6 +95,17 @@
         app:indicatorName="PacmanIndicator"
         style="AVLoadingIndicatorView.Large"
         app:layout_constraintBottom_toTopOf="@+id/auth_btnAuth"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="@font/consola"
+        android:text="@string/inspired_by_cicada"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

@@ -88,6 +88,11 @@ public class MainActivity extends AppCompatActivity
         if (isLoggedIn == null || !isLoggedIn || firebaseUser == null) {
             startAuthActivity();
         }
+        Boolean isFirstRun = localStorage.getData("isFirstRun", Boolean.class);
+        if (isFirstRun == null || isFirstRun) {
+            localStorage.putData("isFirstRun", false);
+            
+        }
     }
 
     public void setupView() {

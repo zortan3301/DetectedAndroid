@@ -12,6 +12,7 @@
     <string name="try_later">Попробуйте позже</string>
     <string name="google_signin">Войти</string>
     <string name="network_error">Нет соединения с сервером</string>
+    <string name="inspired_by_cicada">inspired by cicada</string>
 
     <!-- Main Fragment (Activity) -->
     <string name="camera_permission">Для запуска сканера приложению необходим доступ к камере</string>

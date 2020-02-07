@@ -81,7 +81,4 @@ dependencies {
 
     //FloatingActionButton
     implementation 'com.github.clans:fab:1.6.4'
-
-    //FillableLoader
-    implementation 'com.github.jorgecastilloprz:fillableloaders:1.03'
 }
