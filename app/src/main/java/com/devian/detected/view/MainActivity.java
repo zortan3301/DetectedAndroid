@@ -84,17 +84,21 @@ public class MainActivity extends AppCompatActivity
     }
     
     private void checkAuth() {
+        Log.d(TAG, "checkAuth: ");
         Boolean isLoggedIn = localStorage.getData("isLoggedIn", Boolean.class);
         if (isLoggedIn == null || !isLoggedIn || firebaseUser == null) {
+            Log.d(TAG, "checkAuth: isLoggedIn == null || !isLoggedIn || firebaseUser == null");
             startAuthActivity();
-        }
-        Boolean isFirstRun = localStorage.getData("isFirstRun", Boolean.class);
-        if (isFirstRun == null || isFirstRun) {
-            localStorage.putData("isFirstRun", false);
-            
+        } else {
+            Boolean isFirstRun = localStorage.getData("isFirstRun", Boolean.class);
+            if (isFirstRun == null || isFirstRun) {
+                Log.d(TAG, "checkAuth: isFirstRun == null || isFirstRun");
+                localStorage.putData("isFirstRun", false);
+                
+            }
         }
     }
-
+    
     public void setupView() {
         Log.d(TAG, "setupView: ");
         tabLayout.setupWithViewPager(viewPager);
@@ -228,6 +232,7 @@ public class MainActivity extends AppCompatActivity
     }
     
     public void startAuthActivity() {
+        Log.d(TAG, "startAuthActivity: ");
         Intent authIntent = new Intent(this, AuthActivity.class);
         startActivity(authIntent);
         finish();
