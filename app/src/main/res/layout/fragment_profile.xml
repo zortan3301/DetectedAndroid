@@ -312,7 +312,7 @@
         app:menu_colorNormal="@color/black"
         app:menu_showShadow="true"
         app:menu_shadowColor="@color/fab_shadow"
-        app:menu_shadowRadius="4dp"
+        app:menu_shadowRadius="2dp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
