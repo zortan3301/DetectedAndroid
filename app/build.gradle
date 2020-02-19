@@ -81,4 +81,7 @@ dependencies {
 
     // FloatingActionButton
     implementation 'com.github.clans:fab:1.6.4'
+
+    // AppIntro
+    implementation 'com.github.AppIntro:AppIntro:5.1.0'
 }

@@ -17,9 +17,9 @@ public class NetworkModule {
 
     private static NetworkModule mInstance;
 
-    private static final String BASE_URL = "http://185.127.24.48:8080/"; // cloud4box
+    //private static final String BASE_URL = "http://185.127.24.48:8080/"; // cloud4box
     //private static final String BASE_URL = "http://192.168.1.40:8080"; // for OnePlus // 51-pc, 53-laptop
-    //private static final String BASE_URL = "http://10.0.2.2:8080"; // for emulator
+    private static final String BASE_URL = "http://10.0.2.2:8080"; // for emulator
 
     private Retrofit mRetrofit;
 
