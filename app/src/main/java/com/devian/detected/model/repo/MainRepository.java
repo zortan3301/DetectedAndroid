@@ -3,6 +3,7 @@ package com.devian.detected.model.repo;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import com.devian.detected.model.domain.DataWrapper;
@@ -40,7 +41,7 @@ public class MainRepository {
         Log.d(TAG, "authUser: ");
         User mUser = new User(
                 user.getUid(),
-                user.getDisplayName(),
+                getDisplayName(user.getEmail()),
                 user.getEmail()
         );
         Map<String, String> headers = NetworkModule.getInstance().proceedHeader(gson.toJson(mUser));
@@ -77,5 +78,13 @@ public class MainRepository {
                 authUser(user);
             }
         });
+    }
+    
+    private String getDisplayName(@Nullable String email) {
+        Log.d(TAG, "getDisplayName: " + email);
+        if (email == null) {
+            return UUID.randomUUID().toString().split("-")[0];
+        }
+        return email.split("@")[0].toLowerCase().replace('.', '_');
     }
 }
