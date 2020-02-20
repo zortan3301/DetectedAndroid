@@ -85,6 +85,7 @@ public class ProfileFragment extends Fragment
         refreshLayout.setOnRefreshListener(this);
         fab_edit.setOnClickListener(this);
         fab_exit.setOnClickListener(this);
+        fab_info.setOnClickListener(this);
     }
 
     private void bindView() {
@@ -278,6 +279,11 @@ public class ProfileFragment extends Fragment
         popup.show();
     }
     
+    private void popup_info() {
+        Log.d(TAG, "popup_info: ");
+        
+    }
+    
     @Override
     public void onClick(View view) {
         Log.d(TAG, "onClick: ");
@@ -287,6 +293,9 @@ public class ProfileFragment extends Fragment
                 break;
             case R.id.fab_exit:
                 popup_logout();
+                break;
+            case R.id.fab_info:
+                popup_info();
         }
     }
     
@@ -368,4 +377,6 @@ public class ProfileFragment extends Fragment
     FloatingActionButton fab_exit;
     @BindView(R.id.fab_edit)
     FloatingActionButton fab_edit;
+    @BindView(R.id.fab_info)
+    FloatingActionButton fab_info;
 }

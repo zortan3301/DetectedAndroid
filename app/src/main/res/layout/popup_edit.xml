@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/black_shape_with_white_stroke"
     android:orientation="vertical"
     android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textView15"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:fontFamily="@font/consola"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="@string/dollar_more"
+        android:textAlignment="center"
+        android:textColor="@color/light_green"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/spinner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/spinner" />
 
     <EditText
         android:id="@+id/changeNickname_etNickname"
@@ -70,29 +86,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:foreground="@drawable/selectable_item_background"
         android:contentDescription="@string/button_cancel"
+        android:foreground="@drawable/selectable_item_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_yellow" />
 
     <com.wang.avi.AVLoadingIndicatorView
         android:id="@+id/changeNickname_progress"
+        style="AVLoadingIndicatorView.Large"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="invisible"
         app:indicatorName="BallPulseIndicator"
-        style="AVLoadingIndicatorView.Large"
         app:layout_constraintBottom_toBottomOf="@+id/changeNickname_btnOk"
         app:layout_constraintEnd_toEndOf="@+id/changeNickname_btnOk"
         app:layout_constraintStart_toStartOf="@+id/changeNickname_btnOk"
-        app:layout_constraintTop_toTopOf="@+id/changeNickname_btnOk"/>
+        app:layout_constraintTop_toTopOf="@+id/changeNickname_btnOk" />
 
     <Button
         android:id="@+id/changeNickname_btnOk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:background="@color/black"
         android:clickable="true"
         android:fontFamily="@font/consola"
@@ -103,7 +119,18 @@
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/changeNickname_tvWarning"
+        app:layout_constraintTop_toBottomOf="@+id/spinner"
         app:rippleColor="@color/lightBlue" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:dropDownWidth="wrap_content"
+        android:entries="@array/cities"
+        app:layout_constraintEnd_toEndOf="@+id/changeNickname_etNickname"
+        app:layout_constraintStart_toStartOf="@+id/changeNickname_etNickname"
+        app:layout_constraintTop_toBottomOf="@+id/changeNickname_tvWarning" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
