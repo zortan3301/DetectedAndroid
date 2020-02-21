@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
@@ -30,6 +32,7 @@ public class EditPopup {
     private ImageView ivError;
     private TextView tvWarning;
     private AVLoadingIndicatorView progressBar;
+    private Spinner spinner;
 
     private AlertDialog dialog;
     private FragmentActivity context;
@@ -49,6 +52,12 @@ public class EditPopup {
         ivError = mView.findViewById(R.id.changeNickname_imgError);
         tvWarning = mView.findViewById(R.id.changeNickname_tvWarning);
         progressBar = mView.findViewById(R.id.changeNickname_progress);
+        spinner = mView.findViewById(R.id.spinner);
+        
+        String[] cities = context.getResources().getStringArray(R.array.cities);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
+                R.layout.spinner_layout, R.id.spinner_textView, cities);
+        spinner.setAdapter(adapter);
 
         mBuilder.setView(mView);
         dialog = mBuilder.create();
