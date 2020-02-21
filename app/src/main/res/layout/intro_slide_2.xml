@@ -24,7 +24,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView8"
-            app:srcCompat="@drawable/image_slide_2"
+            app:srcCompat="@drawable/slide2_image"
             android:contentDescription="@string/map_with_markers"/>
 
         <TextView

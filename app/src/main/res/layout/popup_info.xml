@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/black"
+    android:layout_height="wrap_content"
+    android:background="@drawable/black_shape_with_white_stroke"
     android:orientation="vertical"
     android:padding="16dp">
 
@@ -20,23 +20,30 @@
 
     <TextView
         android:id="@+id/popupInfo_tvAppName"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:autoSizeTextType="uniform"
         android:fontFamily="@font/hacked"
+        android:maxLines="1"
         android:text="@string/app_name"
+        android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="32sp"
+        android:textSize="64sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/popupInfo_btnCancel" />
 
     <TextView
         android:id="@+id/popupInfo_tvWebsite"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:autoSizeMaxTextSize="18sp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/roboto"
         android:text="@string/website"
+        android:textAlignment="center"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,27 +51,61 @@
 
     <TextView
         android:id="@+id/popupInfo_tvUid"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
+        android:autoSizeMaxTextSize="16sp"
         android:autoSizeTextType="uniform"
-        android:fontFamily="@font/consola"
+        android:fontFamily="@font/roboto"
         android:maxLines="1"
         android:text="@string/uid"
         android:textAlignment="center"
-        android:textSize="20sp"
+        android:textColor="@color/lightBlue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/popupInfo_tvSendEmail" />
+
+    <TextView
+        android:id="@+id/popupInfo_tvSendEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/roboto"
+        android:maxLines="3"
+        android:text="@string/send_email"
+        android:textAlignment="center"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/popupInfo_tvWebsite" />
 
     <TextView
-        android:id="@+id/popupInfo_tvSendEmail"
+        android:id="@+id/popupInfo_tvLicenseHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/send_email"
-        android:textAlignment="center"
+        android:fontFamily="@font/roboto"
+        android:text="@string/license_header"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/popupInfo_tvUid" />
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/popupInfo_tvLicenseHeader">
+
+        <TextView
+            android:id="@+id/popupInfo_tvLicense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto"
+            android:text="@string/licenses"
+            android:textSize="14sp" />
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,7 +21,9 @@
         tools:ignore="GoogleAppIndexingWarning"
         android:allowBackup="true">
 
-        <activity android:name=".view.MainActivity">
+        <activity
+            android:name=".view.MainActivity"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
