@@ -28,9 +28,9 @@
     <string name="scanned_tags">Просканировано меток:</string>
     <string name="rank">место</string>
     <string name="common_ranking">Общий рейтинг:</string>
-    <string name="exit">выход</string>
-    <string name="edit">изменить</string>
-    <string name="info">инфо</string>
+    <string name="exit">Выход</string>
+    <string name="edit">Изменить</string>
+    <string name="info">Информация</string>
     <string name="nickname_less6">Никнейм должен быть не короче 6 символов</string>
     <string name="nickname_exists">Данный никнейм уже занят</string>
 
