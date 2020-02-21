@@ -31,6 +31,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
+import java.util.Date;
+import java.util.UUID;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -128,6 +131,18 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
                 onBackButtonClick();
         }
     }
+    
+    private Date lastRefresh = new Date(1);
+    
+    private boolean isRefreshAvailable() {
+        Date currTime = new Date();
+        if (currTime.getTime() - lastRefresh.getTime() >= getResources().getInteger(R.integer.refresh_delay)) {
+            lastRefresh = currTime;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     private void onBackButtonClick() {
         Log.d(TAG, "onBackButtonClick: ");
@@ -136,6 +151,9 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
 
     private void onSaveButtonClick() {
         Log.d(TAG, "onSaveButtonClick: ");
+        if (!isRefreshAvailable()) {
+            return;
+        }
         if (getActivityNonNull().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             DefaultPopup popupPermissions =
@@ -180,7 +198,7 @@ public class TaskInfoFragment extends Fragment implements View.OnClickListener {
         MediaStore.Images.Media.insertImage(
                 getActivityNonNull().getContentResolver(),
                 bitmap,
-                task.getTitle(),
+                task.getTitle() + "_" + UUID.randomUUID(),
                 task.getDescription()
         );
         Toast.makeText(getActivityNonNull(),
