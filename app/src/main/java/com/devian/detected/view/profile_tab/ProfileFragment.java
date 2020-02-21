@@ -30,6 +30,7 @@ import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.ui.popups.DefaultPopup;
 import com.devian.detected.view.interfaces.OnLogoutListener;
 import com.devian.detected.view.profile_tab.popups.EditPopup;
+import com.devian.detected.view.profile_tab.popups.InfoPopup;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -281,7 +282,8 @@ public class ProfileFragment extends Fragment
     
     private void popup_info() {
         Log.d(TAG, "popup_info: ");
-        
+        InfoPopup popup = new InfoPopup(getActivityNonNull(), currentUser);
+        popup.show();
     }
     
     @Override

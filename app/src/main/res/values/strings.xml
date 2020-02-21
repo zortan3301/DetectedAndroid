@@ -77,4 +77,9 @@
     <string name="slide2_text">Поэтому мы решили обьеденить понимающих людей в одну сеть и разработали новую технологию с помощью сканирования меток. Так мы сможем объединиться. Сканируйте метки, отмеченные на карте, либо выполняйте задания.</string>
     <string name="slide2_header">Свободный интернет - это миф!</string>
 
+    <!-- Info popup -->
+    <string name="website">detected.space</string>
+    <string name="uid">UID:</string>
+    <string name="send_email">Все вопросы отправлять на e-mail: detectedinfo@protonmail.com с указанием своего UID</string>
+
 </resources>
