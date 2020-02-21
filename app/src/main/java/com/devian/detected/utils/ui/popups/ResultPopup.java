@@ -55,6 +55,7 @@ public class ResultPopup {
     
     private void dismiss() {
         mDialog.dismiss();
+        loading.setVisibility(View.VISIBLE);
     }
     
     public void setResult(int resultCode, int reward) {

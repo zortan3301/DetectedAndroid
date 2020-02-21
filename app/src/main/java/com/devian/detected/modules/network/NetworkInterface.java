@@ -10,39 +10,36 @@ import retrofit2.http.HeaderMap;
 import retrofit2.http.POST;
 
 public interface NetworkInterface {
-    @GET("/testConnection")
-    Call<ServerResponse> testConnection();
-
-    @GET("/auth")
+    @GET("auth")
     Call<ServerResponse> auth(@HeaderMap Map<String, String> headers);
 
-    @GET("/getUserInfo")
+    @GET("getUserInfo")
     Call<ServerResponse> getUserInfo(@HeaderMap Map<String, String> headers);
 
-    @GET("/getUserStats")
+    @GET("getUserStats")
     Call<ServerResponse> getUserStats(@HeaderMap Map<String, String> headers);
 
-    @GET("/getMapTasks")
+    @GET("getMapTasks")
     Call<ServerResponse> getMapTasks();
 
-    @GET("/getTextTasks")
+    @GET("getTextTasks")
     Call<ServerResponse> getTextTasks();
     
-    @POST("/scanGeoTag")
+    @POST("scanGeoTag")
     Call<ServerResponse> scanGeoTag(@HeaderMap Map<String, String> headers);
     
-    @POST("/scanGeoTextTag")
+    @POST("scanGeoTextTag")
     Call<ServerResponse> scanGeoTextTag(@HeaderMap Map<String, String> headers);
 
-    @GET("/getRankTop10")
+    @GET("getRankTop10")
     Call<ServerResponse> getRankTop10();
 
-    @GET("/getSelfRank")
+    @GET("getSelfRank")
     Call<ServerResponse> getSelfRank(@HeaderMap Map<String, String> headers);
 
-    @GET("/getEvent")
+    @GET("getEvent")
     Call<ServerResponse> getEvent();
 
-    @POST("/changeNickname")
+    @POST("changeNickname")
     Call<ServerResponse> changeNickname(@HeaderMap Map<String, String> headers);
 }
