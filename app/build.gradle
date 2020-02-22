@@ -1,7 +1,20 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\Maksim\\.keys\\detected.keystore')
+            storePassword 'bd72uem2mbs3'
+            keyAlias = 'release_key'
+            keyPassword 'bd72uem2mbs3'
+        }
+        debug {
+            storeFile file('C:\\Users\\Maksim\\.android\\debug.keystore')
+            keyAlias = 'androiddebugkey'
+            storePassword 'android'
+            keyPassword 'android'
+        }
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
@@ -16,6 +29,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable = true
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
@@ -72,8 +90,8 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.10'
-    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
 
     // AVLoadingIndicator
     implementation 'com.wang.avi:library:2.1.3'
@@ -85,3 +103,5 @@ dependencies {
     // AppIntro
     implementation 'com.github.AppIntro:AppIntro:5.1.0'
 }
+
+apply plugin: 'com.google.gms.google-services'

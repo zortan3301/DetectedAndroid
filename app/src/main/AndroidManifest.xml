@@ -33,7 +33,9 @@
         <activity android:name=".view.auth.AuthActivity" />
         <activity android:name=".view.extra.intro.IntroActivity"/>
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCF8xG7m5YTjQDNtjF2tuqnsLoQLBZPrOQ"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_api_key"/>
     </application>
 
 </manifest>

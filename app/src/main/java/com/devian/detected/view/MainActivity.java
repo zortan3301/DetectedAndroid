@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "onLogout: ");
         mAuth.signOut();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(getResources().getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
