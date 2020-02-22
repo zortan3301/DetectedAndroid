@@ -17,9 +17,9 @@ public class NetworkModule {
 
     private static NetworkModule mInstance;
 
-    private static final String BASE_URL = "http://194.87.111.46/api/"; // ruvds
-    //private static final String BASE_URL = "http://192.168.1.40:8080"; // for OnePlus // 51-pc, 53-laptop
-    //private static final String BASE_URL = "http://10.0.2.2:8080"; // for emulator
+    //private static final String BASE_URL = "http://194.87.111.46/api/"; // ruvds
+    private static final String BASE_URL = "http://192.168.1.53:8080/api/"; // laptop
+    //private static final String BASE_URL = "http://10.0.2.2:8080/api/"; // for emulator
 
     private Retrofit mRetrofit;
 
@@ -53,6 +53,24 @@ public class NetworkModule {
             headers.put("data", SecurityModule.encrypt(data));
         } else {
             headers.put("data", data);
+        }
+        return headers;
+    }
+    
+    public Map<String, String> proceedHeaders(HashMap<String, String> data) {
+        Map<String, String> headers = new HashMap<>();
+        if (encryptionEnabled) {
+            for (Map.Entry<String, String> stringStringEntry : data.entrySet()) {
+                headers.put(
+                        ((Map.Entry) stringStringEntry).getKey().toString(),
+                        SecurityModule.encrypt(((Map.Entry) stringStringEntry).getValue().toString()));
+            }
+        } else {
+            for (Map.Entry<String, String> stringStringEntry : data.entrySet()) {
+                headers.put(
+                        ((Map.Entry) stringStringEntry).getKey().toString(),
+                        ((Map.Entry) stringStringEntry).getValue().toString());
+            }
         }
         return headers;
     }

@@ -42,4 +42,9 @@ public interface NetworkInterface {
 
     @POST("changeNickname")
     Call<ServerResponse> changeNickname(@HeaderMap Map<String, String> headers);
+    
+    /* Admin options*/
+    
+    @POST("addTag")
+    Call<ServerResponse> addTag(@HeaderMap Map<String, String> headers);
 }

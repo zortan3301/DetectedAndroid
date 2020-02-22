@@ -42,7 +42,6 @@ public class MapFragment extends Fragment
     private static final String TAG = "MapFragment";
     
     private GoogleMap mMap;
-    
     private MapViewModel viewModel;
     
     @BindView(R.id.mapView) MapView mapView;
@@ -114,7 +113,7 @@ public class MapFragment extends Fragment
     
     private void displayGeoTasks(ArrayList<GeoTask> geoTasks) {
         Log.d(TAG, "displayMarkers: ");
-        if (geoTasks == null || geoTasks.isEmpty()) {
+        if (geoTasks == null || geoTasks.isEmpty() || mMap == null) {
             return;
         }
         mMap.clear();

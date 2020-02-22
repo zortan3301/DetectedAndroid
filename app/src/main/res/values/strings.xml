@@ -10,7 +10,7 @@
     <string name="restrict">Запретить</string>
     <string name="dollar_more"><![CDATA[$>]]></string>
     <string name="try_later">Попробуйте позже</string>
-    <string name="google_signin">Войти</string>
+    <string name="sign_in">Войти</string>
     <string name="network_error">Нет соединения с сервером</string>
     <string name="inspired_by_cicada">inspired by cicada</string>
 
@@ -77,6 +77,23 @@
     <string name="map_with_markers">Карта с метками</string>
     <string name="slide2_text">Поэтому мы решили объединить понимающих людей в одну сеть и разработали новую технологию с помощью сканирования меток. Так мы сможем объединиться. Сканируйте метки, отмеченные на карте, либо выполняйте задания.</string>
     <string name="slide2_header">Свободный интернет - это миф!</string>
+
+    <!-- Admin mode -->
+    <string name="admin_mode_activated">Режим администратора активирован</string>
+    <string name="scan_tag_to_add">Для добавления метки, отсканируйте ее</string>
+    <string name="error_scan_tag">Ошибка считывания метки, попробуйте заново</string>
+    <string name="id">id:</string>
+    <string name="tag_type">Тип метки:</string>
+    <string name="continue_to_add_lat_lng">Нажмите далее, чтобы указать координаты</string>
+    <string name="move_marker">Переместите маркер на карте, чтобы выбрать координаты</string>
+    <string name="latitude">Широта:</string>
+    <string name="longitude">Долгота:</string>
+    <string name="check_and_continue">Подтвердите данные и нажмите кнопку загрузки</string>
+    <string name="upload">Загрузить</string>
+    <string name="not_enough_permissions">У вас недостаточно прав для загрузки тэгов</string>
+    <string name="error_uploading">Ошибка загрузки, попробуйте заново</string>
+    <string name="upload_success">Успешно загружено</string>
+    <string name="button_flashlight">button flashlight</string>
 
     <!-- Info popup -->
     <string name="website">detected.space</string>

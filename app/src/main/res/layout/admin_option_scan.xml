@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <me.dm7.barcodescanner.zxing.ZXingScannerView
+        android:id="@+id/admin_scanner"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/admin_tvScanTag">
+
+    </me.dm7.barcodescanner.zxing.ZXingScannerView>
+
+    <ImageView
+        android:id="@+id/admin_btnFlash"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@+id/admin_scanner"
+        app:layout_constraintTop_toTopOf="@+id/admin_scanner"
+        app:srcCompat="@drawable/ic_flashlight"
+        android:contentDescription="@string/button_flashlight" />
+
+    <TextView
+        android:id="@+id/admin_tvScanTag"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/roboto"
+        android:maxLines="1"
+        android:text="@string/scan_tag_to_add"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/admin_btnReset"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/admin_scanner"
+        app:layout_constraintEnd_toEndOf="@+id/admin_scanner"
+        app:layout_constraintStart_toStartOf="@+id/admin_scanner"
+        app:layout_constraintTop_toTopOf="@+id/admin_scanner"
+        app:srcCompat="@drawable/ic_refresh"
+        android:contentDescription="@string/button_cancel" />
+
+    <TextView
+        android:id="@+id/admin_tvWarning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:fontFamily="@font/roboto"
+        android:text="@string/error_scan_tag"
+        android:textAlignment="center"
+        android:textColor="@color/red"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/admin_scanner" />
+
+    <TextView
+        android:id="@+id/admin_tvTagIdHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/roboto"
+        android:gravity="center_vertical"
+        android:text="@string/id"
+        android:textColor="@color/light_green"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/admin_scanner"
+        app:layout_constraintTop_toBottomOf="@+id/admin_tvWarning" />
+
+    <TextView
+        android:id="@+id/admin_tvTagId"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/roboto"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:textAlignment="gravity"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/admin_tvTagIdHeader"
+        app:layout_constraintEnd_toEndOf="@+id/admin_scanner"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/admin_tvTagIdHeader"
+        app:layout_constraintTop_toTopOf="@+id/admin_tvTagIdHeader" />
+
+    <TextView
+        android:id="@+id/admin_tvTagTypeHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/roboto"
+        android:gravity="center_vertical"
+        android:text="@string/tag_type"
+        android:textColor="@color/light_green"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/admin_tvTagIdHeader"
+        app:layout_constraintTop_toBottomOf="@+id/admin_tvTagIdHeader" />
+
+    <TextView
+        android:id="@+id/admin_tvTagType"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/roboto"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/admin_tvTagTypeHeader"
+        app:layout_constraintEnd_toEndOf="@+id/admin_tvTagId"
+        app:layout_constraintStart_toEndOf="@+id/admin_tvTagTypeHeader"
+        app:layout_constraintTop_toTopOf="@+id/admin_tvTagTypeHeader" />
+
+    <TextView
+        android:id="@+id/admin_tvContinue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="@font/roboto"
+        android:text="@string/continue_to_add_lat_lng"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/admin_tvTagType" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,6 +32,7 @@
         <activity android:name=".view.extra.ScanActivity" />
         <activity android:name=".view.auth.AuthActivity" />
         <activity android:name=".view.extra.intro.IntroActivity"/>
+        <activity android:name=".view.extra.admin.AdminActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

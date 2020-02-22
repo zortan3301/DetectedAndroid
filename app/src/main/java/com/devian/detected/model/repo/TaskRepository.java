@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.devian.detected.model.domain.DataWrapper;
 import com.devian.detected.model.domain.tasks.GeoTask;
 import com.devian.detected.model.domain.tasks.GeoTextTask;
+import com.devian.detected.model.domain.tasks.Tag;
 import com.devian.detected.model.domain.tasks.Task;
 import com.devian.detected.modules.network.GsonSerializer;
 import com.devian.detected.modules.network.NetworkModule;
@@ -16,9 +17,9 @@ import com.devian.detected.model.domain.network.ServerResponse;
 import com.google.gson.Gson;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import lombok.Getter;
 import retrofit2.Call;
@@ -33,16 +34,13 @@ public class TaskRepository {
     private Gson gson = GsonSerializer.getInstance().getGson();
     
     @Getter
-    private MutableLiveData<UUID> mldNetworkError = new MutableLiveData<>();
-    @Getter
-    private MutableLiveData<UUID> mldNetworkSuccess = new MutableLiveData<>();
-    
-    @Getter
     private MutableLiveData<DataWrapper<List<GeoTask>>> mldGeoTaskList = new MutableLiveData<>();
     @Getter
     private MutableLiveData<DataWrapper<List<GeoTextTask>>> mldGeoTextTasks = new MutableLiveData<>();
     @Getter
     private MutableLiveData<DataWrapper<Task>> mldCompletedTask = new MutableLiveData<>();
+    @Getter
+    private MutableLiveData<DataWrapper<Tag>> mldAddedTag = new MutableLiveData<>();
     
     public void updateMldGeoTaskList() {
         Log.d(TAG, "updateMldGeoTaskList: ");
@@ -52,7 +50,6 @@ public class TaskRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse:");
-                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -73,7 +70,6 @@ public class TaskRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
-                mldNetworkError.setValue(UUID.randomUUID());
                 updateMldGeoTaskList();
             }
         });
@@ -87,7 +83,6 @@ public class TaskRepository {
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ");
-                mldNetworkSuccess.setValue(UUID.randomUUID());
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -108,7 +103,6 @@ public class TaskRepository {
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.d(TAG, "onFailure: ");
-                mldNetworkError.setValue(UUID.randomUUID());
                 updateMldGeoTextTaskList();
             }
         });
@@ -116,39 +110,69 @@ public class TaskRepository {
 
     public void scanTag(String data, String executor) {
         Log.d(TAG, "scanTag: ");
-        Uri uri = Uri.parse(data);
-        String tagType_param = uri.getQueryParameter("tag_type");
-        String tagId_param = uri.getQueryParameter("tag_id");
-
-        if (tagId_param == null || tagType_param == null) {
-            Log.d(TAG, "scanTag: ======== tagId_param == null || tagType_param == null");
+        
+        Task task = proceedTask(data, executor);
+        if (task == null) {
             mldCompletedTask.setValue(new DataWrapper<>(ServerResponse.TYPE_TASK_FAILURE));
             return;
         }
-
-        int tagType = Integer.parseInt(tagType_param);
-
-        if (tagType != Task.GEO_TAG && tagType != Task.GEO_TEXT_TAG) {
-            Log.d(TAG, "scanTag: ======== tagType != Task.GEO_TAG && tagType != Task.GEO_TEXT_TAG");
-            mldCompletedTask.setValue(new DataWrapper<>(ServerResponse.TYPE_TASK_FAILURE));
-            return;
-        }
-
-        Task task;
-        if (tagType == Task.GEO_TAG) {
-            task = new GeoTask(tagId_param, executor);
-        } else {
-            task = new GeoTextTask(tagId_param, executor);
-        }
-        task.setExecutor(executor);
-
+    
         Map<String, String> headers = NetworkModule.getInstance().proceedHeader(gson.toJson(task));
-        Callback<ServerResponse> callback = new Callback<ServerResponse>() {
+    
+        if (task instanceof GeoTask) {
+            Call<ServerResponse> call = NetworkModule.getInstance().getApi().scanGeoTag(headers);
+            call.enqueue(getTaskCallback());
+        } else {
+            Call<ServerResponse> call = NetworkModule.getInstance().getApi().scanGeoTextTag(headers);
+            call.enqueue(getTaskCallback());
+        }
+    }
+    
+    public void addTag(Tag tag, String admin) {
+        Log.d(TAG, "addTag: ");
+        
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("data", gson.toJson(tag));
+        headers.put("admin_id", admin);
+        Map<String, String> headersMap = NetworkModule.getInstance().proceedHeaders(headers);
+    
+        Call<ServerResponse> call = NetworkModule.getInstance().getApi().addTag(headersMap);
+        call.enqueue(new Callback<ServerResponse>() {
             @Override
             public void onResponse(@NonNull Call<ServerResponse> call,
                                    @NonNull Response<ServerResponse> response) {
                 Log.d(TAG, "onResponse: ======== Response");
-                mldNetworkSuccess.setValue(UUID.randomUUID());
+                ServerResponse serverResponse = response.body();
+                if (serverResponse == null) {
+                    Log.e(TAG, "serverResponse == null");
+                    return;
+                }
+                if (serverResponse.getType() == ServerResponse.TYPE_ADD_TAG_SUCCESS) {
+                    Log.d(TAG, "onResponse: ======== ServerResponse.TYPE_ADD_TAG_SUCCESS");
+                    mldAddedTag.setValue(new DataWrapper<>(null));
+                }
+                if (serverResponse.getType() == ServerResponse.TYPE_ADD_TAG_ADMIN_FAILURE) {
+                    Log.d(TAG, "onResponse: ======== ServerResponse.TYPE_ADD_TAG_ADMIN_FAILURE");
+                    mldAddedTag.setValue(new DataWrapper<>(ServerResponse.TYPE_ADD_TAG_ADMIN_FAILURE));
+                }
+            }
+    
+            @Override
+            public void onFailure(@NonNull Call<ServerResponse> call,
+                                  @NonNull Throwable t) {
+                Log.e(TAG, "onFailure: ", t);
+                addTag(tag, admin);
+            }
+        });
+    }
+    
+    private Callback<ServerResponse> getTaskCallback() {
+        Log.d(TAG, "getTaskCallback: ");
+        return new Callback<ServerResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<ServerResponse> call,
+                                   @NonNull Response<ServerResponse> response) {
+                Log.d(TAG, "onResponse: ======== Response");
                 ServerResponse serverResponse = response.body();
                 if (serverResponse == null) {
                     Log.e(TAG, "serverResponse == null");
@@ -168,21 +192,41 @@ public class TaskRepository {
                     mldCompletedTask.setValue(new DataWrapper<>(serverResponse.getType()));
                 }
             }
-
+        
             @Override
             public void onFailure(@NonNull Call<ServerResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
-                mldNetworkError.setValue(UUID.randomUUID());
                 mldCompletedTask.setValue(new DataWrapper<>(ServerResponse.TYPE_TASK_FAILURE));
             }
         };
-
-        if (tagType == Task.GEO_TAG) {
-            Call<ServerResponse> call = NetworkModule.getInstance().getApi().scanGeoTag(headers);
-            call.enqueue(callback);
-        } else {
-            Call<ServerResponse> call = NetworkModule.getInstance().getApi().scanGeoTextTag(headers);
-            call.enqueue(callback);
+    }
+    
+    
+    public static Task proceedTask(String data, String executor) {
+        Log.d(TAG, "proceedTask: ");
+        Uri uri = Uri.parse(data);
+        String tagType_param = uri.getQueryParameter("tag_type");
+        String tagId_param = uri.getQueryParameter("tag_id");
+    
+        if (tagId_param == null || tagType_param == null) {
+            Log.d(TAG, "scanTag: ======== tagId_param == null || tagType_param == null");
+            return null;
         }
+    
+        int tagType = Integer.parseInt(tagType_param);
+    
+        if (tagType != Task.GEO_TAG && tagType != Task.GEO_TEXT_TAG) {
+            Log.d(TAG, "scanTag: ======== tagType != Task.GEO_TAG && tagType != Task.GEO_TEXT_TAG");
+            return null;
+        }
+    
+        Task task;
+        if (tagType == Task.GEO_TAG) {
+            task = new GeoTask(tagId_param, executor);
+        } else {
+            task = new GeoTextTask(tagId_param, executor);
+        }
+        task.setExecutor(executor);
+        return task;
     }
 }

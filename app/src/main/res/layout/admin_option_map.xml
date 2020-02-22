@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+
+    <TextView
+        android:id="@+id/admin_tvMapHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/roboto"
+        android:maxLines="2"
+        android:text="@string/move_marker"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/admin_mapView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/admin_tvLatitudeHeader"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/admin_tvMapHeader" />
+
+    <TextView
+        android:id="@+id/admin_tvLatitudeHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/roboto"
+        android:text="@string/latitude"
+        android:textColor="@color/yellow"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/admin_tvLongitudeHeader"
+        app:layout_constraintStart_toStartOf="@+id/admin_mapView" />
+
+    <TextView
+        android:id="@+id/admin_tvLongitudeHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
+        android:fontFamily="@font/roboto"
+        android:text="@string/longitude"
+        android:textColor="@color/yellow"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/admin_tvLatitudeHeader" />
+
+    <TextView
+        android:id="@+id/admin_tvLatitude"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/roboto"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/admin_tvLatitudeHeader"
+        app:layout_constraintEnd_toEndOf="@+id/admin_mapView"
+        app:layout_constraintStart_toEndOf="@+id/admin_tvLatitudeHeader"
+        app:layout_constraintTop_toTopOf="@+id/admin_tvLatitudeHeader" />
+
+    <TextView
+        android:id="@+id/admin_tvLongitude"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="@font/roboto"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/admin_tvLongitudeHeader"
+        app:layout_constraintEnd_toEndOf="@+id/admin_tvLatitude"
+        app:layout_constraintStart_toEndOf="@+id/admin_tvLongitudeHeader"
+        app:layout_constraintTop_toTopOf="@+id/admin_tvLongitudeHeader" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 
 import com.devian.detected.model.domain.DataWrapper;
 import com.devian.detected.model.domain.User;
+import com.devian.detected.model.domain.tasks.Tag;
 import com.devian.detected.model.domain.tasks.Task;
 import com.devian.detected.model.repo.MainRepository;
 import com.devian.detected.model.repo.TaskRepository;
@@ -46,5 +47,15 @@ public class MainViewModel extends AndroidViewModel {
     public void authUserOnServer(FirebaseUser user) {
         Log.d(TAG, "authUserOnServer: ");
         mainRepository.authUser(user);
+    }
+    
+    public LiveData<DataWrapper<Tag>> bindAddedTag() {
+        Log.d(TAG, "bindAddedTag: ");
+        return taskRepository.getMldAddedTag();
+    }
+    
+    public void addTag(Tag tag, String admin) {
+        Log.d(TAG, "addTag: ");
+        taskRepository.addTag(tag, admin);
     }
 }

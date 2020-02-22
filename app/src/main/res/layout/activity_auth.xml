@@ -57,7 +57,7 @@
         android:gravity="center_horizontal|center_vertical"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:text="@string/google_signin"
+        android:text="@string/sign_in"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/textView"

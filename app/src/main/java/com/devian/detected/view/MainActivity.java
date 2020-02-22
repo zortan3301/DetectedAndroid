@@ -27,6 +27,7 @@ import com.devian.detected.utils.ui.popups.DefaultPopup;
 import com.devian.detected.utils.ui.popups.ResultPopup;
 import com.devian.detected.view.auth.AuthActivity;
 import com.devian.detected.view.extra.ScanActivity;
+import com.devian.detected.view.extra.admin.AdminActivity;
 import com.devian.detected.view.extra.intro.IntroActivity;
 import com.devian.detected.view.interfaces.OnLogoutListener;
 import com.devian.detected.view.interfaces.OnTaskItemSelectedListener;
@@ -172,12 +173,18 @@ public class MainActivity extends AppCompatActivity
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.d(TAG, "onActivityResult: ");
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_SCAN_CODE) {
             if(resultCode == Activity.RESULT_OK){
                 if (data != null) {
                     String result = data.getStringExtra("result");
-                    proceedTask(result);
+                    if (result == null)
+                        return;
+                    if (result.equals(getResources().getString(R.string.admin_mode_key)))
+                        runAdminMode();
+                    else
+                        proceedTask(result);
                 }
             }
         }
@@ -196,6 +203,13 @@ public class MainActivity extends AppCompatActivity
                 showToast(getResources().getString(R.string.camera_permission_denied), Toast.LENGTH_LONG);
             }
         }
+    }
+    
+    public void runAdminMode() {
+        Log.d(TAG, "runAdminMode: ");
+        Intent adminIntent = new Intent(this, AdminActivity.class);
+        adminIntent.putExtra("admin", firebaseUser.getUid());
+        startActivity(adminIntent);
     }
     
     public void showToast(String text, int duration) {
