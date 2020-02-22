@@ -178,8 +178,22 @@ public class ProfileFragment extends Fragment
                 rating2.append("\n");
             }
         }
-        tvRating1.setText(rating1);
-        tvRating2.setText(rating2);
+        if (selfRank.getRank() == 11) {
+            rating1.append("\n11. ");
+            rating1.append(selfRank.getNickname());
+            rating2.append("\n");
+            rating2.append(selfRank.getPoints());
+        }
+        if (selfRank.getRank() > 11) {
+            rating1.append("\n...\n");
+            rating2.append("\n\n");
+            rating1.append(selfRank.getRank());
+            rating1.append(". ");
+            rating1.append(selfRank.getNickname());
+            rating2.append(selfRank.getPoints());
+        }
+        tvRating1.setText(rating1.toString());
+        tvRating2.setText(rating2.toString());
     }
 
     private void displayEvent(String event) {
