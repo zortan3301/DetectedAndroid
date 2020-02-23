@@ -207,9 +207,8 @@ public class MainActivity extends AppCompatActivity
     
     public void runAdminMode() {
         Log.d(TAG, "runAdminMode: ");
-        Intent adminIntent = new Intent(this, AdminActivity.class);
-        adminIntent.putExtra("admin", firebaseUser.getUid());
-        startActivity(adminIntent);
+        localStorage.putData("isAdmin", true);
+        showToast(getResources().getString(R.string.admin_mode_activated), Toast.LENGTH_SHORT);
     }
     
     public void showToast(String text, int duration) {

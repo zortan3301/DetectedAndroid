@@ -2,6 +2,7 @@ package com.devian.detected.view.profile_tab;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -28,11 +29,13 @@ import com.devian.detected.model.domain.UserStats;
 import com.devian.detected.utils.LevelManager;
 import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.ui.popups.DefaultPopup;
+import com.devian.detected.view.extra.admin.AdminActivity;
 import com.devian.detected.view.interfaces.OnLogoutListener;
 import com.devian.detected.view.profile_tab.popups.EditPopup;
 import com.devian.detected.view.profile_tab.popups.InfoPopup;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +50,7 @@ public class ProfileFragment extends Fragment
     private static final String TAG = "ProfileFragment";
 
     private FirebaseAuth mAuth;
+    private FirebaseUser firebaseUser;
 
     private ProfileViewModel viewModel;
     private LocalStorage localStorage;
@@ -81,6 +85,7 @@ public class ProfileFragment extends Fragment
     
     private void setupView() {
         mAuth = FirebaseAuth.getInstance();
+        firebaseUser = mAuth.getCurrentUser();
         viewModel = ViewModelProviders.of(getActivityNonNull()).get(ProfileViewModel.class);
         localStorage = new LocalStorage(getActivityNonNull());
         refreshLayout.setOnRefreshListener(this);
@@ -301,6 +306,23 @@ public class ProfileFragment extends Fragment
     }
     
     @Override
+    public void onResume() {
+        super.onResume();
+        Boolean isAdmin = localStorage.getData("isAdmin", Boolean.class);
+        if (isAdmin != null && isAdmin) {
+            fab_admin.setVisibility(View.VISIBLE);
+            fab_admin.setOnClickListener(this);
+        }
+    }
+    
+    private void runAdminMode() {
+        Log.d(TAG, "runAdminMode: ");
+        Intent adminIntent = new Intent(getActivityNonNull(), AdminActivity.class);
+        adminIntent.putExtra("admin", firebaseUser.getUid());
+        startActivity(adminIntent);
+    }
+    
+    @Override
     public void onClick(View view) {
         Log.d(TAG, "onClick: ");
         switch (view.getId()) {
@@ -312,6 +334,9 @@ public class ProfileFragment extends Fragment
                 break;
             case R.id.fab_info:
                 popup_info();
+                break;
+            case R.id.fab_admin:
+                runAdminMode();
         }
     }
     
@@ -395,4 +420,6 @@ public class ProfileFragment extends Fragment
     FloatingActionButton fab_edit;
     @BindView(R.id.fab_info)
     FloatingActionButton fab_info;
+    @BindView(R.id.fab_admin)
+    FloatingActionButton fab_admin;
 }

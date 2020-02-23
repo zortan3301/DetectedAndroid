@@ -318,6 +318,19 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_admin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_adb"
+            android:visibility="gone"
+            app:fab_colorNormal="@color/black"
+            app:fab_label="@string/admin_panel"
+            app:fab_shadowColor="@color/fab_shadow"
+            app:fab_shadowRadius="2dp"
+            app:fab_showShadow="true"
+            app:fab_size="mini" />
+
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

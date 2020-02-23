@@ -27,9 +27,6 @@ public class AdminActivity extends AppIntro {
     
         setVibrate(true);
         setVibrateIntensity(30);
-    
-        Toast.makeText(this,
-                getResources().getString(R.string.admin_mode_activated), Toast.LENGTH_SHORT).show();
     }
     
     @Override
