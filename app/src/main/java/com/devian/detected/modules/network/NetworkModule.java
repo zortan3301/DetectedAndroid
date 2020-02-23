@@ -13,13 +13,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkModule {
 
-    private static final boolean encryptionEnabled = false;
+    private static final boolean encryptionEnabled = true;
 
     private static NetworkModule mInstance;
 
-    private static final String BASE_URL = "http://194.87.111.46/api/"; // ruvds
-    //private static final String BASE_URL = "http://192.168.1.53:8080/api/"; // laptop
-    //private static final String BASE_URL = "http://10.0.2.2:8080/api/"; // for emulator
+    //private static final String BASE_URL = "http://194.87.111.46/api/"; // ru vds
+    private static final String BASE_URL = "http://192.168.1.53/api/"; // laptop
+    //private static final String BASE_URL = "http://10.0.2.2/api/"; // for emulator
 
     private Retrofit mRetrofit;
 

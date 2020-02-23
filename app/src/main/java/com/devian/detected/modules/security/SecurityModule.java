@@ -1,5 +1,7 @@
 package com.devian.detected.modules.security;
 
+import com.devian.detected.BuildConfig;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -11,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class SecurityModule {
     
-    private static final String key = "qMg88AeRKteP4H2NTzU9s3tTWafmcBZGs3CTE7rRUqJDBVQqFqrQ4aYLmx7YZfNN";
+    private static final String key = BuildConfig.AES_KEY;
     
     public static String encrypt(String toEncrypt) {
         try {
