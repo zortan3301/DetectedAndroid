@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
-def apikeyPropertiesFile = rootProject.file("app/apikey.properties")
-def apikeyProperties = new Properties()
-apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+def appPropertiesFile = rootProject.file("app/app.properties")
+def appProperties = new Properties()
+appProperties.load(new FileInputStream(appPropertiesFile))
 
 android {
     signingConfigs {
@@ -28,7 +28,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "AES_KEY", apikeyProperties['AES_KEY'])
+        buildConfigField("String", "AES_KEY", appProperties['AES_KEY'])
+        buildConfigField("String", "SERVER_BASE_URL", appProperties['SERVER_BASE_URL'])
     }
     buildTypes {
         release {

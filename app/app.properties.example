@@ -1,0 +1,4 @@
+# AES key to exchange data between server and app
+AES_KEY="YOUR_AES_KEY_HERE"
+# Server BASE url
+SERVER_BASE_URL="http://10.0.0.1/api/"

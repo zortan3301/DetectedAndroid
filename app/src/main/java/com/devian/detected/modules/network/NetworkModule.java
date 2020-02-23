@@ -1,5 +1,6 @@
 package com.devian.detected.modules.network;
 
+import com.devian.detected.BuildConfig;
 import com.devian.detected.model.domain.network.ServerResponse;
 import com.devian.detected.modules.security.SecurityModule;
 
@@ -16,10 +17,8 @@ public class NetworkModule {
     private static final boolean encryptionEnabled = true;
 
     private static NetworkModule mInstance;
-
-    //private static final String BASE_URL = "http://194.87.111.46/api/"; // ru vds
-    private static final String BASE_URL = "http://192.168.1.53/api/"; // laptop
-    //private static final String BASE_URL = "http://10.0.2.2/api/"; // for emulator
+    
+    private static final String BASE_URL = BuildConfig.SERVER_BASE_URL;
 
     private Retrofit mRetrofit;
 
