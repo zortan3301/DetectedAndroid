@@ -53,7 +53,7 @@ public class ScanActivity extends AppCompatActivity implements ZXingScannerView.
     
     @Override
     public void handleResult(Result result) {
-        Log.d(TAG, "handleResult");
+        Log.d(TAG, "handleResult: " + result.getText());
         Intent returnIntent = new Intent();
         returnIntent.putExtra("result", result.getText());
         setResult(Activity.RESULT_OK, returnIntent);
@@ -62,6 +62,7 @@ public class ScanActivity extends AppCompatActivity implements ZXingScannerView.
     
     @Override
     public void onClick(View view) {
+        Log.d(TAG, "onClick: " + view.getId());
         if (view.getId() == R.id.fab_flashlight) {
             if (scannerView.getFlash()) {
                 fab_flash.startAnimation(fab_anticlock);

@@ -175,16 +175,21 @@ public class MainActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         Log.d(TAG, "onActivityResult: ");
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: request code = " + requestCode);
         if (requestCode == CAMERA_SCAN_CODE) {
+            Log.d(TAG, "onActivityResult: result code = " + resultCode);
             if(resultCode == Activity.RESULT_OK){
                 if (data != null) {
                     String result = data.getStringExtra("result");
-                    if (result == null)
+                    if (result == null) {
                         return;
-                    if (result.equals(getResources().getString(R.string.admin_mode_key)))
+                    }
+                    if (result.equals(getResources().getString(R.string.admin_mode_key))) {
                         runAdminMode();
-                    else
+                    }
+                    else {
                         proceedTask(result);
+                    }
                 }
             }
         }
@@ -194,11 +199,12 @@ public class MainActivity extends AppCompatActivity
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults
     ) {
+        Log.d(TAG, "onRequestPermissionsResult: ");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Intent i = new Intent(this, ScanActivity.class);
-                startActivityForResult(i, 1);
+                startActivityForResult(i, CAMERA_SCAN_CODE);
             } else {
                 showToast(getResources().getString(R.string.camera_permission_denied), Toast.LENGTH_LONG);
             }
