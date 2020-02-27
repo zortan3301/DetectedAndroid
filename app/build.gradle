@@ -35,7 +35,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            debuggable = true
+            debuggable = false
             signingConfig signingConfigs.release
         }
         debug {
@@ -97,8 +97,8 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    implementation 'org.projectlombok:lombok:1.18.12'
 
     // AVLoadingIndicator
     implementation 'com.wang.avi:library:2.1.3'

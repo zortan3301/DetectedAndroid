@@ -18,8 +18,8 @@
         android:fontFamily="@font/roboto"
         android:text="@string/cancel"
         android:textAlignment="textEnd"
+        android:textColor="@color/white"
         android:textSize="18sp"
-        android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/popup_permissions_btnAllow"
         app:layout_constraintTop_toBottomOf="@+id/popup_permissions_tvInfo" />
 
@@ -58,8 +58,8 @@
         android:fontFamily="@font/roboto"
         android:text="@string/ok"
         android:textAlignment="textEnd"
+        android:textColor="@color/white"
         android:textSize="18sp"
-        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/popup_permissions_tvInfo"
         app:layout_constraintTop_toBottomOf="@+id/popup_permissions_tvInfo" />
 

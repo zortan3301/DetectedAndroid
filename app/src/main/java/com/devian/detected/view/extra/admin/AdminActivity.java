@@ -2,12 +2,10 @@ package com.devian.detected.view.extra.admin;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.devian.detected.R;
 import com.github.paolorotolo.appintro.AppIntro;
 
 public class AdminActivity extends AppIntro {
