@@ -92,6 +92,12 @@ public class ProfileFragment extends Fragment
         fab_edit.setOnClickListener(this);
         fab_exit.setOnClickListener(this);
         fab_info.setOnClickListener(this);
+    
+        Boolean isAdmin = localStorage.getData("isAdmin", Boolean.class);
+        if (isAdmin != null && isAdmin) {
+            fab_admin.setVisibility(View.VISIBLE);
+            fab_admin.setOnClickListener(this);
+        }
     }
 
     private void bindView() {
@@ -306,16 +312,6 @@ public class ProfileFragment extends Fragment
         Log.d(TAG, "popup_info: ");
         InfoPopup popup = new InfoPopup(getActivityNonNull(), currentUser);
         popup.show();
-    }
-    
-    @Override
-    public void onResume() {
-        super.onResume();
-        Boolean isAdmin = localStorage.getData("isAdmin", Boolean.class);
-        if (isAdmin != null && isAdmin) {
-            fab_admin.setVisibility(View.VISIBLE);
-            fab_admin.setOnClickListener(this);
-        }
     }
     
     private void runAdminMode() {

@@ -68,13 +68,15 @@ public class OptionScan extends Fragment implements ISlidePolicy, ZXingScannerVi
         formats.add(BarcodeFormat.QR_CODE);
         scannerView.setFormats(formats);
         
+        showRefresh();
+        
         return v;
     }
     
     @Override
     public void handleResult(Result result) {
         Log.d(TAG, "handleResult: ");
-        btnReset.setVisibility(View.VISIBLE);
+        showRefresh();
         Task task = TaskRepository.proceedTask(result.getText(), admin);
         if (task == null) {
             tvWarning.setVisibility(View.VISIBLE);
@@ -95,17 +97,27 @@ public class OptionScan extends Fragment implements ISlidePolicy, ZXingScannerVi
     public void onClick(View view) {
         Log.d(TAG, "onClick: " + view.getId());
         if (view.getId() == R.id.admin_btnReset) {
-            btnReset.setVisibility(View.INVISIBLE);
-            scannerView.resumeCameraPreview(this);
-            tvWarning.setVisibility(View.GONE);
-            tvContinue.setVisibility(View.INVISIBLE);
-            tvTagId.setText("");
-            tvTagType.setText("");
-            tag = null;
+            hideRefresh();
+            scannerView.setResultHandler(this);
+            scannerView.startCamera();
         }
         if (view.getId() == R.id.admin_btnFlash) {
             scannerView.setFlash(!scannerView.getFlash());
         }
+    }
+    
+    private void showRefresh() {
+        Log.d(TAG, "showRefresh: ");
+        btnReset.setVisibility(View.VISIBLE);
+    }
+    
+    private void hideRefresh() {
+        Log.d(TAG, "hideRefresh: ");
+        btnReset.setVisibility(View.GONE);
+        scannerView.resumeCameraPreview(this);
+        tvTagId.setText("");
+        tvTagType.setText("");
+        tag = null;
     }
     
     @Override
@@ -122,13 +134,7 @@ public class OptionScan extends Fragment implements ISlidePolicy, ZXingScannerVi
     @Override
     public void onPause() {
         super.onPause();
+        showRefresh();
         scannerView.stopCamera();
-    }
-    
-    @Override
-    public void onResume() {
-        super.onResume();
-        scannerView.setResultHandler(this);
-        scannerView.startCamera();
     }
 }

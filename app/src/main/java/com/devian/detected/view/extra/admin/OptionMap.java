@@ -30,12 +30,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class OptionMap extends Fragment implements ISlidePolicy, OnMapReadyCallback,
-        GoogleMap.OnMarkerDragListener {
+        GoogleMap.OnCameraMoveListener,
+        GoogleMap.OnCameraIdleListener {
     
     private static final String TAG = "OptionMap";
     
     private GoogleMap mMap;
     public Tag tag = new Tag();
+    private Marker marker;
     
     @BindView(R.id.admin_mapView)
     MapView mapView;
@@ -77,10 +79,12 @@ public class OptionMap extends Fragment implements ISlidePolicy, OnMapReadyCallb
         );
         mMap.setLatLngBoundsForCameraTarget(MOSCOW_BOUNDS);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MOSCOW_BOUNDS.getCenter(), 0));
-        mMap.addMarker(new MarkerOptions()
-                        .position(MOSCOW_BOUNDS.getCenter())
-                        .draggable(true));
-        mMap.setOnMarkerDragListener(this);
+    
+        mMap.setOnCameraMoveListener(this);
+        mMap.setOnCameraIdleListener(this);
+        
+        LatLng center = mMap.getCameraPosition().target;
+        marker = mMap.addMarker(new MarkerOptions().position(center).draggable(false));
     }
     
     private void setMapStyle() {
@@ -98,11 +102,19 @@ public class OptionMap extends Fragment implements ISlidePolicy, OnMapReadyCallb
     }
     
     @Override
-    public void onMarkerDrag(Marker marker) {
-        tag.setLatitude((float) marker.getPosition().latitude);
-        tag.setLongitude((float) marker.getPosition().longitude);
-        tvLatitude.setText(String.valueOf(marker.getPosition().latitude));
-        tvLongitude.setText(String.valueOf(marker.getPosition().longitude));
+    public void onCameraMove() {
+        LatLng center = mMap.getCameraPosition().target;
+        marker.setPosition(center);
+    }
+    
+    @Override
+    public void onCameraIdle() {
+        LatLng center = mMap.getCameraPosition().target;
+        tag.setLatitude((float) center.latitude);
+        tag.setLongitude((float) center.longitude);
+        tvLatitude.setText(String.valueOf((float) center.latitude));
+        tvLongitude.setText(String.valueOf((float) center.longitude));
+        
     }
     
     @Override
@@ -152,15 +164,5 @@ public class OptionMap extends Fragment implements ISlidePolicy, OnMapReadyCallb
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
-    }
-    
-    @Override
-    public void onMarkerDragStart(Marker marker) {
-    
-    }
-    
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-    
     }
 }

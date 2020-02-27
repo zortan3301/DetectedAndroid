@@ -64,13 +64,17 @@ public class OptionResult extends Fragment implements ISlidePolicy, View.OnClick
             isPolicyRespected = true;
             if (tagDataWrapper.isError()) {
                 tvWarning.setTextColor(Color.RED);
-                if (tagDataWrapper.getCode() == ServerResponse.TYPE_ADD_TAG_ADMIN_FAILURE)
+                if (tagDataWrapper.getCode() == ServerResponse.TYPE_ADD_TAG_ADMIN_FAILURE) {
                     tvWarning.setText(getResources().getString(R.string.not_enough_permissions));
-                else
+                    btnUpload.setVisibility(View.GONE);
+                }
+                else {
                     tvWarning.setText(getResources().getString(R.string.error_uploading));
+                }
             } else {
                 tvWarning.setTextColor(Color.GREEN);
                 tvWarning.setText(getResources().getString(R.string.upload_success));
+                btnUpload.setVisibility(View.GONE);
             }
         });
         

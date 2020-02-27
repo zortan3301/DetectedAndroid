@@ -79,7 +79,7 @@
     <string name="slide2_header">Свободный интернет - это миф!</string>
 
     <!-- Admin mode -->
-    <string name="admin_mode_activated">Режим администратора активирован</string>
+    <string name="admin_mode_activated">Режим администратора активирован, перезапустите приложение</string>
     <string name="scan_tag_to_add">Для добавления метки, отсканируйте ее</string>
     <string name="error_scan_tag">Ошибка считывания метки, попробуйте заново</string>
     <string name="id">id:</string>

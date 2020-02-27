@@ -46,10 +46,14 @@ public class AdminActivity extends AppIntro {
         Log.d(TAG, "onSlideChanged: ");
         super.onSlideChanged(oldFragment, newFragment);
         if (oldFragment instanceof OptionScan && newFragment instanceof OptionMap) {
+            oldFragment.onPause();
             ((OptionMap) newFragment).setTag(((OptionScan) oldFragment).tag);
         }
         if (oldFragment instanceof OptionMap && newFragment instanceof OptionResult) {
             ((OptionResult) newFragment).setTag(((OptionMap) oldFragment).tag);
+        }
+        if (oldFragment instanceof OptionMap && newFragment instanceof OptionScan) {
+            newFragment.onResume();
         }
     }
 }
