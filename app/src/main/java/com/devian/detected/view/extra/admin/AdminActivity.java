@@ -52,8 +52,5 @@ public class AdminActivity extends AppIntro {
         if (oldFragment instanceof OptionMap && newFragment instanceof OptionResult) {
             ((OptionResult) newFragment).setTag(((OptionMap) oldFragment).tag);
         }
-        if (oldFragment instanceof OptionMap && newFragment instanceof OptionScan) {
-            newFragment.onResume();
-        }
     }
 }

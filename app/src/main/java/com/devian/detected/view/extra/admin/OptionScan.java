@@ -68,8 +68,6 @@ public class OptionScan extends Fragment implements ISlidePolicy, ZXingScannerVi
         formats.add(BarcodeFormat.QR_CODE);
         scannerView.setFormats(formats);
         
-        showRefresh();
-        
         return v;
     }
     
@@ -98,8 +96,6 @@ public class OptionScan extends Fragment implements ISlidePolicy, ZXingScannerVi
         Log.d(TAG, "onClick: " + view.getId());
         if (view.getId() == R.id.admin_btnReset) {
             hideRefresh();
-            scannerView.setResultHandler(this);
-            scannerView.startCamera();
         }
         if (view.getId() == R.id.admin_btnFlash) {
             scannerView.setFlash(!scannerView.getFlash());
@@ -132,9 +128,18 @@ public class OptionScan extends Fragment implements ISlidePolicy, ZXingScannerVi
     }
     
     @Override
+    public void onResume() {
+        super.onResume();
+        hideRefresh();
+        scannerView.setResultHandler(this);
+        scannerView.startCamera();
+    }
+    
+    @Override
     public void onPause() {
         super.onPause();
         showRefresh();
         scannerView.stopCamera();
+        scannerView.setFlash(false);
     }
 }
