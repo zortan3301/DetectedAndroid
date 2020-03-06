@@ -94,6 +94,10 @@
     <string name="error_uploading">Ошибка загрузки, попробуйте заново</string>
     <string name="upload_success">Успешно загружено</string>
     <string name="button_flashlight">button flashlight</string>
+    <string name="admin_panel">Панель администратора</string>
+    <string name="available_options">Доступные действия</string>
+    <string name="add_tag">Добавить метку</string>
+    <string name="tag_map">Карта с метками</string>
 
     <!-- Info popup -->
     <string name="website">detected.space</string>
@@ -216,6 +220,5 @@
 
         Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.\n\n
     </string>
-    <string name="admin_panel">Панель администратора</string>
 
 </resources>

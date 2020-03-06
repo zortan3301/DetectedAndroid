@@ -27,7 +27,6 @@ import com.devian.detected.utils.ui.popups.DefaultPopup;
 import com.devian.detected.utils.ui.popups.ResultPopup;
 import com.devian.detected.view.auth.AuthActivity;
 import com.devian.detected.view.extra.ScanActivity;
-import com.devian.detected.view.extra.admin.AdminActivity;
 import com.devian.detected.view.extra.intro.IntroActivity;
 import com.devian.detected.view.interfaces.OnLogoutListener;
 import com.devian.detected.view.interfaces.OnTaskItemSelectedListener;

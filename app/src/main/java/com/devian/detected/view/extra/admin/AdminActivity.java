@@ -1,56 +1,56 @@
 package com.devian.detected.view.extra.admin;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.github.paolorotolo.appintro.AppIntro;
+import com.devian.detected.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-public class AdminActivity extends AppIntro {
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class AdminActivity extends AppCompatActivity implements View.OnClickListener {
     
     private static final String TAG = "AdminActivity";
     
+    private FirebaseUser firebaseUser;
+    
+    @BindView(R.id.admin_btnNewTag)
+    Button btnNewTag;
+    @BindView(R.id.admin_btnMap)
+    Button btnMap;
+    
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    
-        Bundle bundle = getIntent().getExtras();
-    
-        assert bundle != null;
-        addSlide(new OptionScan(bundle.getString("admin")));
-        addSlide(new OptionMap());
-        addSlide(new OptionResult(bundle.getString("admin")));
-    
-        setVibrate(true);
-        setVibrateIntensity(30);
+        setContentView(R.layout.admin_activity);
+        ButterKnife.bind(this);
+        
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        
+        btnNewTag.setOnClickListener(this);
+        btnMap.setOnClickListener(this);
     }
     
     @Override
-    public void onSkipPressed(Fragment currentFragment) {
-        Log.d(TAG, "onSkipPressed: ");
-        super.onSkipPressed(currentFragment);
-        finish();
-    }
-    
-    @Override
-    public void onDonePressed(Fragment currentFragment) {
-        Log.d(TAG, "onDonePressed: ");
-        super.onDonePressed(currentFragment);
-        finish();
-    }
-    
-    @Override
-    public void onSlideChanged(@Nullable Fragment oldFragment, @Nullable Fragment newFragment) {
-        Log.d(TAG, "onSlideChanged: ");
-        super.onSlideChanged(oldFragment, newFragment);
-        if (oldFragment instanceof OptionScan && newFragment instanceof OptionMap) {
-            oldFragment.onPause();
-            ((OptionMap) newFragment).setTag(((OptionScan) oldFragment).tag);
+    public void onClick(View view) {
+        Log.d(TAG, "onClick: " + view.getId());
+        switch (view.getId()) {
+            case R.id.admin_btnNewTag:
+                Intent newTagIntent = new Intent(this, NewTagActivity.class);
+                newTagIntent.putExtra("admin", firebaseUser.getUid());
+                startActivity(newTagIntent);
+                break;
+            case R.id.admin_btnMap:
         }
-        if (oldFragment instanceof OptionMap && newFragment instanceof OptionResult) {
-            ((OptionResult) newFragment).setTag(((OptionMap) oldFragment).tag);
-        }
+        finish();
     }
 }

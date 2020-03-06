@@ -30,6 +30,7 @@ import com.devian.detected.utils.LevelManager;
 import com.devian.detected.utils.LocalStorage;
 import com.devian.detected.utils.ui.popups.DefaultPopup;
 import com.devian.detected.view.extra.admin.AdminActivity;
+import com.devian.detected.view.extra.admin.NewTagActivity;
 import com.devian.detected.view.interfaces.OnLogoutListener;
 import com.devian.detected.view.profile_tab.popups.EditPopup;
 import com.devian.detected.view.profile_tab.popups.InfoPopup;
@@ -317,7 +318,6 @@ public class ProfileFragment extends Fragment
     private void runAdminMode() {
         Log.d(TAG, "runAdminMode: ");
         Intent adminIntent = new Intent(getActivityNonNull(), AdminActivity.class);
-        adminIntent.putExtra("admin", firebaseUser.getUid());
         startActivity(adminIntent);
     }
     
